@@ -1,0 +1,13 @@
+name = "MarkovKernels"
+uuid = "202a2b00-fae3-41a1-a054-d2db40c1e3ea"
+authors = ["Filip Tronarp <filip.tronarp@uni-tuebingen.de> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
