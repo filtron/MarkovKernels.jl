@@ -19,8 +19,10 @@ export AbstractDistribution, AbstractMarkovKernel, AbstractLikelihood
 include("normal.jl")
 
 export AbstractNormalParametrisation, Usual, Information
-export Normal, parametrisation
-export dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
+export Normal, parametrisation, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
+
+include("normalkernel.jl")
+
 
 
 include("utilities.jl")
