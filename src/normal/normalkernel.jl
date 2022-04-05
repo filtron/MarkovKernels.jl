@@ -31,7 +31,6 @@ Chapman--Kolmogorov:
 K3(y∣x) = ∫K2(y∣z)K1(z∣x)dz
 
 alternative:  K2*K1
-
 """
 # implement Chapman-Kolmogorov (FIX THIS)
 #compose(K2::NormalKernel,K1::NormalKernel) = NormalKernel( K2.μ, K2.Σ )
