@@ -1,9 +1,7 @@
 
 
 
-function normal_test(T,P,n)
-
-    @testset "Normal | $T | $P" begin
+function normal_test(T,n)
 
     μ1 = randn(T,n)
     L1 = randn(T,n,n)
@@ -15,8 +13,8 @@ function normal_test(T,P,n)
     L2 = randn(T,n,n)
     Σ2 = Hermitian(L2*L2')
 
-    N1 = Normal(μ1,Σ1,P())
-    N2 = Normal(μ2,Σ2,P())
+    N1 = Normal(μ1,Σ1)
+    N2 = Normal(μ2,Σ2)
 
     if T<:Real
 
@@ -38,6 +36,8 @@ function normal_test(T,P,n)
 
     end
 
+    @testset "Normal | $(T)" begin
+
     # correct values
     @test mean(N1) == μ1
     @test cov(N1) == Σ1
@@ -56,6 +56,8 @@ function normal_test(T,P,n)
     @test eltype(std(N1))<:Real
     @test eltype(logpdf(N1,x1))<:Real
     @test eltype(entropy(N1))<:Real
+    @test eltype(kldivergence(N1,N2))<:Real
+    @test eltype(kldivergence(N2,N1))<:Real
 
     end
 

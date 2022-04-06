@@ -9,12 +9,10 @@ n = 2
 
 etypes = (Float64,Complex{Float64})
 
-parametrisations = (Usual,)
-
 @testset "MarkovKernels.jl" begin
 
-    for T in etypes, P in parametrisations
-    normal_test(T,P,n)
+    for T in etypes
+    normal_test(T,n)
     end
 
 end

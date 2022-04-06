@@ -1,54 +1,72 @@
 
 
-abstract type AbstractConditionalMean{T<:Number} end
+abstract type AbstractAffineMap{T<:Number}  end
 
+eltype(μ::AbstractAffineMap{T}) where T = T
 
-eltype(μ::AbstractConditionalMean{T}) where T = T
-
-
-abstract type AbstractAffineMap{T} <: AbstractConditionalMean{T} end
-
-# representing x -> A*x + b
+# representing x -> Φ*x + b
 struct AffineMap{T,U,V} <: AbstractAffineMap{T}
-    A::U
+    Φ::U
     b::V
-    function AffineMap(A::AbstractMatrix,b::AbstractVector)
-        nrow = size(A,1)
+    function AffineMap(Φ::AbstractMatrix,b::AbstractVector)
+        nrow = size(Φ,1)
         nb = length(b)
         if nb != nrow
             error("The number of rows in A $(nrow) is not equal to the number of elements in b $(nb)")
         else
-            T = promote_type(eltype(A),eltype(b))
-            A = convert(AbstractMatrix{T},A)
-            b = convert(AbstractVector{T},b)
-            new{T,typeof(A),typeof(b)}(A,b)
+            T = promote_type(eltype(Φ),eltype(b))
+            new{T,typeof(Φ),typeof(b)}(A,b)
         end
     end
 end
 
-# representing x -> A*x
-struct LinearMap{T,U} <: AbstractAffineMap{T}
-    A::U
-    LinearMap(A::AbstractMatrix) = new{eltype(A),typeof(A)}(A)
+# represents x -> prior + Φ*(x - pred)
+struct AffineCorrector{T,U,V,W} <: AbstractAffineMap{T}
+    Φ::U
+    prior::V
+    pred::W
+    function AffineCorrector(Φ::AbstractMatrix,prior::AbstractVector,pred::AbstractVector)
+        T = promote_type(eltype(Φ),eltype(prior),eltype(pred))
+        new{T,typeof(Φ),typeof(prior),typeof(pred)}(Φ,prior,pred)
+    end
 end
 
-nin(M::AbstractAffineMap) = size(M.A,2)
-nout(M::AbstractAffineMap) = size(M.A,1)
+# representing x -> Φ*x
+struct LinearMap{T,U} <: AbstractAffineMap{T}
+    Φ::U
+    LinearMap(Φ::AbstractMatrix) = new{eltype(Φ),typeof(Φ)}(Φ)
+end
 
-slope(M::AffineMap) = M.A
-slope(M::LinearMap) = M.A
+struct LinearCorrector{T,U,V} <: AbstractAffineMap{T}
+    Φ::U
+    pred::V
+    function LinearCorrector(Φ::AbstractMatrix,pred::AbstractVector)
+        T = promote_type(eltype(Φ),eltype(pred))
+        new{T,typeof(Φ),typeof(pred)}(Φ,pred)
+    end
+end
+
+nin(M::AbstractAffineMap) = size(M.Φ,2)
+nout(M::AbstractAffineMap) = size(M.Φ,1)
+
+slope(M::AffineMap) = M.Φ
+slope(M::LinearMap) = M.Φ
+slope(M::AffineCorrector) = M.Φ
+slope(M::LinearCorrector) = M.Φ
 
 intercept(M::AffineMap) = M.b
 intercept(M::LinearMap) = zeros(eltype(M),nout(M))
+intercept(M::AffineCorrector) = M.prior - M.Φ*M.pred
+intercept(M::LinearCorrector) = - M.Φ*M.pred
 
-(M::AffineMap)(x) = A*x + b
-(M::LinearMap)(x) = A*x
+(M::AbstractAffineMap)(x) = slope(M)*x + intercept(M)
+(M::AffineMap)(x) = M.Φ*x + b
+(M::LinearMap)(x) = M.Φ*x
+(M::AffineCorrector)(x) = M.prior + M.Φ*(x - M.pred)
+(M::LinearCorrector)(x) = M.Φ*(x - M.pred)
 
-compose(M2::AbstractAffineMap,M1::AbstractAffineMap) = AffineMap(slope(M2)*slope(M1), slope(M2)*intercept(M1) + intercept(M2)) # fallback
-compose(M2::AbstractAffineMap,M1::LinearMap) = AffineMap(slope(M2)*slope(M1), intercept(M2))
-compose(M2::LinearMap,M1::AbstractAffineMap) = AffineMap(slope(M2)*slope(M1), slope(M2)*intercept(M1))
-compose(M2::LinearMap,M1::LinearMap) = LinearMap(slope(M2)*slope(M1))
-
+# efficient compositions not a priortity tbh
+compose(M2::AbstractAffineMap,M1::AbstractAffineMap) = AffineMap(slope(M2)*slope(M1), slope(M2)*intercept(M1) + intercept(M2))
 *(M2::AbstractAffineMap,M1::AbstractAffineMap) = compose(M2,M1)
 
 
