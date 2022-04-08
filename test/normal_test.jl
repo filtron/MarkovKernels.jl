@@ -31,12 +31,12 @@ function normal_test(T,n)
 
         entropy1 =  n*log(π) + logdet(Σ1) + n
 
-        kld12 = real(tr(Σ2 \ Σ1)) - n  + real(dot(μ2-μ1,inv(Σ2),μ2-μ1))    +  logabsdet(Σ2)[1] - logabsdet(Σ1)[1]
-        kld21 = real(tr(Σ1 \ Σ2)) - n  + real(dot(μ1-μ2,inv(Σ1),μ1-μ2))    +  logabsdet(Σ1)[1] - logabsdet(Σ2)[1]
+        kld12 = real(tr(Σ2 \ Σ1)) - n  + real(dot(μ2-μ1,inv(Σ2),μ2-μ1))    +  logdet(Σ2) - logdet(Σ1)
+        kld21 = real(tr(Σ1 \ Σ2)) - n  + real(dot(μ1-μ2,inv(Σ1),μ1-μ2))    +  logdet(Σ1) - logdet(Σ2)
 
     end
 
-    @testset "Normal | $(T)" begin
+    @testset "Normal | $(T) " begin
 
     # correct values
     @test mean(N1) == μ1
