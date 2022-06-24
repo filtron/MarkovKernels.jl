@@ -7,17 +7,17 @@ struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <: AbstractN
     μ::U
     Σ::V
     function NormalKernel(μ,Σ)
-        #should convert μ and Σ to common eltype here
         new{eltype(μ),typeof(μ),typeof(Σ)}(μ,Σ)
     end
 end
+
 
 NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix) = NormalKernel( LinearMap(Φ), Hermitian(Σ) )
 NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b),Σ )
 
 mean(K::NormalKernel) = K.μ
 cov(K::NormalKernel) = K.Σ # callable conditional covariance
-cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = x -> K.Σ # constant coditionmal covariance
+cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = x -> K.Σ # constant conitionmal covariance
 
 """
 condition(K::NormalKernel,x)
