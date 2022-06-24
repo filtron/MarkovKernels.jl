@@ -4,8 +4,9 @@
 # define normal types
 abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end
 
-eltype(n::AbstractNormal{T}) where {T} = T
+eltype(N::AbstractNormal{T}) where {T} = T
 
+# hm.. should we make Information form / Precision parametrisations here as well?
 struct Normal{T,U,V} <: AbstractNormal{T}
     μ::U
     Σ::V
@@ -42,4 +43,3 @@ end
 
 rand(RNG::AbstractRNG, N::Normal{T,U,V}) where {T,U,V} = N.μ + lsqrt(N.Σ)*randn(RNG,eltype(N),dim(N))
 rand(N::Normal) = rand(GLOBAL_RNG,N)
-

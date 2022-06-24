@@ -10,7 +10,7 @@ n = 2
 
 etypes = (Float64,Complex{Float64})
 
-amtypes = (LinearMap,AffineMap,AffineCorrector)
+amtypes = (LinearMap,AffineMap)
 
 @testset "MarkovKernels.jl" begin
 

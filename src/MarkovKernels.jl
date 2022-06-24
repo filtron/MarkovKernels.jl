@@ -12,18 +12,25 @@ abstract type AbstractDistribution end
 
 abstract type AbstractMarkovKernel end
 
-abstract type AbstractLikelihood end
+export AbstractDistribution, AbstractMarkovKernel
 
-export AbstractDistribution, AbstractMarkovKernel, AbstractLikelihood
+include("likelihoods.jl")
+export AbstractLikelihood, Likelihood, FlatLikelihood
 
 include("normal/normal.jl")
 export AbstractNormal, Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
+
+include("conditionalmoments/conditionalmean.jl")
+export AbstractConditonalMean
 
 include("conditionalmoments/affinemaps.jl")
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, nin, nout, slope, intercept, stein, compose
 
 include("normal/normalkernel.jl")
-export NormalKernel
+export NormalKernel, condition, compose, marginalise, invert
+
+include("inference/filter.jl")
+export filter
 
 include("utilities.jl")
 

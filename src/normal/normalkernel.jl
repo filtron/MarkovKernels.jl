@@ -2,19 +2,18 @@
 
 abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end
 
-struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
+# NormalKernel for Homoscedastic noise
+struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
     function NormalKernel(μ,Σ)
-        #outdim, indim = size(μ)
+        #should convert μ and Σ to common eltype here
         new{eltype(μ),typeof(μ),typeof(Σ)}(μ,Σ)
     end
 end
 
 NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix) = NormalKernel( LinearMap(Φ), Hermitian(Σ) )
-
-nout(K::NormalKernel) = nout(K.μ)
-nin(K::NormalKernel) = nin(K.μ)
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b),Σ )
 
 mean(K::NormalKernel) = K.μ
 cov(K::NormalKernel) = K.Σ # callable conditional covariance
