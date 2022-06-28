@@ -1,48 +1,93 @@
 # types for representing affine conditional means
-
 abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T}  end
 
+#  T <: AbstractAffineMap implements slope and intercept
 (M::AbstractAffineMap)(x) = slope(M)*x + intercept(M)
 
-# representing x -> Φ*x
-struct LinearMap{T,U} <: AbstractAffineMap{T}
+# AffineMap is default?
+compose(M2::AbstractAffineMap,M1::AbstractAffineMap) = AffineMap(slope(M2)*slope(M1), slope(M2)*intercept(M1) + intercept(M2))
+*(M2::AbstractAffineMap,M1::AbstractAffineMap) = compose(M2,M1)
+
+# type for representing affine maps x ↦ prior + Φ*(x-pred)
+struct AffineMap{T,U,V,S} <: AbstractConditionalMean{T}
     Φ::U
-    LinearMap(Φ::AbstractMatrix) = new{eltype(Φ),typeof(Φ)}(Φ)
+    prior::V
+    pred::S
+    AffineMap{T}(Φ,prior,pred) where T <: Number = new{T,typeof(Φ),typeof(prior),typeof(pred)}(Φ,prior,pred)
 end
 
-# representing x -> Φ*(y-x)
-struct LinearCorrector{T,U,V} <: AbstractAffineMap{T}
-    Φ::U
-    y::V
-    function LinearCorrector(Φ::AbstractMatrix,y::AbstractVector)
-        T = promote_type(eltype(Φ),eltype(y))
-        new{T,AbstractMatrix{T},AbstractVector{T}}( convert(AbstractMatrix{T},Φ), convert(AbstractVector{T},y) )
-    end
+# constructors
+AffineMap(Φ::AbstractMatrix{T}) where T <: Number = AffineMap{T}(Φ,nothing,nothing)
+
+function AffineMap(Φ::AbstractMatrix,prior::AbstractVector)
+    T = promote_type(eltype(Φ),eltype(prior))
+    return AffineMap{T}( convert(AbstractMatrix{T},Φ), convert(AbstractVector{T},prior), nothing )
 end
 
-# representing x -> Φ*x + b
-struct AffineMap{T,U,V} <: AbstractAffineMap{T}
-    Φ::U
-    b::V
-    function AffineMap(Φ::AbstractMatrix,b::AbstractVector)
-        nrow = size(Φ,1)
-        nb = length(b)
-        if nb != nrow
-            error("The number of rows in A $(nrow) is not equal to the number of elements in b $(nb)")
-        else
-            T = promote_type(eltype(Φ),eltype(b))
-            new{T,typeof(Φ),typeof(b)}(Φ,b)
-        end
-    end
+function AffineMap(Φ::AbstractMatrix,prior::AbstractVector,pred::AbstractVector)
+    T = promote_type(eltype(Φ),eltype(prior),eltype(pred))
+    return AffineMap{T}( convert(AbstractMatrix{T},Φ), convert(AbstractVector{T},prior), convert(AbstractVector{T},pred) )
 end
+
+# Seems convenient with constructors for nothings, there might be  a cleverer way...
+AffineMap(Φ::AbstractMatrix,prior::Nothing,pred::Nothing) = AffineMap(Φ)
+AffineMap(Φ::AbstractMatrix,prior::AbstractVector,pred::Nothing) = AffineMap(Φ,prior)
+
+# functions
+nout(M::AffineMap) = size(M.Φ,1)
+nin(M::AffineMap)  = size(M.Φ,2)
+
+has_pred(M::AffineMap) = !isnothing(M.pred)
+has_prior(M::AffineMap) = !isnothing(M.prior)
+islinear(M::AffineMap) = has_pred(M) == false && has_prior(M) == false ? true : false
 
 slope(M::AffineMap) = M.Φ
-slope(M::LinearMap) = M.Φ
 
-intercept(M::AffineMap) = M.b
-intercept(M::LinearMap) = zeros(eltype(M),size(slope(M),1))
+function intercept(M::AffineMap)
+
+    if islinear(M)
+        return zeros(nout(M))
+    end
+
+    if has_prior(M)
+        out = M.prior
+    end
+
+    if has_pred(M)
+        out = out - M.Φ*M.pred
+    end
+
+    return out
+
+end
+
+function (M::AffineMap)(x)
+
+    if islinear(M)
+        return slope(M)*x
+    end
+
+    if has_pred(M)
+        out = slope(M)*(x - M.pred)
+    end
+
+    if has_prior(M)
+        out = out + M.prior
+    end
+
+    return out
+end
+
+function compose(M2::AffineMap,M1::AffineMap)
+
+    Φ = slope(M2)*slope(M1)
+    prior = has_prior(M1) ? M2(M1.prior) : nothing
+    pred = M1.pred
+
+    return AffineMap(Φ,prior,pred)
+
+end
 
 stein(Σ::Hermitian,M::AbstractAffineMap,Q::Hermitian) = Hermitian(slope(M)*Σ*slope(M)' + Q)
 
-compose(M2::AbstractAffineMap,M1::AbstractAffineMap) = AffineMap(slope(M2)*slope(M1), slope(M2)*intercept(M1) + intercept(M2))
-*(M2::AbstractAffineMap,M1::AbstractAffineMap) = compose(M2,M1)
+

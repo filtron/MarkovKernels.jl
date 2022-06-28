@@ -24,7 +24,7 @@ include("conditionalmoments/conditionalmean.jl")
 export AbstractConditonalMean
 
 include("conditionalmoments/affinemaps.jl")
-export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, nin, nout, slope, intercept, stein, compose
+export AbstractAffineMap, AffineMap, nin, nout, slope, intercept, stein, compose
 
 include("normal/normalkernel.jl")
 export NormalKernel, condition, compose, marginalise, invert
