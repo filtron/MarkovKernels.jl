@@ -5,12 +5,14 @@ using LinearAlgebra
 
 include("normal_test.jl")
 include("affinemap_test.jl")
+include("normalkernel_test.jl")
 
 n = 2
 
 etypes = (Float64,Complex{Float64})
 
-amtypes = (LinearMap,AffineMap)
+#amtypes = (:Linear,:Affine,:Corrector)
+amtypes = (:Linear,:Affine)
 
 @testset "MarkovKernels.jl" begin
 
@@ -20,6 +22,10 @@ amtypes = (LinearMap,AffineMap)
 
     for T in etypes, MT in amtypes
         affinemap_test(T,MT,n)
+    end
+
+    for T in etypes
+        normalkernel_test(T,n)
     end
 
 end

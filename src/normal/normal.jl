@@ -12,9 +12,12 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Σ::V
     function Normal(μ::AbstractVector,Σ::AbstractMatrix)
         T = promote_type( eltype(μ), eltype(Σ) )
-        new{T,typeof(μ),typeof(Σ)}(μ,Hermitian(Σ))
+        new{T,typeof(μ),typeof(Σ)}( convert(AbstractVector{T},μ),Hermitian( convert(AbstractMatrix{T},Σ) ) )
     end
 end
+
+similar(N::Normal) = Normal(similar(N.μ),similar(N.Σ))
+==(N1::Normal,N2::Normal) = N1.μ == N2.μ && N1.Σ == N2.Σ
 
 dim(N::Normal) = length(N.μ)
 
@@ -38,7 +41,7 @@ end
 
 function kldivergence(N1::Normal{T,U,V},N2::Normal{T,U,V}) where {T<:Complex,U,V}
     root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)
-    return norm_sqr(root_ratio) + norm_sqr(residual(N2,N1.μ)) - dim(N1) - 2.0*logabsdet(root_ratio)[1]
+    return norm_sqr(root_ratio) + norm_sqr(residual(N2,N1.μ)) - dim(N1) - 2.0*real(logdet(root_ratio))
 end
 
 rand(RNG::AbstractRNG, N::Normal{T,U,V}) where {T,U,V} = N.μ + lsqrt(N.Σ)*randn(RNG,eltype(N),dim(N))
