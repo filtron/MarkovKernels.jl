@@ -1,0 +1,13 @@
+
+
+# simple Kalman update function + prediction error loglike
+function update(N::AbstractNormal,L::Likelihood)
+
+    M, C = invert(N,L.K)
+
+    N_new = condition(C,L.y)
+    loglike = logpdf(M,y)
+
+    return N_new, loglike
+
+end

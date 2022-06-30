@@ -43,3 +43,21 @@ end
 
 rand(RNG::AbstractRNG, N::Normal{T,U,V}) where {T,U,V} = N.μ + lsqrt(N.Σ)*randn(RNG,eltype(N),dim(N))
 rand(N::Normal) = rand(GLOBAL_RNG,N)
+
+# Dirac
+struct Dirac{T,U} <: AbstractNormal{T}
+    μ::U
+    Dirac(μ::AbstractVector) = new{eltype(μ),typeof(μ)}(μ)
+end
+
+similar(D::Dirac) = Dirac(similar(D.μ))
+
+dim(D::Dirac) = length(D.μ)
+mean(D::Dirac) = D.μ
+cov(D::Dirac) = zeros(eltype(D),dim(D),dim(D))
+var(D::Dirac) = zeros(T,dim(D))
+std(D::Dirac) = zeros(T,dim(D))
+
+rand(RNG::AbstractRNG,D::Dirac) = mean(D)
+rand(D::Dirac) = rand(GLOBAL_RNG,D)
+

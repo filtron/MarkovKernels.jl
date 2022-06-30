@@ -6,4 +6,3 @@ struct Likelihood{U<:AbstractMarkovKernel,V} <: AbstractLikelihood
     y::V
 end
 
-struct FlatLikelihood <: AbstractLikelihood end

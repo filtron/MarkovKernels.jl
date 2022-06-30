@@ -4,8 +4,6 @@ abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end
 
 eltype(K::AbstractNormalKernel{T}) where T = T
 
-(K::AbstractNormalKernel)(x) = condition(K,x)
-
 # NormalKernel for Homoscedastic noise
 struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <: AbstractNormalKernel{T}
     μ::U
@@ -16,7 +14,8 @@ struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <: AbstractN
 end
 
 NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ), Hermitian(Σ) )
-NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b),Σ )
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b), Hermitian(Σ) )
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,pred::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b,pred), Hermitian(Σ) )
 
 mean(K::NormalKernel) = K.μ
 cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
@@ -28,7 +27,7 @@ compose(K2::NormalKernel{T,U,V},K1::NormalKernel{T,U,V}) where {T,U<:AbstractAff
 
 marginalise(N::Normal{T,U,V},K::NormalKernel{T,S,V}) where {T,U,S<:AbstractAffineMap,V<:AbstractMatrix} = Normal( mean(K)(mean(N)), stein(N.Σ,K.μ,K.Σ) )
 
-function invert(N::Normal{T,U,V},K::NormalKernel{T,M,V})  where {T,U,V<:AbstractMatrix,M<:AbstractAffineMap}
+function invert(N::Normal{T,U,V},K::NormalKernel{T,M,W})  where {T,U,V<:AbstractMatrix,M<:AbstractAffineMap,W<:AbstractMatrix}
 
     pred = mean(K)(mean(N))
 
@@ -46,5 +45,22 @@ function invert(N::Normal{T,U,V},K::NormalKernel{T,M,V})  where {T,U,V<:Abstract
     return Nout, Kout
 end
 
-rand(RNG::AbstractRNG, K::NormalKernel,x) = rand( condition(K,x) )
-rand(K::NormalKernel,x) = rand(GLOBAL_RNG,K,x)
+rand(RNG::AbstractRNG, K::NormalKernel,x::AbstractVector) = rand(RNG, condition(K,x) )
+rand(K::NormalKernel,x::AbstractVector) = rand(GLOBAL_RNG,K,x)
+
+# Dirac kernel
+
+struct DiracKernel{T,U<:AbstractConditionalMean} <: AbstractNormalKernel{T}
+    μ::U
+    DiracKernel(μ) = new{eltype(μ),typeof(μ)}(μ)
+end
+
+DiracKernel(Φ::AbstractMatrix) = DiracKernel( AffineMap(Φ) )
+DiracKernel(Φ::AbstractMatrix,b::AbstractVector) = DiracKernel( AffineMap(Φ,b) )
+
+mean(K::DiracKernel) = K.μ
+cov(K::DiracKernel{T}) where T = zeros(T,nout(K.μ),nout(K.μ))
+condition(K::DiracKernel,x) = Dirac(mean(K)(x))
+
+rand(RNG::AbstractRNG, K::DiracKernel,x::AbstractVector) = mean(condition(K,x))
+rand(K::DiracKernel,x::AbstractVector) = rand(GLOBAL_RNG,K,x)
