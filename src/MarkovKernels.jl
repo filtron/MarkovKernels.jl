@@ -20,11 +20,8 @@ export AbstractLikelihood, Likelihood, FlatLikelihood
 include("normal/normal.jl")
 export AbstractNormal, Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
 
-include("conditionalmoments/conditionalmean.jl")
-export AbstractConditonalMean
-
-include("conditionalmoments/affinemaps.jl")
-export AbstractAffineMap, AffineMap, nin, nout, slope, intercept, stein, compose
+include("normal/conditionalmean.jl")
+export AbstractConditonalMean, AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
 
 include("normal/normalkernel.jl")
 export NormalKernel, condition, compose, marginalise, invert

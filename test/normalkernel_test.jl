@@ -24,6 +24,16 @@ function normalkernel_test(T,n)
 
     N12 = Normal(Φ1*x,Q1)
 
+    pred = Φ1*μ
+    S = Hermitian(Φ1*Σ*Φ1' + Q1)
+    G = Σ*Φ1'/S
+    N_gt = Normal(pred,S)
+    Π = Hermitian(Σ - G*S*G')
+
+    corrector = AffineMap(G,μ,pred)
+    K_gt = NormalKernel(corrector,Π)
+
+    Nc, Kc = invert(N1,K1)
 
     @testset "NormalKernel | $(T)" begin
 
@@ -33,12 +43,18 @@ function normalkernel_test(T,n)
         @test cov(K1) == Q1
 
         @test condition(K1,x) == N12
-        @test slope(compose(K2,K1).μ) == Φ2*Φ1
+
+        @test slope(mean(compose(K2,K1))) ≈ slope(K3.μ)
+        @test cov(compose(K2,K1)) ≈ cov(K3)
 
         @test mean(marginalise(N1,K1)) ≈ Φ1*μ
         @test cov(marginalise(N1,K1)) ≈ Hermitian(Φ1*Σ*Φ1' + Q1)
 
-
+        @test mean(Nc) ≈ mean(N_gt)
+        @test cov(Nc) ≈ cov(N_gt)
+        @test cov(Kc) ≈ cov(K_gt)
+        @test slope(mean(Kc)) ≈ slope(mean(K_gt))
+        @test intercept(mean(Kc)) ≈ intercept(mean(K_gt))
 
     end
 

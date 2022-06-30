@@ -1,3 +1,8 @@
+
+abstract type AbstractConditionalMean{T<:Number}  end
+
+eltype(M::AbstractConditionalMean{T}) where T = T
+
 # types for representing affine conditional means
 abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T}  end
 
