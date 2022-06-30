@@ -3,6 +3,18 @@ abstract type AbstractConditionalMean{T<:Number}  end
 
 eltype(M::AbstractConditionalMean{T}) where T = T
 
+struct ConditionalMean{T,U,V} <: AbstractConditonalMean{T}
+    μ::U
+    jac::V
+    ConditionalMean{T}(μ,jac) where T<:Number = new{T,typeof(μ),typeof(jac)}(μ,jac)
+end
+
+ConditionalMean{T}(μ) = ConditionalMean(μ,nothing)
+ConditionalMean(μ) = ConditionalMean{eltype(μ)}(μ,nothing)
+
+
+(M::ConditionalMean)(x) = μ(x)
+
 # types for representing affine conditional means
 abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T}  end
 

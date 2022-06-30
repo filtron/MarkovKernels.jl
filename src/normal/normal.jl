@@ -1,12 +1,9 @@
-
-
-
 # define normal types
 abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end
 
 eltype(N::AbstractNormal{T}) where {T} = T
 
-# hm.. should we make Information form / Precision parametrisations here as well?
+# hm.. should make Information form / Precision parametrisations here as well?
 struct Normal{T,U,V} <: AbstractNormal{T}
     μ::U
     Σ::V
@@ -32,7 +29,7 @@ logpdf(N::Normal{T,U,V},x) where {T<:Real,U,V} = -dim(N)/2*log(2*π) - 1/2*logde
 logpdf(N::Normal{T,U,V},x) where {T<:Complex,U,V} = -dim(N)*log(π) - logdet(N.Σ) - norm_sqr( residual(N,x) )
 
 entropy(N::Normal{T,U,V}) where {T<:Real,U,V} = dim(N)/2.0*( log(2.0*π) + 1) + logdet(N.Σ)/2.0
-entropy(N::Normal{T,U,V,}) where {T<:Complex,U,V} = dim(N)*( log(π) + 1) + logdet(N.Σ)
+entropy(N::Normal{T,U,V}) where {T<:Complex,U,V} = dim(N)*( log(π) + 1) + logdet(N.Σ)
 
 function kldivergence(N1::Normal{T,U,V},N2::Normal{T,U,V}) where {T<:Real,U,V}
     root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)

@@ -21,7 +21,6 @@ NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKe
 mean(K::NormalKernel) = K.μ
 cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
 
-
 condition(K::NormalKernel{T,U,V},x) where {T,U<:AbstractConditionalMean,V<:AbstractMatrix} = Normal(K.μ(x), K.Σ)
 
 compose(K2::NormalKernel{T,U,V},K1::NormalKernel{T,U,V}) where {T,U<:AbstractAffineMap,V<:AbstractMatrix} = NormalKernel( compose(K2.μ,K1.μ), stein(K1.Σ,K2.μ,K2.Σ) )
@@ -46,3 +45,6 @@ function invert(N::Normal{T,U,V},K::NormalKernel{T,M,V})  where {T,U,V<:Abstract
 
     return Nout, Kout
 end
+
+rand(RNG::AbstractRNG, K::NormalKernel,x) = rand( condition(K,x) )
+rand(K::NormalKernel,x) = rand(GLOBAL_RNG,K,x)

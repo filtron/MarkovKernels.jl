@@ -21,10 +21,12 @@ include("normal/normal.jl")
 export AbstractNormal, Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
 
 include("normal/conditionalmean.jl")
-export AbstractConditonalMean, AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
+export AbstractConditonalMean, ConditionalMean, AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
 
 include("normal/normalkernel.jl")
 export NormalKernel, condition, compose, marginalise, invert
+
+include("sampling.jl")
 
 include("inference/filter.jl")
 export filter
