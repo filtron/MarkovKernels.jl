@@ -4,6 +4,7 @@ using Plots
 
 # plotting backend
 pgfplotsx()
+#gr()
 
 # make time span and stamps
 T = 10
@@ -38,8 +39,8 @@ forward_kernel = NormalKernel(Φ,Q)
 xs = rand(init,forward_kernel,N-1)
 
 # plot latent Gauss-Markov process
-pltx = plot(ts,xs)
-display(pltx)
+#pltx = plot(ts,xs)
+#display(pltx)
 
 
 # observation matrix
@@ -50,7 +51,6 @@ C = σ*exp.( - logfactorial.( collect(0:ν) )
 # measurement covariance matrix
 R = fill(0.05,1,1)
 
-
 # measure a Matern process of smoothness ν
 m1 = DiracKernel(Matrix(C'))
 ys1 = rand(m1,xs)
@@ -59,9 +59,26 @@ ys1 = rand(m1,xs)
 m2 = NormalKernel(Matrix(C'),R)
 ys2 = rand(m2,xs)
 
-# plot matern process, woaah!
-plty = plot(ts,[ys1 ys2])
-display(plty)
-
-# does filtering work?
+# state estimates
 fs, bws, loglike = filtering(ys2,init,forward_kernel,m2,true)
+
+# matern estimates
+ps = map( x-> marginalise(x,m1), fs )
+
+# I love this!!!!
+μs = mapreduce(permutedims,vcat,mean.(fs))
+σs = mapreduce(permutedims,vcat,std.(fs))
+
+yhat = μs*C
+
+# plot matern process, woaah!
+#plty = plot(ts,[ys1 ys2],xlabel = "t",shape = [:none :circle])
+#display(plty)
+
+# plot estimate
+pltest = plot(ts,ys1,xlabel="t",ylabel="y")
+plot!(ts,ps)
+display(pltest)
+
+#plt_state = plot(fs)
+#display(plt_state)

@@ -102,7 +102,8 @@ function (M::AffineMap)(x)
         return slope(M)*x
     end
 
-    out = zero(x)
+    #out = zero(x)
+    out = zeros(eltype(M),nout(M))
 
     if has_pred(M)
         out = out + slope(M)*(x - M.pred)

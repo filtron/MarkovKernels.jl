@@ -45,7 +45,7 @@ function filtering(ys,init::AbstractDistribution,fw_kernel::AbstractMarkovKernel
         push!(backward_kernels,b)
 
         # create measurement model
-        y = ys[n,:]
+        @inbounds y = ys[n,:]
         likelihood = Likelihood(m_kernel,y)
         f, loglike_increment = update(p,likelihood)
         push!(filter_distributions,f)

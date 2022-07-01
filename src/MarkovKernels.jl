@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, Statistics, Random
+using LinearAlgebra, Statistics, Random, RecipesBase
 
 import Base: *, +, eltype, length, size, log, ==, similar
 
@@ -21,6 +21,9 @@ export AbstractLikelihood, Likelihood, FlatLikelihood
 # defines marginal normal distributions
 include("normal/normal.jl")
 export AbstractNormal, Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence, Dirac
+
+# plotting marginal normal distributions
+include("normal/normal_plotting.jl")
 
 # defines conditional mean for normal kernels
 include("normal/conditionalmean.jl")

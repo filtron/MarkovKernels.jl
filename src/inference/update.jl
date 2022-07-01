@@ -6,7 +6,7 @@ function update(N::AbstractNormal,L::Likelihood)
     M, C = invert(N,L.K)
 
     N_new = condition(C,L.y)
-    loglike = logpdf(M,y)
+    loglike = logpdf(M,L.y)
 
     return N_new, loglike
 

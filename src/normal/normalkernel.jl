@@ -13,9 +13,9 @@ struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <: AbstractN
     end
 end
 
-NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ), Hermitian(Σ) )
-NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b), Hermitian(Σ) )
-NormalKernel(Φ::AbstractMatrix,b::AbstractVector,pred::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b,pred), Hermitian(Σ) )
+NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ), Σ )
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b), Σ )
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,pred::AbstractVector,Σ::AbstractMatrix) = NormalKernel( AffineMap(Φ,b,pred), Σ )
 
 mean(K::NormalKernel) = K.μ
 cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
@@ -61,6 +61,8 @@ DiracKernel(Φ::AbstractMatrix,b::AbstractVector) = DiracKernel( AffineMap(Φ,b)
 mean(K::DiracKernel) = K.μ
 cov(K::DiracKernel{T}) where T = zeros(T,nout(K.μ),nout(K.μ))
 condition(K::DiracKernel,x) = Dirac(mean(K)(x))
+
+marginalise(N::Normal{T,U,V},K::DiracKernel{T,S}) where {T,U,S<:AbstractAffineMap,V<:AbstractMatrix} = Normal( mean(K)(mean(N)), stein(N.Σ,K.μ,zeros(T,nout(K.μ),nout(K.μ))) )
 
 rand(RNG::AbstractRNG, K::DiracKernel,x::AbstractVector) = mean(condition(K,x))
 rand(K::DiracKernel,x::AbstractVector) = rand(GLOBAL_RNG,K,x)
