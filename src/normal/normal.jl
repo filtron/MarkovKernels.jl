@@ -23,7 +23,7 @@ cov(N::Normal) = Hermitian(Matrix(N.Σ))
 var(N::Normal) = real(diag(N.Σ))
 std(N::Normal) = sqrt.(var(N))
 
-residual(N::Normal,x) = cholesky(N.Σ).L \ (x - N.μ)
+residual(N::Normal,x) = cholesky(N.Σ).L \ (x .- N.μ)
 
 logpdf(N::Normal{T,U,V},x) where {T<:Real,U,V} = -dim(N)/2*log(2*π) - 1/2*logdet(N.Σ) -  norm_sqr( residual(N,x) )/2
 logpdf(N::Normal{T,U,V},x) where {T<:Complex,U,V} = -dim(N)*log(π) - logdet(N.Σ) - norm_sqr( residual(N,x) )

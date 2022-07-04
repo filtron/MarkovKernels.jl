@@ -46,7 +46,7 @@ export update
 
 # Bayesian filtering
 include("inference/filter.jl")
-export filtering
+export filter, smoother
 
 # helper functions
 include("utilities.jl")

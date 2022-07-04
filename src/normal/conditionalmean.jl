@@ -21,7 +21,6 @@ ConditionalMean(μ) = ConditionalMean{eltype(μ)}(μ,nothing)
 (M::ConditionalMean)(x) = μ(x)
 
 
-
 # types for representing affine conditional means
 abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T}  end
 

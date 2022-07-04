@@ -1,3 +1,4 @@
+# filter currently collects output in AbstractDistribution[] but this is really only for plotting Normal curves,  ops...
 @recipe function f(::Type{T},ns::T) where T<:AbstractVector{<:AbstractDistribution}
 
 ribbon_width=1.96
@@ -18,7 +19,7 @@ stds =  mapreduce(permutedims,vcat,std.(ns))
 ribbon --> ribbon_width * stds
 xguide --> "t"
 yguide --> "y"
-label --> hcat(["y$(m)" for m in 1:dimensions]...)
+#label --> hcat(["y$(m)" for m in 1:dimensions]...)
 
 return values
 
