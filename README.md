@@ -29,7 +29,7 @@ abstract type AbstractLikelihood end
 
 $$ 
 x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}) 
-y_n \mi x_n \sim m_n(\cdotp \mid x_n)
+y_n \mid x_n \sim m_n(\cdotp\mid x_n)
 $$
 
 * Bayesian filtering:
