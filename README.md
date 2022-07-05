@@ -25,6 +25,13 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
+* Type for representing state-estimation problems: 
+
+```julia
+abstract type AbstractStateEstimationProblem end
+```
+
+
 ## Bayesian state estimation 
 A probabilistic state-space model may be defined by a family of forward kernel, $f_n$, and a family of measurement kernels $m_n$ according to 
 
