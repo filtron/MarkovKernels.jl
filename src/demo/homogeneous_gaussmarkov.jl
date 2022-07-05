@@ -3,12 +3,11 @@ using SpecialFunctions
 using Plots
 
 # plotting backend
-pgfplotsx()
-#gr()
+# pgfplotsx()
+gr()
 
 include("matern2ssm.jl")
 include("lti_disc.jl")
-
 
 # make time span and stamps
 T = 10
@@ -17,7 +16,7 @@ dt = T/(N-1)
 ts = 0:dt:(N-1)*dt
 
 # define stationary Gauss-Markov process
-ν = 2
+ν = 3
 λ = 2.5
 σ = 1
 
@@ -42,8 +41,11 @@ output_kernel = DiracKernel(Matrix(C'))
 # sample Gauss-Markov process
 xs = rand(init,forward_kernel,N-1)
 
+plt_state = plot(ts,xs)
+display(plt_state)
+
 # measurement covariance matrix
-R = fill(0.005,1,1)
+R = fill(0.05,1,1)
 
 # measure a Matern process of smoothness ν
 matern_process = rand(output_kernel,xs)
@@ -51,6 +53,10 @@ matern_process = rand(output_kernel,xs)
 # noisy measurements of Matern process
 measurement_kernel = NormalKernel(Matrix(C'),R)
 ys = rand(measurement_kernel,xs)
+
+plt_matern = plot(ts,matern_process)
+scatter!(ts,ys,color="black")
+display(plt_matern)
 
 # state estimates
 #fs, bws, mls, loglike = filtering(ys2,init,forward_kernel,measurement_kernel,true)
