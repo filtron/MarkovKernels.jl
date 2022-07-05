@@ -37,7 +37,7 @@ Measurement sequence:
 
 $$ y_{1:N} $$ 
 
-If the marginal density  $$\pi_1(x_1)$$ is given the problem is aligned and if $$\pi_0(x_0)$$ is given it is not aligned.
+If the marginal density  $\pi_1(x_1)$ is given the problem is aligned and if $\pi_0(x_0)$ is given it is not aligned.
 
 * Bayesian filtering:
 ```julia
