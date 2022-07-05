@@ -26,7 +26,7 @@ abstract type AbstractLikelihood end
 ```
 
 ## Bayesian state estimation 
-Probabilistic state-space model:
+A probabilistic state-space model may be defined by a family of forward kernel, $f_n$, and a family of measurement kernels $m_n$ according to 
 
 $$ 
 \displaylines{x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}) \\
