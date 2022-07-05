@@ -28,5 +28,5 @@ abstract type AbstractLikelihood end
 ## Filtering 
 
 ```julia
-filtering_distributions, prediction_distributions, backward_kernels, loglikelihood = filter(init,forward_kernels,likelihoods)
+f_distributions, p_distributions, bw_kernels, loglike = filter(init,forward_kernels,likelihoods)
 ```
