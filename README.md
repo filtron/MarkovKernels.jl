@@ -28,7 +28,7 @@ abstract type AbstractLikelihood end
 ## Bayesian state estimation 
 
 $$ 
-x_{n+1}
+x_n \mid x_{n-1} f_n(x_n\mid x_{n-1}) 
 $$
 
 * Bayesian filtering:
