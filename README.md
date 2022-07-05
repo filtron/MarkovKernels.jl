@@ -37,10 +37,9 @@ Measurement sequence:
 
 $$ y_{1:N} $$ 
 
-* Bayesian filtering:
-```julia
-f_dists, p_dists, bw_kernels, loglike = 
-filter(init,fw_kernels,likelihoods,aligned)
+* The filter problem can be solved by 
+```julia 
+f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods,aligned) 
 ```
 
 * Bayesian smoothing: 
