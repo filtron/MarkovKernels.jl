@@ -27,15 +27,20 @@ abstract type AbstractLikelihood end
 
 ## Bayesian state estimation 
 
-$\pi$
+\begin{subequations}
+\begin{align} 
+x_{n+1}
+\end{align} 
+\end{subeqations}
+
 
 * Bayesian filtering:
 ```julia
-f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods)
+f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods,aligned)
 ```
 
 * Bayesian smoothing: 
 ```julia
-s_dists, f_dists, p_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods)
+s_dists, f_dists, p_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods,aligned)
 ```
 
