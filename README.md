@@ -29,11 +29,11 @@ abstract type AbstractLikelihood end
 
 * Bayesian filtering:
 ```julia
-f_dists, p_dists, bw_kernels, loglike = filter(init,forward_kernels,likelihoods)
+f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods)
 ```
 
 * Bayesian smoothing: 
 ```julia
-s_dists, f_dists, p_dists, bw_kernels, loglike = smoother(init,forward_kernels,likelihoods)
+s_dists, f_dists, p_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods)
 ```
 
