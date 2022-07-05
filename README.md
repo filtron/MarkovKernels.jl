@@ -56,7 +56,15 @@ $$
 
 where $\pi$ denotes the filter distributions.
 The one-step ahead measurement prediction distributions $p$ can be used to compute log-likelihoods,
-and the backward kernels $\beta$ can be used to solve the smoothing problem.  
+and the backward kernels $\beta$ can be used to solve the smoothing problem.
+The filtering problem is mathematically solved via the following prediction / update recursion. 
+
+* Predict: 
+$$
+\displaylines{ \pi(x_n \mid y_{1:n-1}) = \int f_n(x_n\mid x_{n-1}) \pi(x_{n-1}\mid y_{1:n-1}) \dif x_{n-1}, \\
+\beta(x_{n-1} \mid x_n,y_{1:n-1}) \propto  f_n(x_n\mid x_{n-1}) \pi(x_{n-1}\mid y_{1:n-1}) \\
+}
+$$
 
 In code:
 ```julia 
