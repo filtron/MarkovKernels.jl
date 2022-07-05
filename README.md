@@ -33,11 +33,11 @@ $$
 y_n \mid x_n \sim m_n(\cdotp\mid x_n)}
 $$
 
-Given a measurement sequence 
+Measurement sequence: 
 
 $$ y_{1:N} $$ 
 
-two classical inference problems are considered. 
+If the marginal density  $$\pi_1(x_1)$$ is given the problem is aligned and if $$\pi_0(x_0)$$ is given it is not aligned.
 
 * Bayesian filtering:
 ```julia
