@@ -7,10 +7,20 @@ A package implementing Bayesian filtering and smoothing by manipulating marginal
 
 ## Package specific types
 
-* Type for encoding marginal distributions 
+* Type for representing marginal distributions: 
 
 ```julia
-abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
+```
+
+* Type for representing Markov kernels: 
+
+```julia
+abstract type AbstractMarkovKernel end
+```
+
+* Type for representing likelihoods: 
+
+```julia
 abstract type AbstractLikelihood end
 ```
