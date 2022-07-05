@@ -92,7 +92,7 @@ where $\gamma$ denotes the smoothing distributions, and all other quantities hav
 The smoothing problem is mathematically solved via the following backward recursion. 
 
 $$
-\gamma(x_n \mid y_{1:N}) = \int \beta(x_n, x_{n+1}, y_{1:n}) \gamma(x_{n+1} \mid y_{1:N}) \mathrm{d} x_{n+1}
+\gamma(x_n \mid y_{1:N}) = \int \beta(x_n \mid x_{n+1}, y_{1:n}) \gamma(x_{n+1} \mid y_{1:N}) \mathrm{d} x_{n+1}
 $$
 
 In code:
