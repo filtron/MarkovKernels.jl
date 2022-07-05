@@ -25,8 +25,15 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
-## Filtering 
+## Bayesian state estimation 
 
+* Bayesian filtering:
 ```julia
 f_distributions, p_distributions, bw_kernels, loglike = filter(init,forward_kernels,likelihoods)
 ```
+
+* Bayesian smoothing: 
+```julia
+s_distributions, f_distributions, p_distributions, bw_kernels, loglike = smoother(init,forward_kernels,likelihoods)
+```
+
