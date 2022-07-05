@@ -39,7 +39,8 @@ $$ y_{1:N} $$
 
 * Bayesian filtering:
 ```julia
-f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods,aligned)
+f_dists, p_dists, bw_kernels, loglike = 
+filter(init,fw_kernels,likelihoods,aligned)
 ```
 
 * Bayesian smoothing: 
