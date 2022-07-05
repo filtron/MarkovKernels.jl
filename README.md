@@ -38,7 +38,7 @@ Bayesian state estimation problems consist of computing marginal conditional dis
 If it is given by $x_1 \sim \pi(x_1)$ the problem is said to be aligned, and non-aligned if it is given by $x_0 \sim \pi(x_0)$. 
 Other possible initial conditions are currently not supported (but can be done with some fiddling?). 
 
-# The filtering problem 
+### The filtering problem 
 
 * The filter problem can be solved by 
 ```julia 
