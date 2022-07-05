@@ -37,7 +37,7 @@ A probabilistic state-space model may be defined by a family of forward kernel, 
 
 $$ 
 \displaylines{x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}), \\
-y_n \mid x_n \sim m_n(\cdotp\mid x_n)},
+y_n \mid x_n \sim m_n(\cdotp\mid x_n),}
 $$
 
 where $x_n$ is the state sequence, $y_n$ is the measurement sequence, and for fixed $y_n$ the map $x_n \mapsto m_n(y_n\mid x_n)$ is a likelihood. 
