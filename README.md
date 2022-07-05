@@ -29,8 +29,8 @@ abstract type AbstractLikelihood end
 A probabilistic state-space model may be defined by a family of forward kernel, $f_n$, and a family of measurement kernels $m_n$ according to 
 
 $$ 
-\displaylines{x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}) \\
-y_n \mid x_n \sim m_n(\cdotp\mid x_n)}
+\displaylines{x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}), \\
+y_n \mid x_n \sim m_n(\cdotp\mid x_n)}.
 $$
 
 Measurement sequence: 
