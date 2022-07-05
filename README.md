@@ -33,6 +33,11 @@ $$
 y_n \mid x_n \sim m_n(\cdotp\mid x_n)}
 $$
 
+Given a measurement sequence 
+
+$$ y_{1:N} $$ 
+
+two classical inference problems are considered. 
 
 * Bayesian filtering:
 ```julia
