@@ -39,12 +39,17 @@ If it is given by $x_1 \sim \pi(x_1)$ the problem is said to be aligned, and non
 Other possible initial conditions are currently not supported (but can be done with some fiddling?). 
 
 ### The filtering problem 
-The filter problem consists of computing the following conditional densities 
+The filter problem consists of computing the following conditional distributions
 
 $$
 \displaylines{ \pi(x_n \mid y_{1:n}), \\ 
-p(y_n \mid y_{1:n-1}), }
+p(y_n \mid y_{1:n-1}),
+\beta(x_n \mid x_{n+1},y_{1:n})}, 
 $$
+
+where $\pi$ denotes the filter distributions.
+The one-step ahead measurement prediction distributions $p$ can be used to compute log-likelihoods,
+and the backward kernels $\beta$ can be used to solve the smoothing problem.  
 
 ```julia 
 f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods) 
