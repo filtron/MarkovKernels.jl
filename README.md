@@ -51,12 +51,23 @@ where $\pi$ denotes the filter distributions.
 The one-step ahead measurement prediction distributions $p$ can be used to compute log-likelihoods,
 and the backward kernels $\beta$ can be used to solve the smoothing problem.  
 
+In code:
 ```julia 
-f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods) 
+filter_dists, pred_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods) 
 ```
+### The smoothing problem 
+The smoothing problem consists of computing the following 
 
-* Bayesian smoothing: 
+$$
+\displaylines{ \gamma(x_n \mid y_{1:N}), \\
+\pi(x_n \mid y_{1:n}), \\ 
+p(y_n \mid y_{1:n-1}), \\
+\beta(x_n \mid x_{n+1},y_{1:n})}, 
+$$
+
+where $\gamma$ denotes the smoothing distributions, and all other quantities have previously been defined in context of the filtering problem. 
+
 ```julia
-s_dists, f_dists, p_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods)
+smooth_dists, filter_dists, pred_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods)
 ```
 
