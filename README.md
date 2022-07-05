@@ -63,7 +63,15 @@ The filtering problem is mathematically solved via the following prediction / up
 
 $$
 \displaylines{ \pi(x_n \mid y_{1:n-1}) = \int f_n(x_n\mid x_{n-1}) \pi(x_{n-1}\mid y_{1:n-1}) \mathrm{d} x_{n-1}, \\
-\beta(x_{n-1} \mid x_n,y_{1:n-1}) \propto  f_n(x_n\mid x_{n-1}) \pi(x_{n-1}\mid y_{1:n-1}) \\
+\beta(x_{n-1} \mid x_n,y_{1:n-1}) \propto  f_n(x_n\mid x_{n-1}) \pi(x_{n-1}\mid y_{1:n-1}).
+}
+$$
+
+* Update: 
+
+$$
+\displaylines{ \pi(x_n \mid y_{1:n}) \propto \pi(x_n \mid y_{1:n-1}) m_n(y_n\mid x_n), \\
+p(y_n \mid y_{1:n-1}) = \int m_n(y_n\mid x_n) \pi(x_n\mid y_{1:n-1}) \mathrm{d} x_n .
 }
 $$
 
