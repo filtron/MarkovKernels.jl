@@ -28,8 +28,8 @@ abstract type AbstractLikelihood end
 ## Bayesian state estimation 
 
 $$ 
-x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}) \\
-y_n \mid x_n \sim m_n(\cdotp\mid x_n)
+\displaylines{x_n \mid x_{n-1} \sim f_n(\cdotp\mid x_{n-1}) \\
+y_n \mid x_n \sim m_n(\cdotp\mid x_n)}
 $$
 
 * Bayesian filtering:
