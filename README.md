@@ -36,11 +36,9 @@ $$
 where $x_n$ is the state sequence and $y_n$ is the measurement sequence. 
 Bayesian state estimation problems consist of computing marginal conditional distributions of the state given some measurement sequence $y_{1:N}$. For the state-space model to be well posed, an initial condition for the state sequence is required. 
 If it is given by $x_1 \sim \pi(x_1)$ the problem is said to be aligned, and non-aligned if it is given by $x_0 \sim \pi(x_0)$. 
-Other possible, initial conditions are currently not supported (but can be done with some fiddling?). 
+Other possible initial conditions are currently not supported (but can be done with some fiddling?). 
 
-Measurement sequence: 
-
-$$ y_{1:N} $$ 
+# The filtering problem 
 
 * The filter problem can be solved by 
 ```julia 
