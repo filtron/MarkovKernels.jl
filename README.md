@@ -43,7 +43,6 @@ $$
 where $x_n$ is the state sequence, $y_n$ is the measurement sequence, and for fixed $y_n$ the map $x_n \mapsto m_n(y_n\mid x_n)$ is a likelihood. 
 Bayesian state estimation problems consist of computing marginal conditional distributions of the state given some measurement sequence $y_{1:N}$. For the state-space model to be well posed, an initial condition for the state sequence is required. 
 If it is given by $x_1 \sim \pi(x_1)$ the problem is said to be aligned, and non-aligned if it is given by $x_0 \sim \pi(x_0)$. 
-Other possible initial conditions are currently not supported (but can be done with some fiddling?). 
 
 ### The filtering problem 
 The filter problem consists of computing the following conditional distributions
