@@ -7,7 +7,8 @@ A package implementing Bayesian filtering and smoothing by manipulating marginal
 
 ## Package specific types
 
-*
 ```julia
-abstract type AbstractDistribution 
+abstract type AbstractDistribution end
+abstract type AbstractMarkovKernel end
+abstract type AbstractLikelihood end
 ```
