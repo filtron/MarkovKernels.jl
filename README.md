@@ -34,6 +34,7 @@ y_n \mid x_n \sim m_n(\cdotp\mid x_n)},
 $$
 
 where $x_n$ is the state sequence and $y_n$ is the measurement sequence. 
+Bayesian state estimation problems consist of computing marginal conditional distributions of the state given some measurement sequence $y_{1:N}$.  
 
 Measurement sequence: 
 
