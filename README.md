@@ -27,6 +27,8 @@ abstract type AbstractLikelihood end
 
 ## Bayesian state estimation 
 
+$\pi$
+
 * Bayesian filtering:
 ```julia
 f_dists, p_dists, bw_kernels, loglike = filter(init,fw_kernels,likelihoods)
