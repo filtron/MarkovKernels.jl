@@ -34,7 +34,8 @@ y_n \mid x_n \sim m_n(\cdotp\mid x_n)},
 $$
 
 where $x_n$ is the state sequence and $y_n$ is the measurement sequence. 
-Bayesian state estimation problems consist of computing marginal conditional distributions of the state given some measurement sequence $y_{1:N}$.  
+Bayesian state estimation problems consist of computing marginal conditional distributions of the state given some measurement sequence $y_{1:N}$. For the state-space model to be well posed, an initial condition for the state sequence is required. 
+If it is given by §x_1 \sim \pi(x_1)§ the problem is said to be aligned, and non-aligned if it is given by $x_0 \sim \pi(x_0)$.
 
 Measurement sequence: 
 
