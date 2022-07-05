@@ -27,12 +27,9 @@ abstract type AbstractLikelihood end
 
 ## Bayesian state estimation 
 
-\begin{subequations}
-\begin{align} 
+$$ 
 x_{n+1}
-\end{align} 
-\end{subeqations}
-
+$$
 
 * Bayesian filtering:
 ```julia
