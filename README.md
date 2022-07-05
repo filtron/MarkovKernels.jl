@@ -42,7 +42,7 @@ Other possible initial conditions are currently not supported (but can be done w
 The filter problem consists of computing the following conditional densities 
 
 $$
-\displaylins{ \pi(x_n \mid y_{1:n}) \\   }
+\displaylines{ \pi(x_n \mid y_{1:n}) \\ p(y_n \mid y_{1:n-1}) }
 $$
 
 ```julia 
