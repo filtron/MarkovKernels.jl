@@ -44,7 +44,7 @@ The filter problem consists of computing the following conditional distributions
 $$
 \displaylines{ \pi(x_n \mid y_{1:n}), \\ 
 p(y_n \mid y_{1:n-1}), \\
-\beta(x_n \mid x_{n+1},y_{1:n})}, 
+\beta(x_n \mid x_{n+1},y_{1:n}), } 
 $$
 
 where $\pi$ denotes the filter distributions.
@@ -62,11 +62,12 @@ $$
 \displaylines{ \gamma(x_n \mid y_{1:N}), \\
 \pi(x_n \mid y_{1:n}), \\ 
 p(y_n \mid y_{1:n-1}), \\
-\beta(x_n \mid x_{n+1},y_{1:n})}, 
+\beta(x_n \mid x_{n+1},y_{1:n}), } 
 $$
 
 where $\gamma$ denotes the smoothing distributions, and all other quantities have previously been defined in context of the filtering problem. 
 
+In code:
 ```julia
 smooth_dists, filter_dists, pred_dists, bw_kernels, loglike = smoother(init,fw_kernels,likelihoods)
 ```
