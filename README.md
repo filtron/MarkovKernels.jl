@@ -89,6 +89,11 @@ p(y_n \mid y_{1:n-1}), \\
 $$
 
 where $\gamma$ denotes the smoothing distributions, and all other quantities have previously been defined in context of the filtering problem. 
+The smoothing problem is mathematically solved via the following backward recursion. 
+
+§§
+\gamma(x_n \mid y_{1:N}) = \int \beta(x_n, x_{n+1}, y_{1:n}) \gamma(x_{n+1} \mid y_{1:N}) \mathrm{d} x_{n+1}
+§§
 
 In code:
 ```julia
