@@ -43,7 +43,7 @@ The filter problem consists of computing the following conditional distributions
 
 $$
 \displaylines{ \pi(x_n \mid y_{1:n}), \\ 
-p(y_n \mid y_{1:n-1}),
+p(y_n \mid y_{1:n-1}), \\
 \beta(x_n \mid x_{n+1},y_{1:n})}, 
 $$
 
