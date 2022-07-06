@@ -6,3 +6,6 @@ struct Likelihood{U<:AbstractMarkovKernel,V} <: AbstractLikelihood
     y::V
 end
 
+measurement_model(L::Likelihood) = L.K
+measurement(L::Likelihood) = L.y
+

@@ -58,9 +58,12 @@ plt_matern = plot(ts,matern_process)
 scatter!(ts,ys,color="black")
 display(plt_matern)
 
+# define state estimation problem
+problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
+
 # state estimates
-#fs, bws, mls, loglike = filtering(ys2,init,forward_kernel,measurement_kernel,true)
-ss, fs, bws, mls, loglike = smoother(ys,init,forward_kernel,measurement_kernel,true)
+#ss, fs, bws, mls, loglike = smoother(ys,init,forward_kernel,measurement_kernel,true)
+ss, fs, bws, mls, loglike = smoother(problem)
 
 # compute measurement residuals
 residuals = mapreduce(residual,vcat,mls,ys)
@@ -78,6 +81,10 @@ display(plt_filter)
 plt_pred = plot(ts,matern_process,xlabel="t",label="ground-truth")
 plot!(ts,mls,label="one-step ahead prediction")
 display(plt_pred)
+
+# plot prediction errors
+plt_pe = scatter(ts,residuals,color="black")
+display(plt_pe)
 
 # plot smoother estimate
 plt_smoother = plot(ts,matern_process,xlabel="t",label="ground-truth")

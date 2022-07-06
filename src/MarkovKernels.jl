@@ -2,7 +2,7 @@ module MarkovKernels
 
 using LinearAlgebra, Statistics, Random, RecipesBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, filter
+import Base: *, +, eltype, length, size, log, ==, similar, filter, IteratorSize, HasLength
 
 import LinearAlgebra: logdet, norm_sqr
 import Statistics: mean, cov, var, std
@@ -16,7 +16,7 @@ export AbstractDistribution, AbstractMarkovKernel
 
 # defines observation likelihoods
 include("likelihoods.jl")
-export AbstractLikelihood, Likelihood, FlatLikelihood
+export AbstractLikelihood, Likelihood
 
 # defines marginal normal distributions
 include("normal/normal.jl")
@@ -44,9 +44,16 @@ export predict
 include("inference/update.jl")
 export update
 
-# Bayesian filtering
+# Bayesian state estimation problems
 include("inference/state_estimation.jl")
-export AbstractStateEstimationProblem, HomogeneousStateEstimationProblem, filter, smoother
+export AbstractStateEstimationProblem, HomogeneousStateEstimationProblem
+
+# Bayesian filtering
+include("inference/filter.jl")
+
+# Bayesian smoothing
+include("inference/smoother.jl")
+export smoother
 
 # helper functions
 include("utilities.jl")
