@@ -15,9 +15,6 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
-* Type for representing Markov kernels: 
-
-
 * Type for representing state-estimation problems: 
 
 ```julia
