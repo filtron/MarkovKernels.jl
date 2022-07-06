@@ -15,12 +15,12 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
-Two functions need to be defined: 
+For Bayesian state estimation, the following two methods need to be defined:
 
 ```julia
 d_pred, bw_kernel = predict(d::AbstractDistribution,k::AbstractMarkovKernel)
 
-d_new, prediction_error_distribution, loglike update(d::AbstractDistribution,l::AbstractLikelihood)
+d_new, prediction_error_distribution, loglike = update(d::AbstractDistribution,l::AbstractLikelihood)
 ```
 
 
