@@ -15,6 +15,16 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
+Two functions need to be defined: 
+
+```julia
+d_pred, bw_kernel = predict(d::AbstractDistribution,k::AbstractMarkovKernel)
+
+d_new, prediction_error_distribution, loglike update(d::AbstractDistribution,l::AbstractLikelihood)
+```
+
+
+
 * Type for representing state-estimation problems: 
 
 ```julia
