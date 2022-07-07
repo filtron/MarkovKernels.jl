@@ -16,7 +16,7 @@ rsqrt(m) = cholesky(Hermitian(m)).U
 trdiv(Σ1,Σ2) = tr(Σ2 \ Σ1) #norm_sqr( lsqrt(Σ2) \ lsqrt(Σ1) )
 
 # stein operator
-stein(Σ::AbstractMatrix,Φ::AbstractMatrix,Q::AbstractMatrix) = Hermitian( Φ*Σ*Φ' + Q ).data
+stein(Σ::AbstractMatrix,Φ::AbstractMatrix,Q::AbstractMatrix) = Matrix(Hermitian( Φ*Σ*Φ' + Q ))
 stein(Σ::AbstractMatrix,A::AbstractAffineMap,Q::AbstractMatrix) = stein(Σ,slope(A),Q)
 
 # schur reduction

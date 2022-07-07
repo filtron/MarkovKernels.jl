@@ -45,7 +45,7 @@ plt_state = plot(ts,xs)
 display(plt_state)
 
 # measurement covariance matrix
-R = fill(0.05,1,1)
+R = fill(0.01,1,1)
 
 # measure a Matern process of smoothness ν
 matern_process = rand(output_kernel,xs)
@@ -62,8 +62,8 @@ display(plt_matern)
 problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
 
 # state estimates
-#ss, fs, bws, mls, loglike = smoother(ys,init,forward_kernel,measurement_kernel,true)
-ss, fs, bws, mls, loglike = smoother(problem)
+ss, fs, bws, mls, loglike = smoother(ys,init,forward_kernel,measurement_kernel,true)
+#ss, fs, bws, mls, loglike = smoother(problem)
 
 # compute measurement residuals
 residuals = mapreduce(residual,vcat,mls,ys)
@@ -91,6 +91,33 @@ plt_smoother = plot(ts,matern_process,xlabel="t",label="ground-truth")
 plot!(ts,s_est,label="smoother estimate")
 display(plt_smoother)
 
+
+filter_state = mapreduce(permutedims,vcat,mean.(fs))
+smoother_state = mapreduce(permutedims,vcat,mean.(ss))
+
+
+
+
+rmse(r) = sqrt( mean( [LinearAlgebra.norm_sqr(r[i,:]) for i in 1:size(r,1)]  )  )
+
+filter_state_residuals = mapreduce(permutedims,vcat,mean.(fs)) - xs
+smoother_state_residuals = mapreduce(permutedims,vcat,mean.(ss)) - xs
+
+filter_output_residuals = mapreduce(permutedims,vcat,mean.(f_est)) - matern_process
+smoother_output_residuals = mapreduce(permutedims,vcat,mean.(s_est)) - matern_process
+
+filter_output_rmse = rmse(filter_output_residuals)
+smoother_output_rmse = rmse(smoother_output_residuals)
+
+filter_state_rmse = rmse(filter_state_residuals)
+smoother_state_rmse = rmse(smoother_state_residuals)
+
+# smoother is suspicious
+display("filter output error: $(filter_output_rmse)")
+display("smoother output error: $(smoother_output_rmse)")
+
+display("filter state error: $(filter_state_rmse)")
+display("smoother state error: $(smoother_state_rmse)")
 
 #plt_state = plot(fs)
 #display(plt_state)

@@ -1,40 +1,64 @@
 
+abstract type AbstractFilterOutput end
+
+mutable struct FilterOutput{VD,VD,VK,L} <: AbstractFilterOutput
+    filter_distributions::VD
+    prediction_distributions::VD
+    backward_kernels::VK
+    loglikelihood::L
+    function FilterOutput(fd::VD,pd::VD,bk::VK,ll::Number) where {VD<:AbstractVector{<:AbstractDistribution},VK<:AbstractVector{<:AbstractMarkovKernel},L<:Number}
+        new{typeof(fd),typeof(pd),typeof(bk),typeof(ll)}(fd,pd,bk,ll)
+    end
+end
+
+Base.iterate(fo::FilterOutput) = (fo.filter_distributions,Val(:prediction_distributions))
+Base.iterate(fo::FilterOutput, ::Val{:prediction_distributions}) = (fo.prediction_distributions,Val(:backward_kernels))
+Base.iterate(fo::FilterOutput, ::Val{:backward_kernels}) = (fo.backward_kernels,Val(:loglikelihood))
+Base.iterate(fo::FilterOutput, ::Val{:loglikelihood}) = (fo.loglikelihood,Val(:done))
+Base.iterate(fo::FilterOutput, ::Val{:done}) = nothing
+
+add_filter_distribution!(fo::FilterOutput,d::AbstractDistribution) = push!(fo.filter_distributions,d)
+add_prediction_distribution!(fo::FilterOutput,d::AbstractDistribution) = push!(fo.prediction_distributions,d)
+add_backward_kernel!(fo::FilterOutput,k::AbstractMarkovKernel) = push!(fo.backward_kernels,k)
+update_loglikelihood!(fo::FilterOutput,inc::Number) = fo.loglikelihood += inc
+
+
+initialise_filter() = FilterOutput(AbstractDistribution[],AbstractDistribution[],AbstractMarkovKernel[],0.0)
+
 
 function Base.filter(problem::AbstractStateEstimationProblem)
 
-    # initialise (should probably be done by initialise(::AbstractStateEstimationProblem))
-    filter_distributions = AbstractDistribution[]
-    prediction_distributions = AbstractDistribution[]
-    backward_kernels = AbstractMarkovKernel[]
+    filter_output = initialise_filter()
     filter_distribution = initial_distribution(problem)
-    loglike = 0.0
 
     # loop variable should not be called stuff ...
     for stuff in problem
 
         fw_kernel, likelihood = stuff
 
+        # think this will be needed
+        #isnothing(likelihood) ? push!(filter_distributions,filter_distribution) : nothing
+
         # prediction step
         if !isnothing(fw_kernel)
 
             filter_distribution, bw_kernel = predict(filter_distribution,fw_kernel)
-            push!(backward_kernels,bw_kernel)
-
+            add_backward_kernel!(filter_output,bw_kernel)
         end
 
         # update step
         if !isnothing(likelihood)
             filter_distribution, prediction_distribution, loglike_increment = update(filter_distribution,likelihood)
-            push!(filter_distributions,filter_distribution)
-            push!(prediction_distributions,prediction_distribution)
-            loglike = loglike + loglike_increment
+            add_filter_distribution!(filter_output,filter_distribution)
+            add_prediction_distribution!(filter_output,prediction_distribution)
+            update_loglikelihood!(filter_output,loglike_increment)
         end
 
     end
 
     # should probably be organised in ::AbstractFilterOutput ?
-    return filter_distributions, backward_kernels, prediction_distributions, loglike
-
+    #return filter_distributions, backward_kernels, prediction_distributions, loglike
+    return filter_output
 end
 
 # simple filter for homogeneous Markov process
@@ -43,11 +67,8 @@ function Base.filter(ys,init::AbstractDistribution,fw_kernel::AbstractMarkovKern
     N = size(ys,1)
 
     # initialise recursion
-    filter_distributions = AbstractDistribution[]
-    prediction_distributions = AbstractDistribution[]
-    backward_kernels = AbstractMarkovKernel[]
-    f = init
-    loglike = 0.0
+    filter_output = initialise_filter()
+    filter_distribution = init
 
     if aligned
 
@@ -56,32 +77,30 @@ function Base.filter(ys,init::AbstractDistribution,fw_kernel::AbstractMarkovKern
         likelihood = Likelihood(m_kernel,y)
 
         # measurement update
-        f, pred, loglike_increment = update(f,likelihood)
-
-        push!(filter_distributions,f)
-        push!(prediction_distributions,pred)
-        loglike = loglike + loglike_increment
+        filter_distribution, prediction_distribution, loglike_increment = update(filter_distribution,likelihood)
+        add_filter_distribution!(filter_output,filter_distribution)
+        add_prediction_distribution!(filter_output,prediction_distribution)
+        update_loglikelihood!(filter_output,loglike_increment)
 
     end
 
     for n in 2:N
 
         # predict
-        p, b =  predict(f,fw_kernel)
-        push!(backward_kernels,b)
+        filter_distribution, bw_kernel = predict(filter_distribution,fw_kernel)
+        add_backward_kernel!(filter_output,bw_kernel)
 
         # create measurement model
         @inbounds y = ys[n,:]
         likelihood = Likelihood(m_kernel,y)
 
         # measurement update
-        f, pred, loglike_increment = update(p,likelihood)
-
-        push!(filter_distributions,f)
-        push!(prediction_distributions,pred)
-        loglike = loglike + loglike_increment
+        filter_distribution, prediction_distribution, loglike_increment = update(filter_distribution,likelihood)
+        add_filter_distribution!(filter_output,filter_distribution)
+        add_prediction_distribution!(filter_output,prediction_distribution)
+        update_loglikelihood!(filter_output,loglike_increment)
     end
 
-    return filter_distributions, backward_kernels, prediction_distributions, loglike
+    return filter_output
 
 end

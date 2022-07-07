@@ -1,5 +1,4 @@
 
-
 abstract type AbstractStateEstimationProblem end
 
 struct HomogeneousStateEstimationProblem{M,I,FK,MK,B} <: AbstractStateEstimationProblem

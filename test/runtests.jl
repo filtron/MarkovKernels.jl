@@ -7,6 +7,8 @@ include("normal_test.jl")
 include("affinemap_test.jl")
 include("normalkernel_test.jl")
 
+include("kf_homo_test.jl")
+
 n = 2
 
 etypes = (Float64,Complex{Float64})
@@ -27,5 +29,7 @@ amtypes = (:Linear,:Affine)
     for T in etypes
         normalkernel_test(T,n)
     end
+
+    kf_homo_test()
 
 end

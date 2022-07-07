@@ -45,11 +45,12 @@ include("inference/update.jl")
 export update
 
 # Bayesian state estimation problems
-include("inference/state_estimation.jl")
+include("inference/state_estimation_problem.jl")
 export AbstractStateEstimationProblem, HomogeneousStateEstimationProblem
 
 # Bayesian filtering
 include("inference/filter.jl")
+export AbstractFilterOutput, FilterOutput, add_filter_distribution!, add_prediction_distribution!, add_backward_kernel!, update_loglikelihood!, initialise_filter
 
 # Bayesian smoothing
 include("inference/smoother.jl")
