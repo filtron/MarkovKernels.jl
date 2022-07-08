@@ -56,10 +56,8 @@ ys = rand(measurement_kernel,xs)
 problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
 
 # state estimates
-filter_output = filter(ys,init,forward_kernel,measurement_kernel,true)
-#filter_output = filter(problem)
-#(;filter_distributions,prediction_distributions,backward_kernels,loglikelihood) = filter_output
-
+#filter_output = bayes_filter(ys,init,forward_kernel,measurement_kernel,true)
+filter_output = bayes_filter(problem)
 filter_distributions, prediction_distributions, backward_kernels, loglikelihood = filter_output
 
 # compute measurement residuals
@@ -69,7 +67,7 @@ residuals = mapreduce(residual,vcat,prediction_distributions,ys)
 filter_output_estimate = map( x-> marginalise(x,output_kernel), filter_distributions )
 
 # plot state
-plt_state = plot(ts,xs,layout=(dimx,1), title=["state" "" "" ""])
+plt_state = plot(ts,xs,layout=(dimx,1), title=["state" "" "" ""], color="black")
 plot!(ts,filter_distributions,layout=(dimx,1),)
 display(plt_state)
 

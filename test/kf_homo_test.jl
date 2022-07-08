@@ -26,11 +26,11 @@ function kf_homo_test()
     output = rand(output_kernel,xs)
     ys = rand(measurement_kernel,xs)
 
-    fs1, ps1, bs1, ll1 = filter(ys,init,forward_kernel,measurement_kernel,true)
+    fs1, ps1, bs1, ll1 = bayes_filter(ys,init,forward_kernel,measurement_kernel,true)
 
     problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
 
-    fs2, ps2, bs2, ll2 = filter(problem)
+    fs2, ps2, bs2, ll2 = bayes_filter(problem)
 
     @testset "homogeneous Kalman filter | " begin
 
@@ -97,6 +97,6 @@ function _invert_for_testing(y,μ,Π,C,R)
     m = μ + K*(y-pred_mean)
     Σ = Matrix(Hermitian(L*Π*L' + K*R*K'))
 
-    return pred_mean, pred_cov, m,
+    return pred_mean, pred_cov, m, Σ
 
 end

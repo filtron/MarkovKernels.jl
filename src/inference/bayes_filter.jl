@@ -26,7 +26,8 @@ update_loglikelihood!(fo::FilterOutput,inc::Number) = fo.loglikelihood += inc
 initialise_filter() = FilterOutput(AbstractDistribution[],AbstractDistribution[],AbstractMarkovKernel[],0.0)
 
 
-function Base.filter(problem::AbstractStateEstimationProblem)
+# repeated code in filters needs to be fixed...
+function bayes_filter(problem::AbstractStateEstimationProblem)
 
     filter_output = initialise_filter()
     filter_distribution = initial_distribution(problem)
@@ -41,7 +42,6 @@ function Base.filter(problem::AbstractStateEstimationProblem)
 
         # prediction step
         if !isnothing(fw_kernel)
-
             filter_distribution, bw_kernel = predict(filter_distribution,fw_kernel)
             add_backward_kernel!(filter_output,bw_kernel)
         end
@@ -56,13 +56,11 @@ function Base.filter(problem::AbstractStateEstimationProblem)
 
     end
 
-    # should probably be organised in ::AbstractFilterOutput ?
-    #return filter_distributions, backward_kernels, prediction_distributions, loglike
     return filter_output
 end
 
 # simple filter for homogeneous Markov process
-function Base.filter(ys,init::AbstractDistribution,fw_kernel::AbstractMarkovKernel,m_kernel::AbstractMarkovKernel,aligned::Bool)
+function bayes_filter(ys,init::AbstractDistribution,fw_kernel::AbstractMarkovKernel,m_kernel::AbstractMarkovKernel,aligned::Bool)
 
     N = size(ys,1)
 

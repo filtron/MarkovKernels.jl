@@ -41,9 +41,6 @@ output_kernel = DiracKernel(Matrix(C'))
 # sample Gauss-Markov process
 xs = rand(init,forward_kernel,N-1)
 
-plt_state = plot(ts,xs)
-display(plt_state)
-
 # measurement covariance matrix
 R = fill(0.01,1,1)
 
@@ -54,49 +51,29 @@ matern_process = rand(output_kernel,xs)
 measurement_kernel = NormalKernel(Matrix(C'),R)
 ys = rand(measurement_kernel,xs)
 
-plt_matern = plot(ts,matern_process)
-scatter!(ts,ys,color="black")
-display(plt_matern)
-
 # define state estimation problem
 problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
 
 # state estimates
-ss, fs, bws, mls, loglike = smoother(ys,init,forward_kernel,measurement_kernel,true)
-#ss, fs, bws, mls, loglike = smoother(problem)
-
-# compute measurement residuals
-residuals = mapreduce(residual,vcat,mls,ys)
+#smoother_distributions, filter_distributions, prediction_distributions, backward_kernels, loglike = bayes_smoother(ys,init,forward_kernel,measurement_kernel,true)
+smoother_distributions, filter_distributions, prediction_distributions, backward_kernels, loglike = bayes_smoother(problem)
 
 # matern estimates
-f_est = map( x-> marginalise(x,output_kernel), fs )
-s_est = map( x-> marginalise(x,output_kernel), ss )
+smoother_output_estimate = map( x-> marginalise(x,output_kernel), smoother_distributions )
 
-# plot filter estimate
-plt_filter = plot(ts,matern_process,xlabel="t",label="ground-truth")
-plot!(ts,f_est,label="filter estimate")
-display(plt_filter)
+# plot state
+plt_state = plot(ts,xs,layout=(dimx,1), title=["state" "" "" ""], color="black")
+plot!(ts,smoother_distributions,layout=(dimx,1),)
+display(plt_state)
 
-# plot one-step ahead
-plt_pred = plot(ts,matern_process,xlabel="t",label="ground-truth")
-plot!(ts,mls,label="one-step ahead prediction")
-display(plt_pred)
-
-# plot prediction errors
-plt_pe = scatter(ts,residuals,color="black")
-display(plt_pe)
-
-# plot smoother estimate
-plt_smoother = plot(ts,matern_process,xlabel="t",label="ground-truth")
-plot!(ts,s_est,label="smoother estimate")
+# plot output estimate
+plt_smoother = plot(ts,matern_process,xlabel="t",label="ground-truth",color="red")
+scatter!(ts,ys,label="measurement",color="black")
+plot!(ts,smoother_output_estimate,label="smoother estimate")
 display(plt_smoother)
-
 
 filter_state = mapreduce(permutedims,vcat,mean.(fs))
 smoother_state = mapreduce(permutedims,vcat,mean.(ss))
-
-
-
 
 rmse(r) = sqrt( mean( [LinearAlgebra.norm_sqr(r[i,:]) for i in 1:size(r,1)]  )  )
 
