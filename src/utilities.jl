@@ -32,7 +32,7 @@ function schur_red(Π::AbstractMatrix,C,R)
 
     Σ = Hermitian(L*Π*L' + K*R*K')
 
-    return S.data, K, Σ.data
+    return Matrix(S), K, Matrix(Σ)
 
 end
 

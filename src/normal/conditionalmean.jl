@@ -8,7 +8,6 @@ nin(μ::AbstractConditionalMean) = nin(μ)
 nout(μ::AbstractConditionalMean) = nout(μ)
 (μ::AbstractConditionalMean)(x) = μ(x)
 
-
 # need to annotate number of inputs/ outputs here I think...
 struct ConditionalMean{T,U,V} <: AbstractConditionalMean{T}
     f::U
@@ -19,7 +18,6 @@ end
 ConditionalMean{T}(μ) where T = ConditionalMean{T}(μ,nothing)
 ConditionalMean(μ) = ConditionalMean{eltype(μ)}(μ,nothing)
 (M::ConditionalMean)(x) = μ(x)
-
 
 # types for representing affine conditional means
 abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T}  end
@@ -94,7 +92,6 @@ function intercept(M::AffineMap)
 
 end
 
-# this is a mess but it works...
 function (M::AffineMap)(x)
 
     if islinear(M)

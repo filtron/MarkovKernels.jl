@@ -51,7 +51,6 @@ matern_process = rand(output_kernel,xs)
 measurement_kernel = NormalKernel(Matrix(C'),R)
 ys = rand(measurement_kernel,xs)
 
-
 # define state estimation problem
 problem = HomogeneousStateEstimationProblem(ys,init,forward_kernel,measurement_kernel,true)
 
