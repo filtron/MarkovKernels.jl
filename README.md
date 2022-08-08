@@ -15,8 +15,8 @@ abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
-
-Currently only normal distributions are implemented: 
+# Normal distributions 
+Normal distributions are implemented: 
 
 ```julia
 abstract type AbstractNormal end 
