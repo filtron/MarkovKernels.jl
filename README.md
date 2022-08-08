@@ -1,6 +1,7 @@
 # MarkovKernels.jl 
 
-A package implementing Bayesian filtering and smoothing by manipulating marginal distributions and Markov kernels.
+A package implementing defining a Distributions, Markov kernels, and likelihoods that all play nice with eachother. 
+The main motivation is to simplify the implementation of Bayesian filtering and smoothing algorithms. 
 
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
@@ -15,6 +16,27 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
+Currently only normal distributions are implemented 
+
+```julia
+abstract type AbstractNormal end 
+```
+with support for the following oeprations: 
+
+```julia
+dim(N::AbstractNormal) 
+
+mean(N::AbstractNormal) 
+cov(N::AbstractNormal) 
+var(N::AbstractNormal) 
+std(N::AbstractNormal) 
+
+residual(N::AbstractNormal,x) 
+logpdf(N::AbstractNormal,x)
+entropy(N::AbstractNormal)
+kldivergence(N1:AbstractNormal,N2:AbstractNormal)
+```
+
 For Bayesian state estimation, the following two methods need to be defined:
 
 ```julia
@@ -23,13 +45,6 @@ d_pred, bw_kernel = predict(d::AbstractDistribution,k::AbstractMarkovKernel)
 d_new, prediction_error_distribution, loglike = update(d::AbstractDistribution,l::AbstractLikelihood)
 ```
 
-
-
-* Type for representing state-estimation problems: 
-
-```julia
-abstract type AbstractStateEstimationProblem end
-```
 
 
 ## Bayesian state estimation 
