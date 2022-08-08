@@ -18,7 +18,7 @@ $$
 k(y\mid x)\pi(x) = \pi(x \mid y) k(y),  
 $$
 
-where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule. 
+where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the marginal distribution of $y$ (used for prediction error decomposition of the marginal likelihood). In fact, the prediction step may be implemented with the inverse factorisation operation as well, in which case $\pi(x\mid y)$ is the backwards kernel used to compute smoothing distributions in the Rauch-Tung-Striebel recursion, see the demo in src/demo. 
 
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
