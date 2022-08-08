@@ -19,26 +19,33 @@ abstract type AbstractLikelihood end
 Normal distributions are implemented: 
 
 ```julia
-abstract type AbstractNormal end 
-Normal <: AbstractNormal # mean vector / covariance matrix parametrisation of normal distributions 
-Dirac  <: AbstractNormal # normal distribution with zero covariance 
+abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end # normal distributions with realisations in real / complex Euclidean spaces  
+Normal{T} <: AbstractNormal{T} # mean vector / covariance matrix parametrisation of normal distributions 
+Dirac{T}  <: AbstractNormal{T} # normal distribution with zero covariance 
 ```
 
 The following functions are provided:  
 
 ```julia
-dim(N::AbstractNormal) 
+dim(N::AbstractNormal)  # dimension  of the normal distribution 
 
-mean(N::AbstractNormal) 
-cov(N::AbstractNormal) 
-var(N::AbstractNormal) 
-std(N::AbstractNormal) 
+mean(N::AbstractNormal) # mean vector 
+cov(N::AbstractNormal)  # covariance matrix 
+var(N::AbstractNormal)  # vector of marginal variances 
+std(N::AbstractNormal)  # vector of marginal standard deviations 
 
-residual(N::AbstractNormal,x) 
-logpdf(N::AbstractNormal,x)
-entropy(N::AbstractNormal)
+residual(N::AbstractNormal,x) # whitened residual of realisation x
+logpdf(N::AbstractNormal,x)   # logarithm of the probability density function at x 
+entropy(N::AbstractNormal)   
 kldivergence(N1::AbstractNormal,N2::AbstractNormal) 
-rand(N::AbstractNormal)
+rand(N::AbstractNormal) 
 ```
 
+### Normal kernels 
+
+```julia
+abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end # normal kernel over real / complex Euclidean spaces  
+NormalKernel{T} <:  AbstractNormalKernel{T}  # normal kernels with mean function / homoscedastic covariance 
+DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above buit with zero covariance 
+```
 
