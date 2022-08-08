@@ -27,6 +27,13 @@ update(D::AbstractDistribution,L::AbstractLikelihood)
 
 ### Normal distributions 
 
+* Mathematical definition: 
+
+$$
+\pi(x) = \mathcal{N}(x ; \mu  , \Sigma )
+$$
+
+
 * Types:
 
 ```julia
