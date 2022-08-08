@@ -16,7 +16,8 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 ### Normal distributions 
-Normal distributions are implemented: 
+
+* Type
 
 ```julia
 abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end # normal distributions with realisations in real / complex Euclidean spaces  
