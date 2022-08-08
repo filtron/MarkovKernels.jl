@@ -17,7 +17,7 @@ abstract type AbstractLikelihood end
 ```
 ### Normal distributions 
 
-* Type
+* Types:
 
 ```julia
 abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end # normal distributions with realisations in real / complex Euclidean spaces  
@@ -25,7 +25,7 @@ Normal{T} <: AbstractNormal{T} # mean vector / covariance matrix parametrisation
 Dirac{T}  <: AbstractNormal{T} # normal distribution with zero covariance 
 ```
 
-The following functions are provided:  
+* Functionality: 
 
 ```julia
 dim(N::AbstractNormal)  # dimension  of the normal distribution 
@@ -44,9 +44,22 @@ rand(N::AbstractNormal)
 
 ### Normal kernels 
 
+* Types: 
+
 ```julia
 abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end # normal kernel over real / complex Euclidean spaces  
 NormalKernel{T} <:  AbstractNormalKernel{T}  # normal kernels with mean function / homoscedastic covariance 
 DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above buit with zero covariance 
 ```
+
+* Constructors: 
+
+```julia
+NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix)  # Linear conditional mean with slope Φ
+DiracKernel(Φ::AbstractMatrix)                     # same as above but with zero covariance
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) # affine conditional me an with slope Φ and intercept b
+DiracKernel(Φ::AbstractMatrix,b::AbstractVector)                    # same as above but with zero covariance 
+```
+
+* Functionality: 
 
