@@ -15,6 +15,16 @@ abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
+* In practice, to implement Bayesian state estimation algorithms, it is up to the user to define appropriate prediction / update functions: 
+
+```julia
+predict(D::AbstractDistribution,K::AbstractMarkovKernel)
+update(D::AbstractDistribution,L::AbstractLikelihood)
+```
+
+
+
+
 ### Normal distributions 
 
 * Types:
@@ -72,5 +82,5 @@ compose(K2::AbstractNormalKernel,K1::AbstractNormalKernel) # Chapman-Kolmogorov
 marginalise(N::AbstractNormal,K::AbstractNormalKernel)   # marginalise out the conditional argument in K w.r.t N
 invert(N::AbstractNormal,K::AbstractNormalKernel) inverts the factorisation N(x)*K(y,x) such that Nout(y)*Kout(x,y) = N(x)*K(y,x)
 
-rand(K::AbstractNormalKernel,x)   # samples from K cvonditioned on x 
+rand(K::AbstractNormalKernel,x)   # samples from K conditioned on x 
 ```
