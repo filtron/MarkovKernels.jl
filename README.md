@@ -2,6 +2,13 @@
 
 A package implementing defining a Distributions, Markov kernels, and likelihoods that all play nice with eachother. 
 The main motivation is to simplify the implementation of Bayesian filtering and smoothing algorithms. 
+Let $\pi(x)$ is a probability distribution and $k(y\mid x)$ is a Markov kernel then the only the following operations are required for Bayesian state estimation
+
+* Marginalisation: 
+
+$$
+k(y) = \int k(y\mid x) \pi(x) \mathrm{d} x
+$$
 
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
