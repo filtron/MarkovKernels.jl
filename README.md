@@ -16,12 +16,15 @@ abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
 
-Currently only normal distributions are implemented 
+Currently only normal distributions are implemented: 
 
 ```julia
 abstract type AbstractNormal end 
+Normal <: AbstractNormal # mean vector / covariance matrix parametrisation of normal distributions 
+Dirac  <: AbstractNormal # normal distribution with zero covariance 
 ```
-with support for the following oeprations: 
+
+The following functions are provided:  
 
 ```julia
 dim(N::AbstractNormal) 
@@ -34,7 +37,8 @@ std(N::AbstractNormal)
 residual(N::AbstractNormal,x) 
 logpdf(N::AbstractNormal,x)
 entropy(N::AbstractNormal)
-kldivergence(N1:AbstractNormal,N2:AbstractNormal)
+kldivergence(N1::AbstractNormal,N2::AbstractNormal) 
+rand(N::AbstractNormal)
 ```
 
 For Bayesian state estimation, the following two methods need to be defined:
