@@ -30,9 +30,10 @@ update(D::AbstractDistribution,L::AbstractLikelihood)
 * Mathematical definition: 
 
 $$
-\pi(x) = \mathcal{N}(x ; \mu  , \Sigma )
+\pi(x) = \mathcal{N}(x ; \mu  , \Sigma ),  
 $$
 
+the explicit expression for the probability density function  depends on whether $x$ takes valued in real-valued or complex-valued Euvlidean space. 
 
 * Types:
 
