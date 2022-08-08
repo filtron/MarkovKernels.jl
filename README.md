@@ -41,7 +41,6 @@ update(D::AbstractDistribution,L::AbstractLikelihood)
 
 
 
-
 ### Normal distributions 
 
 * Mathematical definition: 
@@ -98,7 +97,7 @@ DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above buit with zero cova
 ```julia
 NormalKernel(Φ::AbstractMatrix,Σ::AbstractMatrix)  # Linear conditional mean with slope Φ
 DiracKernel(Φ::AbstractMatrix)                     # same as above but with zero covariance
-NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) # affine conditional me an with slope Φ and intercept b
+NormalKernel(Φ::AbstractMatrix,b::AbstractVector,Σ::AbstractMatrix) # affine conditional mean with slope Φ and intercept b
 DiracKernel(Φ::AbstractMatrix,b::AbstractVector)                    # same as above but with zero covariance 
 ```
 
