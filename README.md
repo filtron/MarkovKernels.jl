@@ -33,7 +33,7 @@ $$
 \pi(x) = \mathcal{N}(x ; \mu  , \Sigma ),  
 $$
 
-the explicit expression for the probability density function  depends on whether $x$ takes valued in real-valued or complex-valued Euvlidean space. 
+the explicit expression for the probability density function  depends on whether $x$ takes valued in real-valued or complex-valued Euclidean space. 
 
 * Types:
 
@@ -61,6 +61,12 @@ rand(N::AbstractNormal)
 ```
 
 ### Normal kernels 
+
+* Mathematical definition: 
+
+$$
+k(y\mid x) = \mathcal{N}( \mu(x), \Sigma  )
+$$
 
 * Types: 
 
