@@ -16,7 +16,7 @@ export AbstractDistribution, AbstractMarkovKernel
 
 # defines observation likelihoods
 include("likelihoods.jl")
-export AbstractLikelihood, Likelihood
+export AbstractLikelihood, Likelihood, measurement_model, measurement
 
 # defines marginal normal distributions
 include("normal/normal.jl")
@@ -31,30 +31,10 @@ export AbstractConditionalMean, ConditionalMean, AbstractAffineMap, AffineMap, n
 
 # defines normal kernels (conditional normal distributions)
 include("normal/normalkernel.jl")
-export NormalKernel, condition, compose, marginalise, invert, DiracKernel
+export AbstractNormalKernel, NormalKernel, condition, compose, marginalise, invert, DiracKernel
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")
-
-# prediction step for Bayesian filtering and smoothing
-include("inference/predict.jl")
-export predict
-
-# update step for Bayesian filtering and smoothing
-include("inference/update.jl")
-export update
-
-# Bayesian state estimation problems
-include("inference/state_estimation_problem.jl")
-export AbstractStateEstimationProblem, HomogeneousStateEstimationProblem
-
-# Bayesian filtering
-include("inference/bayes_filter.jl")
-export AbstractFilterOutput, FilterOutput, add_filter_distribution!, add_prediction_distribution!, add_backward_kernel!, update_loglikelihood!, initialise_filter, bayes_filter
-
-# Bayesian smoothing
-include("inference/bayes_smoother.jl")
-export bayes_smoother
 
 # helper functions
 include("utilities.jl")
