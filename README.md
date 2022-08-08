@@ -7,8 +7,18 @@ Let $\pi(x)$ is a probability distribution and $k(y\mid x)$ is a Markov kernel t
 * Marginalisation: 
 
 $$
-k(y) = \int k(y\mid x) \pi(x) \mathrm{d} x
+k(y) = \int k(y\mid x) \pi(x) \mathrm{d} x, 
+$$ 
+
+which gives the prediction step in Bayesian filtering. 
+
+* Inverse factorisation: 
+
 $$
+k(y\mid x)\pi(x) = \pi(x \mid y) k(y),  
+$$
+
+where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule. 
 
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
