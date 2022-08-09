@@ -110,7 +110,7 @@ cov(K::AbstractNormalkernel)   # returns (non-callable) conditional covariance m
 condition(K::AbstractNormalKernel,x) # returns normal distribution by evaluating the conditional argument of the kernel 
 compose(K2::AbstractNormalKernel,K1::AbstractNormalKernel) # Chapman-Kolmogorov 
 marginalise(N::AbstractNormal,K::AbstractNormalKernel)   # marginalise out the conditional argument in K w.r.t N
-invert(N::AbstractNormal,K::AbstractNormalKernel) inverts the factorisation N(x)*K(y,x) such that Nout(y)*Kout(x,y) = N(x)*K(y,x)
+invert(N::AbstractNormal,K::AbstractNormalKernel) #inverts the factorisation N(x)*K(y,x) such that Nout(y)*Kout(x,y) = N(x)*K(y,x)
 
 rand(K::AbstractNormalKernel,x)   # samples from K conditioned on x 
 ```
