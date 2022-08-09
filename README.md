@@ -89,7 +89,7 @@ $$
 ```julia
 abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end # normal kernel over real / complex Euclidean spaces  
 NormalKernel{T} <:  AbstractNormalKernel{T}  # normal kernels with mean function / homoscedastic covariance 
-DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above buit with zero covariance 
+DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above but with zero covariance 
 ```
 
 * Constructors: 
