@@ -23,25 +23,6 @@ similar(N::Normal) = Normal(similar(N.μ), similar(N.Σ))
     dim(N::AbstractNormal)
 
 Returns the dimension of the random vector represented by the normal distribution N.
-
-# Example
-```jldoctest
-julia> μ = [1.0, 0]
-2-element Vector{Float64}:
- 1.0
- 0.0
-
-julia> Σ = Diagonal([1.0, 1.0])
-2×2 Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅
-  ⋅   1.0
-
-julia> N = Normal(μ,Σ)
-Normal{Float64, Vector{Float64}, Diagonal{Float64, Vector{Float64}}}([1.0, 0.0], [1.0 0.0; 0.0 1.0])
-
-julia> dim(N)
-2
-```
 """
 dim(N::Normal) = length(N.μ)
 
