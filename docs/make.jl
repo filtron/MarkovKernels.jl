@@ -16,14 +16,12 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Distributions" => [
-            "Normal distributions" => "normal.md"
-        ],
+        "Distributions" => ["Normal distributions" => "normal.md"],
         "Tutorials" => [
             "Sampling from Probabilistic state-space models" => "tutorial_pomp_sampling.md"
             "Implementing a Kalman filter" => "tutorial_kalman_filter.md"
         ],
-        ],
+    ],
 )
 
 deploydocs(;
