@@ -41,7 +41,7 @@ init = Normal(zeros(dimx), 1.0*I(dimx))
 
 # sample Gauss-Markov process and plot
 xs = rand(init, forward_kernel, N)
-plt_states = plot(
+plot(
     ns,
     xs,
     layout=(dimx,1),
@@ -65,7 +65,7 @@ measurement_kernel = NormalKernel(C,R)
 output = rand(output_kernel,xs)
 zs = rand(measurement_kernel,xs)
 
-plt_output = plot(
+plot(
     ns,
     output,
     xlabel = "t",
