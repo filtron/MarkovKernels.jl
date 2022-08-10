@@ -10,8 +10,8 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     function Normal(μ::AbstractVector, Σ::AbstractMatrix)
         T = promote_type(eltype(μ), eltype(Σ))
         new{T,typeof(μ),typeof(Σ)}(
-            convert(AbstractVector{T}, μ),
-            Hermitian(convert(AbstractMatrix{T}, Σ)),
+             μ,
+             Σ,
         )
     end
 end
@@ -19,6 +19,30 @@ end
 similar(N::Normal) = Normal(similar(N.μ), similar(N.Σ))
 ==(N1::Normal, N2::Normal) = N1.μ == N2.μ && N1.Σ == N2.Σ
 
+"""
+    dim(N::AbstractNormal)
+
+Returns the dimension of the random vector represented by the normal distribution N.
+
+# Example
+```jldoctest
+julia> μ = [1.0, 0]
+2-element Vector{Float64}:
+ 1.0
+ 0.0
+
+julia> Σ = Diagonal([1.0, 1.0])
+2×2 Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅
+  ⋅   1.0
+
+julia> N = Normal(μ,Σ)
+Normal{Float64, Vector{Float64}, Diagonal{Float64, Vector{Float64}}}([1.0, 0.0], [1.0 0.0; 0.0 1.0])
+
+julia> dim(N)
+2
+```
+"""
 dim(N::Normal) = length(N.μ)
 
 mean(N::Normal) = N.μ

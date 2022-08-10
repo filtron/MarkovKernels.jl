@@ -6,7 +6,7 @@ function logdet(m::Hermitian)
 end
 
 # matrix square-roots
-lsqrt(m::AbstractMatrix) = cholesky(Hermitian(m)).L
+lsqrt(m::AbstractMatrix) = cholesky(m).L
 rsqrt(m) = cholesky(Hermitian(m)).U
 
 # trace of ratio
