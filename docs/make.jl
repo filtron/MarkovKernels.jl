@@ -19,7 +19,7 @@ makedocs(;
         "Distributions" => ["Normal distributions" => "normal.md"],
         "Tutorials" => [
             "Sampling from Probabilistic state-space models" => "tutorial_pomp_sampling.md"
-            "Implementing a Kalman filter" => "tutorial_kalman_filter.md"
+            "Implementing a Kalman filter and a Rauch-Tung-Striebel smoother" => "tutorial_kalman_filter.md"
         ],
     ],
 )
