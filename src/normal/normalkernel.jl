@@ -1,9 +1,17 @@
+"""
+    AbstractNormalKernel{T<:Number}
 
+Abstract type for representing Normal kernels taking values in T.
+"""
 abstract type AbstractNormalKernel{T<:Number} <: AbstractMarkovKernel end
 
-eltype(K::AbstractNormalKernel{T}) where {T} = T
+eltype(::AbstractNormalKernel{T}) where {T} = T
 
-# NormalKernel for Homoscedastic noise
+"""
+    NormalKernel
+
+Standard parametrisation of Normal kernels.
+"""
 struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <:
        AbstractNormalKernel{T}
     μ::U
@@ -13,7 +21,18 @@ struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <:
     end
 end
 
+"""
+    NormalKernel(Φ::AbstractMatrix, Σ::AbstractMatrix)
+
+Creates a Normal kernel with linear conditional mean of slope Φ and covariance matrix Σ.
+"""
 NormalKernel(Φ::AbstractMatrix, Σ::AbstractMatrix) = NormalKernel(AffineMap(Φ), Σ)
+
+"""
+    NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ::AbstractMatrix)
+
+Creates a Normal kernel with affine conditional mean of slope Φ, intercept b, and covariance matrix Σ.
+"""
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ::AbstractMatrix) =
     NormalKernel(AffineMap(Φ, b), Σ)
 NormalKernel(

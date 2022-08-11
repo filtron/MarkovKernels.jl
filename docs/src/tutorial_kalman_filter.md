@@ -15,17 +15,3 @@ given a measurement sequence $z_{0:N}$.
 
 ### Kalman filter implementation
 
-```@example 1
-
-function kalman_filter(
-    ys::AbstractVecOrMat,
-    init::AbstractNormal,
-    fw_kernel::AbstractNormalKernel,
-    m_kernel::AbstractNormalKernel
-
-)
-
-
-
-end
-```

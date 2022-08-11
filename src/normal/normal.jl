@@ -1,9 +1,17 @@
-# define normal types
+"""
+    AbstractNormal{T<:Number}
+
+Abstract type for representing normal distributed random vectors taking values in T.
+"""
 abstract type AbstractNormal{T<:Number} <: AbstractDistribution end
 
-eltype(N::AbstractNormal{T}) where {T} = T
+eltype(::AbstractNormal{T}) where {T} = T
 
-# hm.. should make Information form / Precision parametrisations here as well?
+"""
+    Normal{T,U,V}
+
+Standard parametrisation of the normal distribution with element type T.
+"""
 struct Normal{T,U,V} <: AbstractNormal{T}
     μ::U
     Σ::V
@@ -16,13 +24,7 @@ end
 similar(N::Normal) = Normal(similar(N.μ), similar(N.Σ))
 ==(N1::Normal, N2::Normal) = N1.μ == N2.μ && N1.Σ == N2.Σ
 
-"""
-    dim(N::AbstractNormal)
-
-Returns the dimension of the random vector represented by the normal distribution N.
-"""
 dim(N::Normal) = length(N.μ)
-
 mean(N::Normal) = N.μ
 cov(N::Normal) = Hermitian(Matrix(N.Σ))
 var(N::Normal) = real(diag(N.Σ))
