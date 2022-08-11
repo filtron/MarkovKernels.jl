@@ -137,11 +137,8 @@ zs = rand(measurement_kernel,xs)
 
 filter_distributions, prediction_distributions, backward_kernels, loglike =
         kalman_filter(zs, init, forward_kernel, measurement_kernel)
-```
 
-Plotting the state estimates.
-
-```@example 2
+# plotting the filter state estimates
 plot(
     ns,
     xs,
@@ -157,8 +154,6 @@ plot!(
     label = ["x0filter" "x1filter"]
 )
 ```
-
-Plotting one-step ahead predictions of the measurement.
 
 ```@example 2
 plot(
@@ -205,11 +200,7 @@ end
 The smoother estimates may thus be calculated from the previous output of the Kalman filter as follows.
 ```@example 2
 smoother_distributions = rts_recursion(filter_distributions[end],backward_kernels)
-```
 
-Plotting the smoother estimates of the state.
-
-```@example 2
 plot(
     ns,
     xs,

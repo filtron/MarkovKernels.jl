@@ -17,6 +17,7 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Distributions" => ["Normal distributions" => "normal.md"],
+        "Kernels" => ["normalkernel.md"],
         "Tutorials" => [
             "Sampling from Probabilistic state-space models" => "tutorial_pomp_sampling.md"
             "Implementing a Kalman filter and a Rauch-Tung-Striebel smoother" => "tutorial_kalman_filter.md"

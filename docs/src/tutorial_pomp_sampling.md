@@ -17,11 +17,9 @@ Additionally, noisy measurements of the output process will be generated accordi
 z_n \mid x_n \sim \mathcal{N}(Cx_n,R).
 ```
 
-
 ### Sampling from the latent Gauss-Markov process
 ```@example 1
 using MarkovKernels, LinearAlgebra, Plots
-
 
 N = 2^9
 ns = 0:N
@@ -30,10 +28,8 @@ ns = 0:N
 λ = 0.9
 σ = 1.0
 dimx = 2
-
 Φ = [λ 0.0; 1 - λ^2 λ]
 Q = (1-λ^2)*(1+λ^2) * 1.0*I(dimx)
-
 forward_kernel = NormalKernel(Φ, Q)
 
 # define initial distribution
