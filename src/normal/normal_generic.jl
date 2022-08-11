@@ -39,15 +39,14 @@ std(N::AbstractNormal) = std(N)
 
 Given a realisation x, computes the whitened residual with respect to N.
 """
-residual(N::AbstractNormal, x) = residual(N,x)
-
+residual(N::AbstractNormal, x) = residual(N, x)
 
 """
     logpdf(N::AbstractNormal,x)
 
 Evaluates the logarithm  of the probability density of N at x.
 """
-logpdf(N::AbstractNormal, x) = logpdf(N,x)
+logpdf(N::AbstractNormal, x) = logpdf(N, x)
 
 """
     entropy(N::AbstractNormal)
@@ -61,15 +60,14 @@ entropy(N::AbstractNormal) = entropy(N)
 
 Computes the Kullback-Leibler divergence between N1 and N2.
 """
-kldivergence(N1::AbstractNormal, N2::AbstractNormal) = kldivergence(N1,N2)
+kldivergence(N1::AbstractNormal, N2::AbstractNormal) = kldivergence(N1, N2)
 
 """
     rand(RNG::AbstractRNG, N::AbstractNormal)
 
 Draws one random vector from N using the random number generator RNG.
 """
-rand(RNG::AbstractRNG, N::AbstractNormal) = rand(RNG,N)
-
+rand(RNG::AbstractRNG, N::AbstractNormal) = rand(RNG, N)
 
 """
     rand(N::AbstractNormal)
