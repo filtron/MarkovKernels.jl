@@ -38,8 +38,8 @@ _nscale(T::Type{<:Complex}) = one(real(T))
 _piconst(T::Type{<:Real}) = T(2π)
 _piconst(T::Type{<:Complex}) = real(T)(π)
 
-logpdf(N::Normal, x) =
-    -_nscale(eltype(N)) * (logdet(_piconst(eltype(N)) * N.Σ) + norm_sqr(residual(N, x)))
+logpdf(N::Normal{T}, x) where {T} =
+    -_nscale(T) * (logdet(_piconst(T) * N.Σ) + norm_sqr(residual(N, x)))
 entropy(N::Normal) =
     _nscale(eltype(N)) * (dim(N) * (log(_piconst(eltype(N))) + 1) + logdet(N.Σ))
 
