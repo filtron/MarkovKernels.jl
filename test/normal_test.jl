@@ -14,7 +14,7 @@ function normal_test(T, n)
     N2 = Normal(μ2, Σ2)
 
     if T <: Real
-        logpdf1 = -1 / 2 * logdet(2 * π * Σ1) - 1 / 2 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
+        logpdf1 = -0.5 * logdet(2 * π * Σ1) - 0.5 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
 
         entropy1 = 1 / 2 * logdet(2 * π * exp(1) * Σ1)
 
