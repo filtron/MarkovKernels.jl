@@ -40,8 +40,8 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 
 logpdf(N::Normal{T}, x) where {T} =
     -_nscale(T) * (logdet(_piconst(T) * N.Σ) + norm_sqr(residual(N, x)))
-entropy(N::Normal) =
-    _nscale(eltype(N)) * (dim(N) * (log(_piconst(eltype(N))) + 1) + logdet(N.Σ))
+entropy(N::Normal{T}) where {T} =
+    _nscale(T) * (dim(N) * (log(_piconst(T) + 1) + logdet(N.Σ))
 
 function kldivergence(N1::Normal{T}, N2::Normal{T}) where {T<:Number}
     root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)
