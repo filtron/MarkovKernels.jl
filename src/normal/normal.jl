@@ -41,7 +41,7 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 logpdf(N::Normal{T}, x) where {T} =
     -_nscale(T) * (logdet(_piconst(T) * N.Σ) + norm_sqr(residual(N, x)))
 entropy(N::Normal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T) + 1) + logdet(N.Σ))
+    _nscale(T) * (dim(N) * (log(_piconst(T)) + 1) + logdet(N.Σ))
 
 function kldivergence(N1::Normal{T}, N2::Normal{T}) where {T<:Number}
     root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)
@@ -50,22 +50,6 @@ function kldivergence(N1::Normal{T}, N2::Normal{T}) where {T<:Number}
         real(T)(2) * real(logdet(root_ratio))
     )
 end
-
-#=
-function kldivergence(N1::Normal{T,U,V}, N2::Normal{T,U,V}) where {T<:Real,U,V}
-    root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)
-    return 1 / 2 * (
-        norm_sqr(root_ratio) + norm_sqr(residual(N2, N1.μ)) - dim(N1) -
-        2.0 * logdet(root_ratio)
-    )
-end
-
-function kldivergence(N1::Normal{T,U,V}, N2::Normal{T,U,V}) where {T<:Complex,U,V}
-    root_ratio = lsqrt(N2.Σ) \ lsqrt(N1.Σ)
-    return norm_sqr(root_ratio) + norm_sqr(residual(N2, N1.μ)) - dim(N1) -
-           2.0 * real(logdet(root_ratio))
-end
-=#
 
 rand(RNG::AbstractRNG, N::Normal{T,U,V}) where {T,U,V} =
     N.μ + lsqrt(N.Σ) * randn(RNG, eltype(N), dim(N))
