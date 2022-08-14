@@ -60,7 +60,8 @@ entropy(N::AbstractNormal) = entropy(N)
 
 Computes the Kullback-Leibler divergence between N1 and N2.
 """
-kldivergence(N1::AbstractNormal, N2::AbstractNormal) = kldivergence(N1, N2)
+kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number} =
+    kldivergence(N1, N2)
 
 """
     rand(RNG::AbstractRNG, N::AbstractNormal)
