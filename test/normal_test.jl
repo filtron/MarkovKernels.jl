@@ -12,6 +12,7 @@ function normal_test(T, n)
 
     N1 = Normal(μ1, Σ1)
     N2 = Normal(μ2, Σ2)
+    N12 = Normal(μ1, Σ1)
 
     if T <: Real
         logpdf1 = -0.5 * logdet(2 * π * Σ1) - 0.5 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
@@ -40,7 +41,7 @@ function normal_test(T, n)
 
     @testset "Normal | $(T) " begin
 
-        # correct values
+        @test N1 == N12
         @test mean(N1) == μ1
         @test cov(N1) == Σ1
         @test var(N1) == diag(Σ1)
@@ -53,7 +54,6 @@ function normal_test(T, n)
         @test kldivergence(N1, N2) ≈ kld12
         @test kldivergence(N2, N1) ≈ kld21
 
-        # correct type
         @test eltype(var(N1)) <: Real
         @test eltype(std(N1)) <: Real
         @test eltype(logpdf(N1, x1)) <: Real
