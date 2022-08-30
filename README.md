@@ -1,6 +1,6 @@
 # MarkovKernels.jl 
 
-A package implementing defining a Distributions, Markov kernels, and likelihoods that all play nice with eachother. 
+A package implementing distributions, Markov kernels, and likelihoods that all play nice with eachother. 
 The main motivation is to simplify the implementation of Bayesian filtering and smoothing algorithms. 
 Let $\pi(x)$ is a probability distribution and $k(y\mid x)$ is a Markov kernel then the only the following operations are required for Bayesian state estimation
 
