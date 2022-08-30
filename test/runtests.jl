@@ -18,7 +18,7 @@ amtypes = (:Linear, :Affine)
 @testset "MarkovKernels.jl" begin
     for T in etypes
         normal_test(T, n)
-        dirac_test(T,n)
+        dirac_test(T, n)
     end
 
     for T in etypes, MT in amtypes

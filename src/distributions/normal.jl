@@ -54,4 +54,3 @@ end
 rand(RNG::AbstractRNG, N::Normal{T,U,V}) where {T,U,V} =
     N.μ + lsqrt(N.Σ) * randn(RNG, eltype(N), dim(N))
 rand(N::Normal) = rand(GLOBAL_RNG, N)
-

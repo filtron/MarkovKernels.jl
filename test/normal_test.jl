@@ -40,7 +40,6 @@ function normal_test(T, n)
     end
 
     @testset "Normal | $(T) " begin
-
         @test N1 == N12
         @test mean(N1) == μ1
         @test cov(N1) == Σ1
