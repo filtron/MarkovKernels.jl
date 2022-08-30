@@ -58,7 +58,7 @@ the explicit expression for the probability density function  depends on whether
 ```julia
 abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end # normal distributions with realisations in real / complex Euclidean spaces  
 Normal{T} <: AbstractNormal{T} # mean vector / covariance matrix parametrisation of normal distributions 
-Dirac{T}  <: AbstractNormal{T} # normal distribution with zero covariance 
+Dirac{T}  <: AbstractDirac{T} # dirac distribution with zero covariance 
 ```
 
 * Functionality: 
@@ -91,7 +91,7 @@ $$
 ```julia
 abstract type AbstractNormalKernel{T<:Number}  <: AbstractMarkovKernel end # normal kernel over real / complex Euclidean spaces  
 NormalKernel{T} <:  AbstractNormalKernel{T}  # normal kernels with mean function / homoscedastic covariance 
-DiracKernel{T}  <:  AbstractNormalKernel{T}  # same as above but with zero covariance 
+DiracKernel{T}  <:  AbstractDiracKernel{T}  # dirac kernels 
 ```
 
 * Constructors: 
