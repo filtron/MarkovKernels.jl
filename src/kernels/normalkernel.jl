@@ -12,8 +12,7 @@ eltype(::AbstractNormalKernel{T}) where {T} = T
 
 Standard parametrisation of Normal kernels.
 """
-struct NormalKernel{T,U<:AbstractConditionalMean,V<:AbstractMatrix} <:
-       AbstractNormalKernel{T}
+struct NormalKernel{T,U,V<:AbstractMatrix} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
     function NormalKernel(μ, Σ)
@@ -46,10 +45,7 @@ mean(K::NormalKernel) = K.μ
 
 cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
 
-condition(
-    K::NormalKernel{T,U,V},
-    x,
-) where {T,U<:AbstractConditionalMean,V<:AbstractMatrix} = Normal(mean(K)(x), cov(K))
+condition(K::NormalKernel, x) = Normal(mean(K)(x), cov(K))
 
 compose(
     K2::NormalKernel{T,U,V},

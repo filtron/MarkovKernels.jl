@@ -1,26 +1,7 @@
-
-abstract type AbstractConditionalMean{T<:Number} end
-
-eltype(M::AbstractConditionalMean{T}) where {T} = T
-
-# list of things all ConditionalMeans must have?
-nin(μ::AbstractConditionalMean) = nin(μ)
-nout(μ::AbstractConditionalMean) = nout(μ)
-(μ::AbstractConditionalMean)(x) = μ(x)
-
-# need to annotate number of inputs/ outputs here I think...
-struct ConditionalMean{T,U,V} <: AbstractConditionalMean{T}
-    f::U
-    jac::V
-    ConditionalMean{T}(f, jac) where {T<:Number} = new{T,typeof(f),typeof(jac)}(f, jac)
-end
-
-ConditionalMean{T}(μ) where {T} = ConditionalMean{T}(μ, nothing)
-ConditionalMean(μ) = ConditionalMean{eltype(μ)}(μ, nothing)
-(M::ConditionalMean)(x) = μ(x)
-
 # types for representing affine conditional means
-abstract type AbstractAffineMap{T<:Number} <: AbstractConditionalMean{T} end
+abstract type AbstractAffineMap{T<:Number} end
+
+eltype(::AbstractAffineMap{T}) where {T} = T
 
 #  T <: AbstractAffineMap implements slope and intercept
 (M::AbstractAffineMap)(x) = slope(M) * x + intercept(M)
@@ -60,12 +41,10 @@ function AffineMap(Φ::AbstractMatrix, prior::AbstractVector, pred::AbstractVect
     )
 end
 
-==(M1::AffineMap, M2::AffineMap) =
-    M1.Φ == M2.Φ && M1.prior == M2.prior && M1.pred == M2.pred
 function similar(M::AffineMap)
     Φ = similar(M.Φ)
-    prior = prior === nothing ? nothing : similar(prior)
-    pred = pred === nothing ? nothing : similar(pred)
+    prior = M.prior === nothing ? nothing : similar(M.prior)
+    pred = M.pred === nothing ? nothing : similar(M.pred)
 
     return AffineMap(Φ, prior, pred)
 end

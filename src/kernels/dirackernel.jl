@@ -2,7 +2,7 @@ abstract type AbstractDiracKernel{T<:Number} <: AbstractMarkovKernel end
 
 eltype(::AbstractDiracKernel{T}) where {T} = T
 
-struct DiracKernel{T,U<:AbstractConditionalMean} <: AbstractDiracKernel{T}
+struct DiracKernel{T,U} <: AbstractDiracKernel{T}
     μ::U
     DiracKernel(μ) = new{eltype(μ),typeof(μ)}(μ)
 end
@@ -21,7 +21,7 @@ marginalise(
     N::Normal{T,U,V},
     K::DiracKernel{T,S},
 ) where {T,U,S<:AbstractAffineMap,V<:AbstractMatrix} =
-    Normal(mean(K)(mean(N)), stein(cov(N), mean(K))) # not the smartest way ...
+    Normal(mean(K)(mean(N)), stein(cov(N), mean(K)))
 
 function invert(
     N::Normal{T,U,V},
