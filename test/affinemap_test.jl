@@ -20,10 +20,12 @@ function affinemap_test(T, MT, n)
         M2 = AffineMap(Φ2, prior2)
         prior3 = Φ2 * prior1 + prior2
     end
+    M12 = AffineMap(Φ1)
 
     M3 = compose(M2, M1)
 
     @testset "AffineMap | $(T) | $(MT)" begin
+        @test typeof(similar(M1)) == typeof(M1)
         @test eltype(M1) == T
 
         @test slope(M1) == Φ1
