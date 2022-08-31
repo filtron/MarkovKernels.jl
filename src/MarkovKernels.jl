@@ -23,7 +23,18 @@ include("distributions/normal_generic.jl") # generic normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
 include("distributions/dirac.jl") # dirac distributions
 export AbstractNormal,
-    Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence, AbstractDirac, Dirac
+    Normal,
+    dim,
+    mean,
+    cov,
+    var,
+    std,
+    residual,
+    logpdf,
+    entropy,
+    kldivergence,
+    AbstractDirac,
+    Dirac
 
 # defines conditional mean for normal kernels
 include("kernels/conditionalmean.jl")

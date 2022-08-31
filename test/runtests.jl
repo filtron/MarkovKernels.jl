@@ -10,6 +10,7 @@ include("normalkernel_test.jl")
 include("dirackernel_test.jl")
 
 n = 2
+m = 3
 
 etypes = (Float64, Complex{Float64})
 
@@ -28,6 +29,6 @@ amtypes = (:Linear, :Affine)
 
     for T in etypes
         normalkernel_test(T, n)
-        dirackernel_test(T,n)
+        dirackernel_test(T, n, m)
     end
 end

@@ -87,4 +87,3 @@ end
 
 rand(RNG::AbstractRNG, K::NormalKernel, x::AbstractVector) = rand(RNG, condition(K, x))
 rand(K::NormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
-
