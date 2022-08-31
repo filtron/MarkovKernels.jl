@@ -40,6 +40,8 @@ function normal_test(T, n)
     end
 
     @testset "Normal | $(T) " begin
+        @test eltype(N1) == T
+        @test typeof(similar(N1)) == typeof(N1)
         @test N1 == N12
         @test mean(N1) == μ1
         @test cov(N1) == Σ1

@@ -16,5 +16,5 @@ cov(D::Dirac) = zeros(eltype(D), dim(D), dim(D))
 var(D::Dirac) = zeros(real(eltype(D)), dim(D))
 std(D::Dirac) = zeros(real(eltype(D)), dim(D))
 
-rand(RNG::AbstractRNG, D::Dirac) = mean(D)
+rand(::AbstractRNG, D::Dirac) = mean(D)
 rand(D::Dirac) = rand(GLOBAL_RNG, D)

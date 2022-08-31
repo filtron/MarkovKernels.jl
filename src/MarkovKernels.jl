@@ -52,6 +52,6 @@ export AbstractNormalKernel,
 include("sampling.jl")
 
 # helper functions
-include("utilities.jl")
+include("matrix_utilities.jl")
 
 end

@@ -5,6 +5,7 @@ function dirac_test(T, n)
     D12 = Dirac(μ1)
 
     @testset "Dirac | $(T) " begin
+        @test typeof(similar(D1)) == typeof(D1)
         @test D1 == D12
         @test mean(D1) == μ1
         @test cov(D1) == zeros(T, n, n)
