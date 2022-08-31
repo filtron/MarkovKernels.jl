@@ -8,6 +8,7 @@ end
 
 # matrix square-roots
 lsqrt(m::AbstractMatrix) = cholesky(m).L
+lsqrt(m::UniformScaling) = sqrt(m)
 
 # stein operator
 stein(Σ::AbstractMatrix, Φ::AbstractMatrix) = Matrix(Hermitian(Φ * Σ * Φ'))
