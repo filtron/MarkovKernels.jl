@@ -1,19 +1,15 @@
 
 # fix logdet for Hermitian matrices
-function logdet(m::Hermitian)
-    lad = logabsdet(m)
-    real(lad[2]) >= 0 ? lad[1] : -Inf
+function LinearAlgebra.logdet(H::Hermitian)
+    mag, sign = logabsdet(H)
+    resign = real(sign)
+    return mag + log(resign)
 end
 
 # matrix square-roots
 lsqrt(m::AbstractMatrix) = cholesky(m).L
-rsqrt(m) = cholesky(Hermitian(m)).U
-
-# trace of ratio
-trdiv(Σ1, Σ2) = tr(Σ2 \ Σ1) #norm_sqr( lsqrt(Σ2) \ lsqrt(Σ1) )
 
 # stein operator
-
 stein(Σ::AbstractMatrix, Φ::AbstractMatrix) = Matrix(Hermitian(Φ * Σ * Φ'))
 stein(Σ::AbstractMatrix, Φ::AbstractMatrix, Q::AbstractMatrix) =
     Matrix(Hermitian(Φ * Σ * Φ' + Q))
