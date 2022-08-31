@@ -18,27 +18,33 @@ export AbstractDistribution, AbstractMarkovKernel
 include("likelihoods.jl")
 export AbstractLikelihood, Likelihood, measurement_model, measurement
 
-# defines marginal normal distributions
-include("distributions/normal.jl")
-include("distributions/normal_generic.jl")
+include("distributions/normal.jl")  # normal distributions
+include("distributions/normal_generic.jl") # generic normal distributions
+include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
+include("distributions/dirac.jl") # dirac distributions
 export AbstractNormal,
-    Normal, dim, mean, cov, var, std, residual, logpdf, entropy, kldivergence
-
-# plotting marginal normal distributions
-include("distributions/normal_plotting.jl")
-
-# defines dirac distributions
-include("distributions/dirac.jl")
-export AbstractDirac, Dirac
+    Normal,
+    dim,
+    mean,
+    cov,
+    var,
+    std,
+    residual,
+    logpdf,
+    entropy,
+    kldivergence,
+    AbstractDirac,
+    Dirac
 
 # defines conditional mean for normal kernels
 include("kernels/conditionalmean.jl")
 export AbstractConditionalMean,
     ConditionalMean, AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
 
-# defines normal kernels (conditional normal distributions)
-include("kernels/normalkernel.jl")
-include("kernels/normalkernel_generic.jl")
+include("kernels/normalkernel.jl") # defines normal kernels
+include("kernels/normalkernel_generic.jl") # generic normal kernels
+include("kernels/dirackernel.jl") # defines dirac kernels
+include("kernels/compose.jl")
 export AbstractNormalKernel,
     NormalKernel, condition, compose, marginalise, invert, DiracKernel
 
