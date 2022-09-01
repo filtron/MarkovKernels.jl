@@ -12,13 +12,16 @@ eltype(::AbstractNormalKernel{T}) where {T} = T
 
 Standard parametrisation of Normal kernels.
 """
-struct NormalKernel{T,U,V<:AbstractMatrix} <: AbstractNormalKernel{T}
+struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
     function NormalKernel(μ, Σ)
         new{eltype(μ),typeof(μ),typeof(Σ)}(μ, Σ)
     end
 end
+
+const AffineNormalKernel{T} =
+    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
 
 """
     NormalKernel(Φ::AbstractMatrix, Σ::AbstractMatrix)
@@ -47,31 +50,18 @@ cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
 
 condition(K::NormalKernel, x) = Normal(mean(K)(x), cov(K))
 
-compose(
-    K2::NormalKernel{T,U,V},
-    K1::NormalKernel{T,U,V},
-) where {T,U<:AbstractAffineMap,V<:AbstractMatrix} =
+compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), stein(cov(K1), mean(K2), cov(K2)))
 
 *(K2::AbstractNormalKernel, K1::AbstractNormalKernel) = compose(K2, K1)
 
-marginalise(
-    N::Normal{T,U,V},
-    K::NormalKernel{T,S,V},
-) where {T,U,S<:AbstractAffineMap,V<:AbstractMatrix} =
+marginalise(N::Normal{T}, K::AffineNormalKernel{T}) where {T} =
     Normal(mean(K)(mean(N)), stein(cov(N), mean(K), cov(K)))
 
-function invert(
-    N::Normal{T,U,V},
-    K::NormalKernel{T,M,W},
-) where {T,U,V<:AbstractMatrix,M<:AbstractAffineMap,W<:AbstractMatrix}
+function invert(N::Normal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))
 
-    Π = cov(N)
-    C = slope(mean(K))
-    R = cov(K)
-
-    S, G, Σ = schur_red(Π, C, R)
+    S, G, Σ = schur_red(N.Σ, slope(K.μ), K.Σ)
 
     Nout = Normal(pred, S)
 

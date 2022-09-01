@@ -44,6 +44,8 @@ function normalkernel_test(T, n)
 
         @test slope(mean(compose(K2, K1))) ≈ slope(K3.μ)
         @test cov(compose(K2, K1)) ≈ cov(K3)
+        @test slope(mean(K2 * K1)) == slope(mean(compose(K2, K1)))
+        @test cov(K2 * K1) == cov(compose(K2, K1))
 
         @test mean(marginalise(N1, K1)) ≈ Φ1 * μ
         @test cov(marginalise(N1, K1)) ≈ Hermitian(Φ1 * Σ * Φ1' + Q1)
