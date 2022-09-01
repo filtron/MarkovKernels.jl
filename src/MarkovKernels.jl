@@ -24,6 +24,7 @@ include("distributions/normal_plotting.jl") # plotting vectors of normal distrib
 include("distributions/dirac.jl") # dirac distributions
 export AbstractNormal,
     Normal,
+    IsoNormal,
     dim,
     mean,
     cov,

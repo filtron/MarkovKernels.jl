@@ -14,7 +14,6 @@ m = 3
 
 etypes = (Float64, Complex{Float64})
 
-#amtypes = (:Linear,:Affine,:Corrector)
 amtypes = (:Linear, :Affine)
 
 @testset "MarkovKernels.jl" begin
