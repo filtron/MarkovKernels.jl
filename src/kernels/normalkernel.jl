@@ -23,12 +23,14 @@ end
 const AffineNormalKernel{T} =
     NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
 
-"""
-    NormalKernel(Φ::AbstractMatrix, Σ::AbstractMatrix)
+const AffineIsoNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:UniformScaling}
 
-Creates a Normal kernel with linear conditional mean of slope Φ and covariance matrix Σ.
 """
-NormalKernel(Φ::AbstractMatrix, Σ::AbstractMatrix) = NormalKernel(AffineMap(Φ), Σ)
+    NormalKernel(Φ::AbstractMatrix, Σ)
+
+Creates a Normal kernel with linear conditional mean of slope Φ and covariance parameter Σ.
+"""
+NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
 
 """
     NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ::AbstractMatrix)
@@ -46,7 +48,7 @@ NormalKernel(
 
 mean(K::NormalKernel) = K.μ
 
-cov(K::NormalKernel{T,U,V}) where {T,U,V<:AbstractMatrix} = K.Σ
+cov(K::NormalKernel) = K.Σ
 
 condition(K::NormalKernel, x) = Normal(mean(K)(x), cov(K))
 
