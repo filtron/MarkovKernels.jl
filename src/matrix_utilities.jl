@@ -12,11 +12,10 @@ lsqrt(m::UniformScaling) = sqrt(m)
 
 # stein operator
 stein(Σ, Φ) = Matrix(Hermitian(Φ * Σ * Φ'))
-stein(Σ::T, Φ::T) where T <: UniformScaling = Φ * Σ * Φ'
+stein(Σ::T, Φ::T) where {T<:UniformScaling} = Φ * Σ * Φ'
 
-stein(Σ, Φ, Q) =
-    Matrix(Hermitian(Φ * Σ * Φ' + Q))
-stein(Σ::T, Φ::T, Q::T) where T <: UniformScaling = Φ * Σ * Φ' + Q
+stein(Σ, Φ, Q) = Matrix(Hermitian(Φ * Σ * Φ' + Q))
+stein(Σ::T, Φ::T, Q::T) where {T<:UniformScaling} = Φ * Σ * Φ' + Q
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)

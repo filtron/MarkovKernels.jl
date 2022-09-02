@@ -55,9 +55,9 @@ function normalkernel_test(T, n)
     end
 
     λ1 = 2.0
-    IN1 = IsoNormal(μ,λ1)
+    IN1 = IsoNormal(μ, λ1)
 
-    pred, S, G, Π = _schur(λ1*I, μ, Φ1, Q1)
+    pred, S, G, Π = _schur(λ1 * I, μ, Φ1, Q1)
     N_gt2 = Normal(pred, S)
     corrector = AffineMap(G, μ, pred)
     K_gt2 = NormalKernel(corrector, Π)
@@ -65,7 +65,6 @@ function normalkernel_test(T, n)
     NC2, KC2 = invert(IN1, K1)
 
     @testset "AffineNormalKernel / IsoNormal | $(T) " begin
-
         @test mean(marginalise(IN1, K1)) ≈ Φ1 * μ
         @test cov(marginalise(IN1, K1)) ≈ Hermitian(Φ1 * λ1 * Φ1' + Q1)
 
@@ -75,14 +74,12 @@ function normalkernel_test(T, n)
         @test slope(mean(KC2)) ≈ slope(mean(K_gt2))
         @test intercept(mean(KC2)) ≈ intercept(mean(K_gt2))
     end
-
 end
 
-function _schur(Σ, μ, C,R)
-
+function _schur(Σ, μ, C, R)
     pred = C * μ
-  #  dimx = length(μ)
-   # dimy = length(pred)
+    #  dimx = length(μ)
+    # dimy = length(pred)
 
     S = Hermitian(C * Σ * C' + R)
     G = Σ * C' / S
