@@ -79,7 +79,6 @@ function normalkernel_test(T, n)
     K4 = NormalKernel(Φ2 * Φ1, Hermitian(Φ2 * λ2 * Φ2' + λ3 * I))
 
     @testset "AffineIsoNormalKernel | $(T) " begin
-        @test typeof(IK1) <: AffineIsoNormalKernel
         @test mean(IK1)(x) == Φ1 * x
         @test cov(IK1) == λ2 * I
 

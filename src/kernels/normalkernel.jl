@@ -23,8 +23,6 @@ end
 const AffineNormalKernel{T} =
     NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
 
-const AffineIsoNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:UniformScaling}
-
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
 
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
