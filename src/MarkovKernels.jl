@@ -39,15 +39,21 @@ export AbstractNormal,
 
 # defines conditional mean for normal kernels
 include("kernels/affinemap.jl")
-export AbstractConditionalMean,
-    ConditionalMean, AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
+export AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/normalkernel_generic.jl") # generic normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 include("kernels/compose.jl")
 export AbstractNormalKernel,
-    NormalKernel, condition, compose, marginalise, invert, DiracKernel
+    NormalKernel,
+    AffineNormalKernel,
+    AffineIsoNormalKernel,
+    condition,
+    compose,
+    marginalise,
+    invert,
+    DiracKernel
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

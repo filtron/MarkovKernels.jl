@@ -11,14 +11,17 @@ lsqrt(m::AbstractMatrix) = cholesky(m).L
 lsqrt(m::UniformScaling) = sqrt(m)
 
 # stein operator
-stein(Σ::AbstractMatrix, Φ::AbstractMatrix) = Matrix(Hermitian(Φ * Σ * Φ'))
-stein(Σ::AbstractMatrix, Φ::AbstractMatrix, Q::AbstractMatrix) =
-    Matrix(Hermitian(Φ * Σ * Φ' + Q))
-stein(Σ::AbstractMatrix, A::AbstractAffineMap) = stein(Σ, slope(A))
-stein(Σ::AbstractMatrix, A::AbstractAffineMap, Q::AbstractMatrix) = stein(Σ, slope(A), Q)
+stein(Σ, Φ) = Matrix(Hermitian(Φ * Σ * Φ'))
+stein(Σ::T, Φ::T) where {T<:UniformScaling} = Φ * Σ * Φ'
+
+stein(Σ, Φ, Q) = Matrix(Hermitian(Φ * Σ * Φ' + Q))
+stein(Σ::T, Φ::T, Q::T) where {T<:UniformScaling} = Φ * Σ * Φ' + Q
+
+stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
+stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
 
 # schur reduction
-function schur_red(Π::AbstractMatrix, C, R)
+function schur_red(Π, C, R)
     K = Π * C'
     S = Hermitian(C * K + R)
 
@@ -32,4 +35,4 @@ function schur_red(Π::AbstractMatrix, C, R)
     return Matrix(S), K, Matrix(Σ)
 end
 
-schur_red(Π::AbstractMatrix, C) = schur_red(Π, C, 0.0 * I) # might be done smarter?
+schur_red(Π, C) = schur_red(Π, C, 0.0 * I) # might be done smarter?
