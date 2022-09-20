@@ -4,15 +4,15 @@ function normalkernel_test(T, n)
 
     Φ1 = randn(T, n, n)
     RQ1 = randn(T, n, n)
-    Q1 = Hermitian(RQ1' * RQ1)
+    Q1 = RQ1' * RQ1
     K1 = NormalKernel(Φ1, Q1)
 
     Φ2 = randn(T, n, n)
     RQ2 = randn(T, n, n)
-    Q2 = Hermitian(RQ2' * RQ2)
+    Q2 = RQ2' * RQ2
     K2 = NormalKernel(Φ2, Q2)
 
-    K3 = NormalKernel(Φ2 * Φ1, Hermitian(Φ2 * Q1 * Φ2' + Q2))
+    K3 = NormalKernel(Φ2 * Φ1, Φ2 * Q1 * Φ2' + Q2)
 
     x = randn(T, n)
 

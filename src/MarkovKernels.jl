@@ -16,7 +16,7 @@ export AbstractDistribution, AbstractMarkovKernel
 
 # defines observation likelihoods
 include("likelihoods.jl")
-export AbstractLikelihood, Likelihood, measurement_model, measurement
+export AbstractLikelihood, Likelihood, measurement_model, measurement, bayes_rule
 
 include("distributions/normal.jl")  # normal distributions
 include("distributions/normal_generic.jl") # generic normal distributions
