@@ -16,6 +16,7 @@ struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
     function NormalKernel(μ, Σ)
+        Σ = symmetrise(Σ)
         new{eltype(μ),typeof(μ),typeof(Σ)}(μ, Σ)
     end
 end
