@@ -12,7 +12,7 @@ lsqrt(m::UniformScaling) = sqrt(m)
 
 # project matrix onto symmetric matrix
 symmetrise(Σ) = Σ
-symmetrise(Σ::Matrix{T}) where T = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+symmetrise(Σ::Matrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
 
 # stein operator
 stein(Σ, Φ) = symmetrise(Φ * Σ * Φ')
