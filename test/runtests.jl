@@ -8,6 +8,7 @@ include("dirac_test.jl")
 include("affinemap_test.jl")
 include("normalkernel_test.jl")
 include("dirackernel_test.jl")
+include("likelihood_test.jl")
 
 n = 2
 m = 3
@@ -29,5 +30,6 @@ amtypes = (:Linear, :Affine)
     for T in etypes
         normalkernel_test(T, n)
         dirackernel_test(T, n, m)
+        likelihood_test(T, n, m)
     end
 end
