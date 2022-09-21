@@ -84,7 +84,7 @@ end
 
 function _logpdf(T, μ1, Σ1, x1)
     n = length(μ1)
-    Σ1 = _symmetrise(T,Σ1[1:n, 1:n])
+    Σ1 = _symmetrise(T, Σ1[1:n, 1:n])
     if T <: Real
         logpdf = -0.5 * logdet(2 * π * Σ1) - 0.5 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
     elseif T <: Complex
