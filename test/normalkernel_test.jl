@@ -4,15 +4,15 @@ function normalkernel_test(T, n)
 
     Φ1 = randn(T, n, n)
     RQ1 = randn(T, n, n)
-    Q1 = Hermitian(RQ1' * RQ1)
+    Q1 = RQ1' * RQ1
     K1 = NormalKernel(Φ1, Q1)
 
     Φ2 = randn(T, n, n)
     RQ2 = randn(T, n, n)
-    Q2 = Hermitian(RQ2' * RQ2)
+    Q2 = RQ2' * RQ2
     K2 = NormalKernel(Φ2, Q2)
 
-    K3 = NormalKernel(Φ2 * Φ1, Hermitian(Φ2 * Q1 * Φ2' + Q2))
+    K3 = NormalKernel(Φ2 * Φ1, Φ2 * Q1 * Φ2' + Q2)
 
     x = randn(T, n)
 
@@ -40,7 +40,7 @@ function normalkernel_test(T, n)
 
     @testset "AffineNormalKernel / Normal | $(T) " begin
         @test mean(marginalise(N1, K1)) ≈ Φ1 * μ
-        @test cov(marginalise(N1, K1)) ≈ Hermitian(Φ1 * Σ * Φ1' + Q1)
+        @test cov(marginalise(N1, K1)) ≈ Φ1 * Σ * Φ1' + Q1
 
         @test mean(NC1) ≈ mean(N_gt1)
         @test cov(NC1) ≈ cov(N_gt1)
@@ -61,7 +61,7 @@ function normalkernel_test(T, n)
 
     @testset "AffineNormalKernel / IsoNormal | $(T) " begin
         @test mean(marginalise(IN1, K1)) ≈ Φ1 * μ
-        @test cov(marginalise(IN1, K1)) ≈ Hermitian(Φ1 * λ1 * Φ1' + Q1)
+        @test cov(marginalise(IN1, K1)) ≈ Φ1 * λ1 * Φ1' + Q1
 
         @test mean(NC2) ≈ mean(N_gt2)
         @test cov(NC2) ≈ cov(N_gt2)
@@ -76,7 +76,7 @@ function normalkernel_test(T, n)
     IK1 = NormalKernel(Φ1, λ2 * I)
     IK2 = NormalKernel(Φ2, λ3 * I)
 
-    K4 = NormalKernel(Φ2 * Φ1, Hermitian(Φ2 * λ2 * Φ2' + λ3 * I))
+    K4 = NormalKernel(Φ2 * Φ1, Φ2 * λ2 * Φ2' + λ3 * I)
 
     @testset "AffineIsoNormalKernel | $(T) " begin
         @test mean(IK1)(x) == Φ1 * x
@@ -97,7 +97,7 @@ function normalkernel_test(T, n)
 
     @testset "AffineIsoNormalKernel / Normal | $(T) " begin
         @test mean(marginalise(N1, IK1)) ≈ Φ1 * μ
-        @test cov(marginalise(N1, IK1)) ≈ Hermitian(Φ1 * Σ * Φ1' + λ2 * I)
+        @test cov(marginalise(N1, IK1)) ≈ Φ1 * Σ * Φ1' + λ2 * I
 
         @test mean(NC3) ≈ mean(N_gt3)
         @test cov(NC3) ≈ cov(N_gt3)
@@ -115,7 +115,7 @@ function normalkernel_test(T, n)
 
     @testset "AffineIsoNormalKernel / IsoNormal | $(T) " begin
         @test mean(marginalise(IN1, IK1)) ≈ Φ1 * μ
-        @test cov(marginalise(IN1, IK1)) ≈ Hermitian(Φ1 * λ1 * Φ1' + λ2 * I)
+        @test cov(marginalise(IN1, IK1)) ≈ Φ1 * λ1 * Φ1' + λ2 * I
 
         @test mean(NC4) ≈ mean(N_gt4)
         @test cov(NC4) ≈ cov(N_gt4)

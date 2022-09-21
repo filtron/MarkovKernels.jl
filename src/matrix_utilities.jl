@@ -11,8 +11,9 @@ lsqrt(m::AbstractMatrix) = cholesky(m).L
 lsqrt(m::UniformScaling) = sqrt(m)
 
 # project matrix onto symmetric matrix
-symmetrise(Σ) = Σ
-symmetrise(Σ::Matrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+symmetrise(Σ::UniformScaling) = Σ
+symmetrise(Σ::Diagonal) = Σ
 
 # stein operator
 stein(Σ, Φ) = symmetrise(Φ * Σ * Φ')

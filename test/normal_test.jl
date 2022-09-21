@@ -2,13 +2,13 @@
 function normal_test(T, n)
     μ1 = randn(T, n)
     L1 = randn(T, n, n)
-    Σ1 = Hermitian(L1 * L1')
+    Σ1 = L1 * L1'
 
     x1 = randn(T, n)
 
     μ2 = randn(T, n)
     L2 = randn(T, n, n)
-    Σ2 = Hermitian(L2 * L2')
+    Σ2 = L2 * L2'
 
     N1 = Normal(μ1, Σ1)
     N2 = Normal(μ2, Σ2)
@@ -74,9 +74,17 @@ function normal_test(T, n)
     end
 end
 
+function _symmetrise(T, Σ)
+    if T <: Real
+        return Symmetric(Σ)
+    else
+        return Hermitian(Σ)
+    end
+end
+
 function _logpdf(T, μ1, Σ1, x1)
     n = length(μ1)
-    Σ1 = Hermitian(Σ1[1:n, 1:n])
+    Σ1 = _symmetrise(T,Σ1[1:n, 1:n])
     if T <: Real
         logpdf = -0.5 * logdet(2 * π * Σ1) - 0.5 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
     elseif T <: Complex
@@ -88,7 +96,7 @@ end
 
 function _entropy(T, μ1, Σ1)
     n = length(μ1)
-    Σ1 = Hermitian(Σ1[1:n, 1:n])
+    Σ1 = _symmetrise(T, Σ1[1:n, 1:n])
     if T <: Real
         entropy = 1.0 / 2.0 * logdet(2 * π * exp(1) * Σ1)
     elseif T <: Complex
@@ -98,8 +106,8 @@ end
 
 function _kld(T, μ1, Σ1, μ2, Σ2)
     n = length(μ1)
-    Σ1 = Hermitian(Σ1[1:n, 1:n])
-    Σ2 = Hermitian(Σ2[1:n, 1:n])
+    Σ1 = _symmetrise(T, Σ1[1:n, 1:n])
+    Σ2 = _symmetrise(T, Σ2[1:n, 1:n])
 
     if T <: Real
         kld =
