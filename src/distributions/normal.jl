@@ -17,6 +17,7 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Σ::V
     function Normal(μ::AbstractVector, Σ)
         T = promote_type(eltype(μ), eltype(Σ))
+        Σ = symmetrise(Σ)
         new{T,typeof(μ),typeof(Σ)}(μ, Σ)
     end
 end
