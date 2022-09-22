@@ -22,7 +22,6 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     end
 end
 
-
 const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
 IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
 
@@ -77,7 +76,7 @@ Returns the logarithm of the probability density function of N evaluated at x.
 logpdf(N::AbstractNormal{T}, x) where {T} =
     -_nscale(T) * (logdet(_piconst(T) * cov(N)) + norm_sqr(residual(N, x))) # fallback
 logpdf(N::Normal{T}, x) where {T} =
-    -_nscale(T) * ( dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
+    -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
 logpdf(N::IsoNormal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(N.Σ.λ)) + norm_sqr(residual(N, x)))
 
@@ -118,7 +117,7 @@ function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
     (dim(N1) * ratio + norm_sqr(residual(N2, mean(N1))) - dim(N1) - dim(N1) * log(ratio))
 end
 
-rand(RNG::AbstractRNG,N::AbstractNormal) = mean(N) + lsqrt(cov(N)) * randn(RNG, eltype(N),  dim(N)) # fallback
+rand(RNG::AbstractRNG, N::AbstractNormal) =
+    mean(N) + lsqrt(cov(N)) * randn(RNG, eltype(N), dim(N)) # fallback
 rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
-rand(RNG::AbstractRNG, N::Normal)  = mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
-
+rand(RNG::AbstractRNG, N::Normal) = mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
