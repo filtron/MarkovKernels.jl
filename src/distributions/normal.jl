@@ -46,6 +46,7 @@ covp(N::Normal) = N.Σ
 mean(N::Normal) = N.μ
 
 cov(N::Normal) = Matrix(N.Σ)
+cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
 cov(N::IsoNormal) = covp(N)(dim(N))
 
 var(N::AbstractNormal) = real(diag(cov(N))) # fallback

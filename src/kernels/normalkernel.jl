@@ -77,9 +77,9 @@ Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, 
 
 P(y,x) = Nout(y)*Kout(x,y)
 """
-function invert(N::Normal{T}, K::AffineNormalKernel{T}) where {T} #fallback
+function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} #fallback
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(cov(N), slope(mean(K)), cov(K))
+    S, G, Σ = schur_red(cov(N), slope(mean(K)), covp(K))
 
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineMap(G, mean(N), pred), Σ)
