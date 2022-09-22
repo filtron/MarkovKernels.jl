@@ -25,6 +25,7 @@ function normal_test(T, n)
         @test N1 == N12
         @test mean(N1) == μ1
         @test cov(N1) == Σ1
+        @test covp(N1) == _symmetrise(Σ1)
         @test var(N1) == diag(Σ1)
         @test std(N1) == sqrt.(diag(Σ1))
 
@@ -47,7 +48,8 @@ function normal_test(T, n)
         @test eltype(IN1) == T
         @test IN1 == IsoNormal(μ1, λ1)
         @test mean(IN1) == μ1
-        @test cov(IN1) == λ1 * I
+        @test cov(IN1) == λ1 * I(n)
+        @test covp(IN1) == λ1 * I
         @test var(IN1) == fill(λ1, length(μ1))
         @test std(IN1) == sqrt.(fill(λ1, length(μ1)))
 
@@ -74,7 +76,8 @@ function normal_test(T, n)
     end
 end
 
-function _symmetrise(T, Σ)
+_symmetrise(Σ) = Σ
+function _symmetrise(T, Σ::AbstractMatrix)
     if T <: Real
         return Symmetric(Σ)
     else

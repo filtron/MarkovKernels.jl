@@ -44,11 +44,15 @@ For computing the actual covariance matrix, use cov.
 covp(N::Normal) = N.Σ
 
 mean(N::Normal) = N.μ
-cov(N::Normal) = N.Σ  # this needs to be changed to form a matrix
+
+cov(N::Normal) = Matrix(N.Σ)
+cov(N::IsoNormal) = covp(N)(dim(N))
+
 var(N::AbstractNormal) = real(diag(cov(N))) # fallback
 var(N::Normal) = real(diag(covp(N)))
 var(N::IsoNormal) = real(diag(N.Σ(dim(N))))
-std(N::Normal) = sqrt.(var(N))
+
+std(N::AbstractNormal) = sqrt.(var(N))
 
 """
     residual(N::AbstractNormal,x)
