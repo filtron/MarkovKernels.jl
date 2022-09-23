@@ -60,7 +60,7 @@ std(N::AbstractNormal) = sqrt.(var(N))
 Returns the whitened residual associated with N and observed vector x.
 """
 residual(N::AbstractNormal, x) = lsqrt(cov(N)) \ (x - mean(N)) # fallback
-residual(N::Normal, x) = lsqrt(N.Σ) \ (x - mean(N))
+residual(N::Normal, x) = lsqrt(covp(N)) \ (x - mean(N))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
