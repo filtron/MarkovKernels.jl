@@ -19,7 +19,6 @@ include("likelihoods.jl")
 export AbstractLikelihood, Likelihood, measurement_model, measurement, bayes_rule
 
 include("distributions/normal.jl")  # normal distributions
-include("distributions/normal_generic.jl") # generic normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
 include("distributions/dirac.jl") # dirac distributions
 export AbstractNormal,
@@ -28,6 +27,7 @@ export AbstractNormal,
     dim,
     mean,
     cov,
+    covp,
     var,
     std,
     residual,
@@ -42,7 +42,6 @@ include("kernels/affinemap.jl")
 export AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
 
 include("kernels/normalkernel.jl") # defines normal kernels
-include("kernels/normalkernel_generic.jl") # generic normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 include("kernels/compose.jl")
 export AbstractNormalKernel,

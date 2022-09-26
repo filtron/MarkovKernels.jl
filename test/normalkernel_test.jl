@@ -21,12 +21,14 @@ function normalkernel_test(T, n)
         @test typeof(K1) <: AffineNormalKernel
 
         @test mean(K1)(x) ≈ Φ1 * x
-        @test cov(K1) == Q1
+        @test cov(K1)(x) == Q1
+        @test covp(K1) == Q1
 
         @test condition(K1, x) == Normal(Φ1 * x, Q1)
 
-        @test slope(mean(compose(K2, K1))) == slope(mean(K2 * K1)) ≈ slope(mean(K3))
-        @test cov(compose(K2, K1)) == cov(K2 * K1) ≈ cov(K3)
+        @test slope(mean(compose(K2, K1))) ≈ slope(mean(K3))
+        @test cov(compose(K2, K1))(x) ≈ cov(K3)(x)
+        @test covp(compose(K2, K1)) ≈ covp(K3)
     end
 
     μ, Σ, N1 = _make_normal(T, n)
@@ -44,7 +46,8 @@ function normalkernel_test(T, n)
 
         @test mean(NC1) ≈ mean(N_gt1)
         @test cov(NC1) ≈ cov(N_gt1)
-        @test cov(KC1) ≈ cov(K_gt1)
+        @test cov(KC1)(x) ≈ cov(K_gt1)(x)
+
         @test slope(mean(KC1)) ≈ slope(mean(K_gt1))
         @test intercept(mean(KC1)) ≈ intercept(mean(K_gt1))
     end
@@ -65,7 +68,7 @@ function normalkernel_test(T, n)
 
         @test mean(NC2) ≈ mean(N_gt2)
         @test cov(NC2) ≈ cov(N_gt2)
-        @test cov(KC2) ≈ cov(K_gt2)
+        @test cov(KC2)(x) ≈ cov(K_gt2)(x)
         @test slope(mean(KC2)) ≈ slope(mean(K_gt2))
         @test intercept(mean(KC2)) ≈ intercept(mean(K_gt2))
     end
@@ -80,12 +83,12 @@ function normalkernel_test(T, n)
 
     @testset "AffineIsoNormalKernel | $(T) " begin
         @test mean(IK1)(x) == Φ1 * x
-        @test cov(IK1) == λ2 * I
+        @test cov(IK1)(x) == λ2 * I
 
         @test condition(IK1, x) == Normal(Φ1 * x, λ2 * I)
 
-        @test slope(mean(compose(IK2, IK1))) == slope(mean(IK2 * IK1)) ≈ slope(mean(K4))
-        @test cov(compose(IK2, IK1)) == cov(IK2 * IK1) ≈ cov(K4)
+        @test slope(mean(compose(IK2, IK1))) ≈ slope(mean(K4))
+        @test cov(compose(IK2, IK1))(x) ≈ cov(K4)(x)
     end
 
     pred, S, G, Π = _schur(Σ, μ, Φ1, λ2 * I)
@@ -101,7 +104,7 @@ function normalkernel_test(T, n)
 
         @test mean(NC3) ≈ mean(N_gt3)
         @test cov(NC3) ≈ cov(N_gt3)
-        @test cov(KC3) ≈ cov(K_gt3)
+        @test cov(KC3)(x) ≈ cov(K_gt3)(x)
         @test slope(mean(KC3)) ≈ slope(mean(K_gt3))
         @test intercept(mean(KC3)) ≈ intercept(mean(K_gt3))
     end
@@ -119,7 +122,7 @@ function normalkernel_test(T, n)
 
         @test mean(NC4) ≈ mean(N_gt4)
         @test cov(NC4) ≈ cov(N_gt4)
-        @test cov(KC4) ≈ cov(K_gt4)
+        @test cov(KC4)(x) ≈ cov(K_gt4)(x)
         @test slope(mean(KC4)) ≈ slope(mean(K_gt4))
         @test intercept(mean(KC4)) ≈ intercept(mean(K_gt4))
     end
@@ -127,7 +130,7 @@ end
 
 function _make_normal(T, n)
     RV = randn(T, n, n)
-    Σ = Hermitian(RV' * RV)
+    Σ = RV' * RV
     μ = randn(T, n)
 
     return μ, Σ, Normal(μ, Σ)

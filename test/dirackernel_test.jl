@@ -46,7 +46,7 @@ function dirackernel_test(T, n, m)
 
         @test mean(Nc) ≈ mean(N_gt)
         @test cov(Nc) ≈ cov(N_gt)
-        @test cov(Kc) ≈ cov(K_gt)
+        @test cov(Kc)(x) ≈ cov(K_gt)(x)
         @test slope(mean(Kc)) ≈ slope(mean(K_gt))
         @test intercept(mean(Kc)) ≈ intercept(mean(K_gt))
     end

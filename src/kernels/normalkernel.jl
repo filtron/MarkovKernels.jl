@@ -25,37 +25,66 @@ const AffineNormalKernel{T} =
     NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
 
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
-
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, pred::AbstractVector, Σ) =
     NormalKernel(AffineMap(Φ, b, pred), Σ)
 
+"""
+    covp(K::NormalKernel)
+
+Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
+For computing the actual conditional covariance matrix, use cov.
+"""
+covp(K::NormalKernel) = K.Σ
+
 mean(K::NormalKernel) = K.μ
+cov(K::NormalKernel) = x -> K.Σ
 
-cov(K::NormalKernel) = K.Σ
+"""
+    condition(K::AbstractNormalKernel, x)
 
-condition(K::NormalKernel, x) = Normal(mean(K)(x), cov(K))
+Returns a Normal distribution corresponding to K evaluated at x.
+"""
+condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
+condition(K::AffineNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
+"""
+    compose(K2::AffineNormalKernel, K1::AffineNormalKernel)
+
+Returns K3, the composition of K2 ∘ K1 i.e,
+
+K3(y,x) = ∫ K2(y,z) K1(z,x) dz
+"""
 compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T} =
-    NormalKernel(compose(mean(K2), mean(K1)), stein(cov(K1), mean(K2), cov(K2)))
+    NormalKernel(compose(mean(K2), mean(K1)), stein(covp(K1), mean(K2), covp(K2)))
 
-*(K2::AbstractNormalKernel, K1::AbstractNormalKernel) = compose(K2, K1)
+"""
+    marginalise(N::AbstractNormal, K::AffineNormalKernel)
 
-marginalise(N::Normal{T}, K::AffineNormalKernel{T}) where {T} =
-    Normal(mean(K)(mean(N)), stein(cov(N), mean(K), cov(K)))
+Returns M, K marginalised with respect to N i.e,
 
-function invert(N::Normal{T}, K::AffineNormalKernel{T}) where {T}
+M(y) = ∫ K(y,x)N(x) dx
+"""
+marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} =
+    Normal(mean(K)(mean(N)), stein(covp(N), mean(K), covp(K)))
+
+"""
+    invert(N::AbstractNorma, K::AffineNormalKernel)
+
+Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, x) i.e
+
+P(y,x) = Nout(y)*Kout(x,y)
+"""
+function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))
-
-    S, G, Σ = schur_red(N.Σ, slope(K.μ), K.Σ)
+    S, G, Σ = schur_red(covp(N), slope(mean(K)), covp(K))
 
     Nout = Normal(pred, S)
-
-    corrector = AffineMap(G, mean(N), pred)
-    Kout = NormalKernel(corrector, Σ)
+    Kout = NormalKernel(AffineMap(G, mean(N), pred), Σ)
 
     return Nout, Kout
 end
 
-rand(RNG::AbstractRNG, K::NormalKernel, x::AbstractVector) = rand(RNG, condition(K, x))
-rand(K::NormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
+rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
+    rand(RNG, condition(K, x))
+rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
