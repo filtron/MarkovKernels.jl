@@ -32,13 +32,13 @@ NormalKernel(Φ::AbstractMatrix, b::AbstractVector, pred::AbstractVector, Σ) =
 """
     covp(K::NormalKernel)
 
-Returns the internal representation of the conditonal covariance matrix of the Normal distribution N.
-For computing the actual covariance matrix, use cov.
+Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
+For computing the actual conditional covariance matrix, use cov.
 """
 covp(K::NormalKernel) = K.Σ
 
 mean(K::NormalKernel) = K.μ
-cov(K::NormalKernel) = x -> K.Σ # needs to return callable
+cov(K::NormalKernel) = x -> K.Σ
 
 """
     condition(K::AbstractNormalKernel, x)
@@ -65,9 +65,7 @@ Returns M, K marginalised with respect to N i.e,
 
 M(y) = ∫ K(y,x)N(x) dx
 """
-marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} = # fallback
-    Normal(mean(K)(mean(N)), stein(cov(N), mean(K), covp(K)))
-marginalise(N::Normal{T}, K::AffineNormalKernel{T}) where {T} =
+marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} =
     Normal(mean(K)(mean(N)), stein(covp(N), mean(K), covp(K)))
 
 """
@@ -77,16 +75,7 @@ Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, 
 
 P(y,x) = Nout(y)*Kout(x,y)
 """
-function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} #fallback
-    pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(cov(N), slope(mean(K)), covp(K))
-
-    Nout = Normal(pred, S)
-    Kout = NormalKernel(AffineMap(G, mean(N), pred), Σ)
-
-    return Nout, Kout
-end
-function invert(N::Normal{T}, K::AffineNormalKernel{T}) where {T}
+function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))
     S, G, Σ = schur_red(covp(N), slope(mean(K)), covp(K))
 
@@ -96,5 +85,6 @@ function invert(N::Normal{T}, K::AffineNormalKernel{T}) where {T}
     return Nout, Kout
 end
 
-rand(RNG::AbstractRNG, K::NormalKernel, x::AbstractVector) = rand(RNG, condition(K, x))
-rand(K::NormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
+rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
+    rand(RNG, condition(K, x))
+rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)

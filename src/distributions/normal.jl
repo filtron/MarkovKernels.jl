@@ -48,8 +48,7 @@ cov(N::Normal) = Matrix(N.Σ)
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
 cov(N::IsoNormal) = covp(N)(dim(N))
 
-var(N::AbstractNormal) = real(diag(cov(N))) # fallback
-var(N::Normal) = real(diag(covp(N)))
+var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::IsoNormal) = real(diag(N.Σ(dim(N))))
 
 std(N::AbstractNormal) = sqrt.(var(N))
@@ -59,8 +58,7 @@ std(N::AbstractNormal) = sqrt.(var(N))
 
 Returns the whitened residual associated with N and observed vector x.
 """
-residual(N::AbstractNormal, x) = lsqrt(cov(N)) \ (x - mean(N)) # fallback
-residual(N::Normal, x) = lsqrt(covp(N)) \ (x - mean(N))
+residual(N::AbstractNormal, x) = lsqrt(covp(N)) \ (x - mean(N))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
@@ -74,8 +72,6 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 Returns the logarithm of the probability density function of N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) * (logdet(_piconst(T) * cov(N)) + norm_sqr(residual(N, x))) # fallback
-logpdf(N::Normal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
 logpdf(N::IsoNormal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(N.Σ.λ)) + norm_sqr(residual(N, x)))
@@ -86,8 +82,6 @@ logpdf(N::IsoNormal{T}, x) where {T} =
 Returns the entropy of N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(cov(N)))  # fallback
-entropy(N::Normal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
 entropy(N::IsoNormal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(covp(N).λ))
@@ -97,14 +91,7 @@ entropy(N::IsoNormal{T}) where {T} =
 
 Returns the Kullback-Leibler divergence between N1 and N2.
 """
-function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number} # fallback
-    root_ratio = lsqrt(cov(N2)) \ lsqrt(cov(N1))
-    _nscale(T) * (
-        norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
-        real(T)(2) * real(logdet(root_ratio))
-    )
-end
-function kldivergence(N1::Normal{T}, N2::Normal{T}) where {T<:Number}
+function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
     root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
     _nscale(T) * (
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
@@ -118,6 +105,5 @@ function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
 end
 
 rand(RNG::AbstractRNG, N::AbstractNormal) =
-    mean(N) + lsqrt(cov(N)) * randn(RNG, eltype(N), dim(N)) # fallback
+    mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
 rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
-rand(RNG::AbstractRNG, N::Normal) = mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
