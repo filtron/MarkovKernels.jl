@@ -2,6 +2,8 @@ using MarkovKernels
 using Test
 using LinearAlgebra
 
+include("normal_test_utilities.jl")
+
 include("normal_test.jl")
 include("dirac_test.jl")
 
@@ -16,6 +18,8 @@ m = 3
 etypes = (Float64, Complex{Float64})
 
 amtypes = (:Linear, :Affine)
+
+covariance_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
     for T in etypes

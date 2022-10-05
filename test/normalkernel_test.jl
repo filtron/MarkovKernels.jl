@@ -127,23 +127,3 @@ function normalkernel_test(T, n)
         @test intercept(mean(KC4)) ≈ intercept(mean(K_gt4))
     end
 end
-
-function _make_normal(T, n)
-    RV = randn(T, n, n)
-    Σ = RV' * RV
-    μ = randn(T, n)
-
-    return μ, Σ, Normal(μ, Σ)
-end
-
-function _schur(Σ, μ, C, R)
-    pred = C * μ
-    # dimx = length(μ)
-    # dimy = length(pred)
-
-    S = Hermitian(C * Σ * C' + R)
-    G = Σ * C' / S
-    Π = Hermitian(Σ - G * S * G')
-
-    return pred, S, G, Π
-end
