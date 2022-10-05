@@ -20,7 +20,6 @@ etypes = (Float64, Complex{Float64})
 amtypes = (:Linear, :Affine)
 
 cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
-#cov_types = (:Matrix, :Diagonal, :UniformScaling)
 
 @testset "MarkovKernels.jl" begin
     for T in etypes
