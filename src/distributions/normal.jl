@@ -50,8 +50,7 @@ cov(N::IsoNormal) = covp(N)(dim(N))
 
 var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::IsoNormal) = real(diag(N.Σ(dim(N))))
-var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} =
-    dropdims(sum(abs2, covp(N).L, dims = 2), dims = 2) # this is a bit of a mess
+var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2))
 
 std(N::AbstractNormal) = sqrt.(var(N))
 

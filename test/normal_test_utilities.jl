@@ -2,7 +2,6 @@
 # plain implementations of operations on Normal distributions / Normal kernels
 
 function _make_normal(T, n, s::Symbol)
-
     mean = randn(T, n)
 
     if s === :Matrix
