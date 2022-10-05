@@ -3,10 +3,8 @@
 
 function _make_normal(T, n, s::Symbol)
 
-    # mean vector
     mean = randn(T, n)
 
-    # covariance matrix / parameter
     if s === :Matrix
         R = randn(T, n, n)
         covariance_matrix = R' * R
