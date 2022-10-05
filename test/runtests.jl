@@ -19,11 +19,12 @@ etypes = (Float64, Complex{Float64})
 
 amtypes = (:Linear, :Affine)
 
-covariance_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
+cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
+#cov_types = (:Matrix, :Diagonal, :UniformScaling)
 
 @testset "MarkovKernels.jl" begin
     for T in etypes
-        normal_test(T, n)
+        normal_test(T, n, cov_types)
         dirac_test(T, n)
     end
 
