@@ -46,6 +46,7 @@ stein(Σ::Cholesky, Φ, Q) = Cholesky(qr2chol([Σ.U * Φ'; lsqrt(Q)'])) # add Un
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
+stein(Σ::Cholesky, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q) # needed to disambiguate, why?
 
 """
     schur_red(Π, C, R)
