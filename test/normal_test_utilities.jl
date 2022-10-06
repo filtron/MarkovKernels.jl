@@ -1,9 +1,7 @@
 
-# plain implementations of operations on Normal distributions / Normal kernels
+# plain implementations of operations on Normal distributions / Normal kernels 
 
-function _make_normal(T, n, s::Symbol)
-    mean = randn(T, n)
-
+function _make_cov(T, n, s::Symbol)
     if s === :Matrix
         R = randn(T, n, n)
         covariance_matrix = R' * R
@@ -24,6 +22,12 @@ function _make_normal(T, n, s::Symbol)
         covariance_parameter = cholesky(covariance_matrix)
     end
 
+    return covariance_parameter, covariance_matrix
+end
+
+function _make_normal(T, n, s::Symbol)
+    mean = randn(T, n)
+    covariance_parameter, covariance_matrix = _make_cov(T, n, s)
     N = Normal(mean, covariance_parameter)
 
     return mean, covariance_matrix, covariance_parameter, N
@@ -44,6 +48,29 @@ function _make_normals(T, n, cov_types)
     end
 
     return means, cov_matrices, cov_parameters, normals
+end
+
+function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
+    cov_param, cov_mat = _make_cov(T, n, ctype)
+
+    if atype === :LinearMap
+        A = randn(T, n, m)
+        M = AffineMap(A)
+        K = NormalKernel(A, cov_param)
+    elseif atype === :AffineMap
+        A = randn(T, n, m)
+        b = randn(T, n)
+        M = AffineMap(A, b)
+        K = NormalKernel(A, b, cov_param)
+    elseif atype === :AffineCorrector
+        A = randn(T, n, m)
+        b = randn(T, n)
+        c = randn(T, m)
+        M = AffineMap(A, b, c)
+        K = NormalKernel(A, b, c, cov_param)
+    end
+
+    return M, cov_mat, cov_param, K
 end
 
 # this will be replaced by the above at some point
@@ -109,8 +136,6 @@ end
 # this should call symmetrise
 function _schur(Σ, μ, C, R)
     pred = C * μ
-    # dimx = length(μ)
-    # dimy = length(pred)
 
     S = Hermitian(C * Σ * C' + R)
     G = Σ * C' / S

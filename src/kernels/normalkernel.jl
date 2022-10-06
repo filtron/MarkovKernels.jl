@@ -22,7 +22,7 @@ struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
 end
 
 const AffineNormalKernel{T} =
-    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
+    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
 
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)

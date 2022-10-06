@@ -19,6 +19,7 @@ etypes = (Float64, Complex{Float64})
 
 amtypes = (:Linear, :Affine)
 
+affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
 cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
@@ -32,7 +33,7 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
     end
 
     for T in etypes
-        normalkernel_test(T, n)
+        normalkernel_test(T, n, affine_types, cov_types)
         dirackernel_test(T, n, m)
         likelihood_test(T, n, m)
     end

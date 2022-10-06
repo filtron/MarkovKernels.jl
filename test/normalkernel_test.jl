@@ -1,7 +1,24 @@
-function normalkernel_test(T, n)
+function normalkernel_test(T, n, affine_types, cov_types)
+    numa = length(affine_types)
+    numc = length(cov_types)
+
+    x = randn(T, n)
+    for i in 1:numa, j in 1:numc
+        atype = affine_types[i]
+        ctype = cov_types[j]
+
+        M, cov_mat, cov_param, K = _make_normalkernel(T, n, n, atype, ctype)
+        @testset "NormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
+            @test eltype(K) == T
+            @test typeof(K) <: AffineNormalKernel
+            @test mean(K)(x) == M(x)
+            @test cov(K)(x) == cov_param
+            @test covp(K) == cov_param
+            @test condition(K, x) == Normal(M(x), cov_param)
+        end
+    end
 
     # define a normal distribution
-
     Φ1 = randn(T, n, n)
     RQ1 = randn(T, n, n)
     Q1 = RQ1' * RQ1
@@ -17,22 +34,12 @@ function normalkernel_test(T, n)
     x = randn(T, n)
 
     @testset "AffineNormalKernel | $(T)" begin
-        @test eltype(K1) == T
-        @test typeof(K1) <: AffineNormalKernel
-
-        @test mean(K1)(x) ≈ Φ1 * x
-        @test cov(K1)(x) == Q1
-        @test covp(K1) == Q1
-
-        @test condition(K1, x) == Normal(Φ1 * x, Q1)
-
         @test slope(mean(compose(K2, K1))) ≈ slope(mean(K3))
         @test cov(compose(K2, K1))(x) ≈ cov(K3)(x)
         @test covp(compose(K2, K1)) ≈ covp(K3)
     end
 
     μ, Σ, N1 = _make_normal(T, n)
-
     pred, S, G, Π = _schur(Σ, μ, Φ1, Q1)
     N_gt1 = Normal(pred, S)
     corrector = AffineMap(G, μ, pred)
@@ -82,11 +89,6 @@ function normalkernel_test(T, n)
     K4 = NormalKernel(Φ2 * Φ1, Φ2 * λ2 * Φ2' + λ3 * I)
 
     @testset "AffineIsoNormalKernel | $(T) " begin
-        @test mean(IK1)(x) == Φ1 * x
-        @test cov(IK1)(x) == λ2 * I
-
-        @test condition(IK1, x) == Normal(Φ1 * x, λ2 * I)
-
         @test slope(mean(compose(IK2, IK1))) ≈ slope(mean(K4))
         @test cov(compose(IK2, IK1))(x) ≈ cov(K4)(x)
     end
