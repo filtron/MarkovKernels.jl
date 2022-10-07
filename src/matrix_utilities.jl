@@ -42,11 +42,17 @@ stein(Σ, Φ) = symmetrise(Φ * Σ * Φ')
 stein(Σ::Cholesky, Φ) = Cholesky(qr2chol(Σ.U * Φ'))
 
 stein(Σ, Φ, Q) = symmetrise(Φ * Σ * Φ' + Q)
-stein(Σ::Cholesky, Φ, Q) = Cholesky(qr2chol([Σ.U * Φ'; lsqrt(Q)'])) # add UniformScaling / Cholesky, Diagonal / Cholesky ?
+stein(Σ::Cholesky, Φ, Q) = Cholesky(qr2chol([Σ.U * Φ'; lsqrt(Q)']))
+stein(Σ::Cholesky, Φ, Q::Diagonal) = Cholesky(qr2chol([Σ.U * Φ'; diagm(sqrt.(Q.diag))]))
 
+# this is a mess
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
-stein(Σ::Cholesky, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q) # needed to disambiguate, why?
+stein(Σ, A::AbstractAffineMap, Q::Cholesky) = stein(Σ, slope(A), Matrix(Q))
+
+stein(Σ::Cholesky, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
+stein(Σ::Cholesky, A::AbstractAffineMap, Q::Cholesky) = stein(Σ, slope(A), Q)
+stein(Σ::Cholesky, A::AbstractAffineMap, Q::Diagonal) = stein(Σ, slope(A), Q)
 
 """
     schur_red(Π, C, R)
