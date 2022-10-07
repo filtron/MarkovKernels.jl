@@ -48,10 +48,12 @@ stein(Σ::Cholesky, Φ, Q::Diagonal) = Cholesky(qr2chol([Σ.U * Φ'; diagm(sqrt.
 # this is a mess
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
-stein(Σ, A::AbstractAffineMap, Q::Cholesky) = stein(Σ, slope(A), Matrix(Q))
+stein(Σ, A::AbstractAffineMap, Q::Cholesky) = stein(Σ, slope(A), Matrix(Q)) # reconsider this 
 
 stein(Σ::Cholesky, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
 stein(Σ::Cholesky, A::AbstractAffineMap, Q::Cholesky) = stein(Σ, slope(A), Q)
+
+#need to convert Diagonal to Matrix to not get weird sparse type which breaks things 
 stein(Σ::Cholesky, A::AbstractAffineMap, Q::Diagonal) = stein(Σ, slope(A), Q)
 
 """
@@ -86,6 +88,34 @@ end
 
 schur_red(Π, C) = schur_red(Π, C, 0.0 * I) # might be done smarter?
 
+schur_red(Π, C, R::Cholesky) = schur_red(Π, C, Matrix(R))
+function schur_red(Π::Cholesky, C, R)
+    ny, nx = size(C)
+
+    pre_array = [lsqrt(R)' zeros(ny, nx); Π.U*C' Π.U]
+    post_array = qr2chol(pre_array)
+
+    S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))
+    Σ = Cholesky(UpperTriangular(post_array[ny+1:ny+nx, ny+1:ny+nx]))
+    Kt = post_array[1:ny, ny+1:ny+nx]
+    K = Kt' / lsqrt(S)
+    return S, K, Σ
+end
+
+#need to convert Diagonal to Matrix to not get weird sparse type which breaks things 
+function schur_red(Π::Cholesky, C, R::Diagonal)
+    ny, nx = size(C)
+
+    pre_array = [diagm(sqrt.(R.diag)) zeros(ny, nx); Π.U*C' Π.U]
+    post_array = qr2chol(pre_array)
+
+    S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))
+    Σ = Cholesky(UpperTriangular(post_array[ny+1:ny+nx, ny+1:ny+nx]))
+    Kt = post_array[1:ny, ny+1:ny+nx]
+    K = Kt' / lsqrt(S)
+    return S, K, Σ
+end
+
 function schur_red(Π::Cholesky, C, R::Cholesky)
     ny, nx = size(C)
 
@@ -93,7 +123,7 @@ function schur_red(Π::Cholesky, C, R::Cholesky)
     post_array = qr2chol(pre_array)
 
     S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))
-    Σ = Cholesky(UpperTriangular(post_array[ny+1:nx, ny+1:ny+nx]))
+    Σ = Cholesky(UpperTriangular(post_array[ny+1:ny+nx, ny+1:ny+nx]))
     Kt = post_array[1:ny, ny+1:ny+nx]
     K = Kt' / lsqrt(S)
     return S, K, Σ
