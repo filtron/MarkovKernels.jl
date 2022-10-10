@@ -1,6 +1,4 @@
-
 # plain implementations of operations on Normal distributions / Normal kernels 
-
 function _make_cov(T, n, s::Symbol)
     if s === :Matrix
         R = randn(T, n, n)
@@ -73,25 +71,10 @@ function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
     return M, cov_mat, cov_param, K
 end
 
-# this will be replaced by the above at some point
-function _make_normal(T, n)
-    RV = randn(T, n, n)
-    Σ = RV' * RV
-    μ = randn(T, n)
-
-    return μ, Σ, Normal(μ, Σ)
-end
-
 _symmetrise(T, Σ, n) = Σ
 _symmetrise(T, Σ::Diagonal, n) = Σ
 _symmetrise(T, Σ::UniformScaling, n) = Σ(n)
-function _symmetrise(T, Σ::AbstractMatrix)
-    if T <: Real
-        return Symmetric(Σ)
-    else
-        return Hermitian(Σ)
-    end
-end
+_symmetrise(T, Σ::AbstractMatrix) = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
 
 function _logpdf(T, μ1, Σ1, x1)
     n = length(μ1)
