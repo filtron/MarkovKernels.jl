@@ -17,6 +17,7 @@ function qr2chol(pre_array)
     return UpperTriangular(right_pos)
 end
 
+
 # matrix square-roots
 lsqrt(m::AbstractMatrix) = cholesky(m).L
 lsqrt(m::UniformScaling) = sqrt(m)
@@ -38,6 +39,13 @@ Computes the output of the stein  operator
 
 Same as stein(Σ, Φ, 0.0I)
 """
+
+# cov_types: HermOrSym, Diagonal, UniformScaling, Cholesky
+# priority rules: 
+# (HermOrSym; HermOrSym, Diagonal, UniformScaling, Cholesky) = HermOrSym 
+# (Diagonal; HermOrSym, Diagonal, UniformScaling, Cholesky) = Cholesky ? 
+# (UniformScaling; HermOrSym, Diagonal, UniformScaling, Cholesky) = Cholesky? 
+# (Cholesky; HermOrSym, Diagonal, UniformScaling, Cholesky) = Cholesky
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
 stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(qr2chol(Σ.U * Φ'))
 
@@ -46,7 +54,7 @@ stein(Σ::Cholesky, Φ::AbstractMatrix, Q) = Cholesky(qr2chol([Σ.U * Φ'; lsqrt
 stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Diagonal) =
     Cholesky(qr2chol([Σ.U * Φ'; diagm(sqrt.(Q.diag))]))
 stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) = Cholesky(qr2chol([Σ.U * Φ'; Q.U]))
-stein(Σ, Φ::AbstractMatrix, Q::Cholesky) = stein(Σ, Φ, Matrix(Q))
+stein(Σ, Φ::AbstractMatrix, Q::Cholesky) = stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
@@ -78,44 +86,26 @@ function schur_red(Π, C, R)
 
     return S, K, Σ
 end
+schur_red(Π, C) = schur_red(Π, C, 0.0 * I) 
 
-schur_red(Π, C) = schur_red(Π, C, 0.0 * I) # might be done smarter?
+schur_red(Π, C, R::Cholesky) = schur_red(Π, C, symmetrise(AbstractMatrix(R)))
+schur_red(Π::Cholesky, C, R) = _schur_red_chol(Π, C, R)
+schur_red(Π::Cholesky, C, R::Cholesky) = _schur_red_chol(Π, C, R)
 
-schur_red(Π, C, R::Cholesky) = schur_red(Π, C, Matrix(R))
-function schur_red(Π::Cholesky, C, R)
+function _schur_red_chol(Π, C, R)
     ny, nx = size(C)
-    pre_array = [lsqrt(R)' zeros(ny, nx); Π.U*C' Π.U]
+    pre_array = _make_pre_array(Π, C, R)
     post_array = qr2chol(pre_array)
-    S, K, Σ = _post_array2schur_reduce(ny, nx, post_array)
-    return S, K, Σ
-end
-
-function schur_red(Π::Cholesky, C, R::Diagonal)
-    ny, nx = size(C)
-    pre_array = [diagm(sqrt.(R.diag)) zeros(ny, nx); Π.U*C' Π.U]
-    post_array = qr2chol(pre_array)
-    S, K, Σ = _post_array2schur_reduce(ny, nx, post_array)
-    return S, K, Σ
-end
-
-function schur_red(Π::Cholesky, C, R::Cholesky)
-    ny, nx = size(C)
-    pre_array = [R.U zeros(ny, nx); Π.U*C' Π.U]
-    post_array = qr2chol(pre_array)
-    S, K, Σ = _post_array2schur_reduce(ny, nx, post_array)
-    return S, K, Σ
-end
-
-"""
-    _post_array2schur_reduce(ny::Int, nx::Int, post_array)
-
-    computes the marginal meaurment covariance S, Kalman gain K, 
-    posterior covariance Π from post_array of size ny+nx × ny+nx.
-"""
-function _post_array2schur_reduce(ny::Int, nx::Int, post_array)
     S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))
     Σ = Cholesky(UpperTriangular(post_array[ny+1:ny+nx, ny+1:ny+nx]))
     Kt = post_array[1:ny, ny+1:ny+nx]
-    K = Kt' / lsqrt(S)
+    K = Kt' / lsqrt(S)    
     return S, K, Σ
 end
+
+function _make_pre_array(Π, C, R) 
+    ny, nx = size(C)
+    pre_array = [lsqrt(R)' zeros(ny, nx); lsqrt(Π)'*C' lsqrt(Π)']
+    return pre_array 
+end 
+_make_pre_array(Π::Cholesky, C, R::Diagonal) = _make_pre_array(Π, C, diagm(R.diag))
