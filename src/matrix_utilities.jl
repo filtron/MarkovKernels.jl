@@ -60,6 +60,9 @@ _stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU(_stein_pre_array(Σ, Φ, Q)))
 _stein_pre_array(Σ, Φ, Q) = [lsqrt(Σ)' * Φ'; lsqrt(Q)']
 # below needed unless we jumpt to compat >= 1.8 ? 
 _stein_pre_array(Σ, Φ, Q::Diagonal) = [lsqrt(Σ)' * Φ'; diagm(sqrt.(Q.diag))]
+_stein_pre_array(Σ::Diagonal, Φ, Q) = [diagm(sqrt.(Σ.diag)) * Φ'; lsqrt(Q)']
+_stein_pre_array(Σ::Diagonal, Φ, Q::Diagonal) =
+    [diagm(sqrt.(Σ.diag)) * Φ'; diagm(sqrt.(Q.diag))]
 
 """
     schur_red(Π, C, R)
