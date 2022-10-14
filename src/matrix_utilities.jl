@@ -7,7 +7,7 @@ function LinearAlgebra.logdet(H::Hermitian)
 end
 
 """
-    qr2chol(pre_array::AbstractMatrix)
+    rsqrt2cholU(pre_array::AbstractMatrix)
 
 Computes the upper triangular cholesky factor of the matrix pre_array'*pre_array
 """
@@ -47,18 +47,19 @@ Same as stein(Σ, Φ, 0.0I)
 # (UniformScaling; HermOrSym, Diagonal, UniformScaling, Cholesky) = Cholesky? 
 # (Cholesky; HermOrSym, Diagonal, UniformScaling, Cholesky) = Cholesky
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
-stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(Σ.U * Φ'))
+stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
 
 stein(Σ, Φ::AbstractMatrix, Q) = symmetrise(Φ * Σ * Φ' + Q)
-stein(Σ::Cholesky, Φ::AbstractMatrix, Q) = Cholesky(rsqrt2cholU([Σ.U * Φ'; lsqrt(Q)']))
-stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Diagonal) =
-    Cholesky(rsqrt2cholU([Σ.U * Φ'; diagm(sqrt.(Q.diag))]))
-stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) = Cholesky(rsqrt2cholU([Σ.U * Φ'; Q.U]))
+
+stein(Σ::Cholesky, Φ::AbstractMatrix, Q) = _stein_chol(Σ, Φ, Q)
+stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) = _stein_chol(Σ, Φ, Q)
 stein(Σ, Φ::AbstractMatrix, Q::Cholesky) = stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
 
+_stein_chol(Σ, Φ, Q)  = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
+_stein_chol(Σ, Φ, Q::Diagonal)  = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; diagm(sqrt.(Q.diag))]))
 """
     schur_red(Π, C, R)
 
@@ -108,4 +109,4 @@ function _make_pre_array(Π, C, R)
     pre_array = [lsqrt(R)' zeros(ny, nx); lsqrt(Π)'*C' lsqrt(Π)']
     return pre_array 
 end 
-_make_pre_array(Π::Cholesky, C, R::Diagonal) = _make_pre_array(Π, C, diagm(R.diag))
+_make_pre_array(Π::Cholesky, C, R::Diagonal) = _make_pre_array(Π, C, diagm(R.diag)) # not efficient?
