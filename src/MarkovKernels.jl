@@ -4,7 +4,7 @@ using LinearAlgebra, Statistics, Random, RecipesBase
 
 import Base: *, +, eltype, length, size, log, ==, similar, filter, IteratorSize, HasLength
 
-import LinearAlgebra: logdet, norm_sqr
+import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
@@ -59,5 +59,5 @@ include("sampling.jl")
 
 # helper functions
 include("matrix_utilities.jl")
-
+export lsqrt, symmetrise, stein, schur_red
 end
