@@ -3,10 +3,7 @@ abstract type AbstractAffineMap{T<:Number} end
 
 eltype(::AbstractAffineMap{T}) where {T} = T
 
-#  T <: AbstractAffineMap implements slope and intercept
 (M::AbstractAffineMap)(x) = slope(M) * x + intercept(M)
-
-# AffineMap is default?
 compose(M2::AbstractAffineMap, M1::AbstractAffineMap) =
     AffineMap(slope(M2) * slope(M1), slope(M2) * intercept(M1) + intercept(M2))
 *(M2::AbstractAffineMap, M1::AbstractAffineMap) = compose(M2, M1)

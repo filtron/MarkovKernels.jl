@@ -2,9 +2,9 @@ module MarkovKernels
 
 using LinearAlgebra, Statistics, Random, RecipesBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, filter, IteratorSize, HasLength
+import Base: *, +, eltype, length, size, log, ==, similar
 
-import LinearAlgebra: logdet, norm_sqr, HermOrSym
+import LinearAlgebra: logdet, norm_sqr
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
@@ -47,7 +47,6 @@ include("kernels/compose.jl")
 export AbstractNormalKernel,
     NormalKernel,
     AffineNormalKernel,
-    AffineIsoNormalKernel,
     condition,
     compose,
     marginalise,
@@ -59,5 +58,4 @@ include("sampling.jl")
 
 # helper functions
 include("matrix_utilities.jl")
-export lsqrt, symmetrise, stein, schur_red
 end
