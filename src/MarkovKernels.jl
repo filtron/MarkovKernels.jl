@@ -39,7 +39,8 @@ export AbstractNormal,
 
 # defines conditional mean for normal kernels
 include("kernels/affinemap.jl")
-export AbstractAffineMap, AffineMap, nin, nout, slope, intercept, compose
+export AbstractAffineMap,
+    AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels

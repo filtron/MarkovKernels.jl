@@ -1,38 +1,51 @@
-function affinemap_test(T, MT, n)
-    Φ1 = randn(T, n, n)
-    Φ2 = randn(T, n, n)
+function affinemap_test(T, affine_types, n)
+    for t in affine_types
+        slopegt, interceptgt, F = _make_affinemap(T, n, n, t)
+        x = randn(T, n)
 
-    x = randn(T, n)
-
-    # composition
-    Φ3 = Φ2 * Φ1
-
-    if MT === :Linear
-        M1 = AffineMap(Φ1)
-        M2 = AffineMap(Φ2)
-        prior1 = zeros(T, n)
-        prior2 = zeros(T, n)
-        prior3 = zeros(T, n)
-    elseif MT == :Affine
-        prior1 = randn(T, n)
-        prior2 = randn(T, n)
-        M1 = AffineMap(Φ1, prior1)
-        M2 = AffineMap(Φ2, prior2)
-        prior3 = Φ2 * prior1 + prior2
+        @testset "AffineMap | Unary | $(T) | $(t)" begin
+            @test eltype(F) == T
+            @test slope(F) ≈ slopegt
+            @test intercept(F) ≈ interceptgt
+            @test F(x) ≈ slopegt * x + interceptgt
+        end
     end
-    M12 = AffineMap(Φ1)
 
-    M3 = compose(M2, M1)
+    for t1 in affine_types, t2 in affine_types
+        slope1, intercept1, F1 = _make_affinemap(T, n, n, t1)
+        slope2, intercept2, F2 = _make_affinemap(T, n, n, t2)
 
-    @testset "AffineMap | $(T) | $(MT)" begin
-        @test typeof(similar(M1)) == typeof(M1)
-        @test eltype(M1) == T
-
-        @test slope(M1) == Φ1
-        @test intercept(M1) == prior1
-        @test M1(x) ≈ slope(M1) * x + intercept(M1)
-
-        @test slope(M3) ≈ Φ3
-        @test intercept(M3) ≈ prior3
+        slopegt = slope2 * slope1
+        interceptgt = intercept2 + slope2 * intercept1
+        @testset "AffineMap | Binary | {$(T),$(t1)} | {$(T),$(t2)}" begin
+            @test slope(compose(F2, F1)) ≈ slopegt
+            @test intercept(compose(F2, F1)) ≈ interceptgt
+        end
     end
+end
+
+function _make_affinemap(T, n::Int, m::Int, t::Symbol)
+    (:LinearMap, :AffineMap, :AffineCorrector)
+
+    if t === :LinearMap
+        A = randn(T, n, m)
+        slope = A
+        intercept = zeros(T, n)
+        F = LinearMap(A)
+    elseif t === :AffineMap
+        A = randn(T, n, m)
+        b = randn(T, n)
+        slope = A
+        intercept = b
+        F = AffineMap(A, b)
+    elseif t == :AffineCorrector
+        A = randn(T, n, m)
+        b = randn(T, n)
+        c = randn(T, n)
+        slope = A
+        intercept = b - A * c
+        F = AffineCorrector(A, b, c)
+    end
+
+    return slope, intercept, F
 end

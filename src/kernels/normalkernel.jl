@@ -24,10 +24,10 @@ end
 const AffineNormalKernel{T} =
     NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
 
-NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
+NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(LinearMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
-NormalKernel(Φ::AbstractMatrix, b::AbstractVector, pred::AbstractVector, Σ) =
-    NormalKernel(AffineMap(Φ, b, pred), Σ)
+NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
+    NormalKernel(AffineCorrector(Φ, b, c), Σ)
 
 """
     covp(K::NormalKernel)
@@ -80,7 +80,7 @@ function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     S, G, Σ = schur_red(covp(N), mean(K), covp(K))
 
     Nout = Normal(pred, S)
-    Kout = NormalKernel(AffineMap(G, mean(N), pred), Σ)
+    Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
 
     return Nout, Kout
 end

@@ -7,7 +7,7 @@ struct DiracKernel{T,U} <: AbstractDiracKernel{T}
     DiracKernel(μ) = new{eltype(μ),typeof(μ)}(μ)
 end
 
-DiracKernel(Φ::AbstractMatrix) = DiracKernel(AffineMap(Φ))
+DiracKernel(Φ::AbstractMatrix) = DiracKernel(LinearMap(Φ))
 DiracKernel(Φ::AbstractMatrix, b::AbstractVector) = DiracKernel(AffineMap(Φ, b))
 
 mean(K::DiracKernel) = K.μ
@@ -36,7 +36,7 @@ function invert(
 
     Nout = Normal(pred, S)
 
-    corrector = AffineMap(G, mean(N), pred)
+    corrector = AffineCorrector(G, mean(N), pred)
     Kout = NormalKernel(corrector, Σ)
 
     return Nout, Kout

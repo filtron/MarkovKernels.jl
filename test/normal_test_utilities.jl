@@ -53,7 +53,7 @@ function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
 
     if atype === :LinearMap
         A = randn(T, n, m)
-        M = AffineMap(A)
+        M = LinearMap(A)
         K = NormalKernel(A, cov_param)
     elseif atype === :AffineMap
         A = randn(T, n, m)
@@ -64,7 +64,7 @@ function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
         A = randn(T, n, m)
         b = randn(T, n)
         c = randn(T, m)
-        M = AffineMap(A, b, c)
+        M = AffineCorrector(A, b, c)
         K = NormalKernel(A, b, c, cov_param)
     end
 

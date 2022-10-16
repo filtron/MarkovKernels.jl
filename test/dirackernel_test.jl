@@ -25,7 +25,7 @@ function dirackernel_test(T, n, m)
     N_gt = Normal(pred, S)
     Π = Hermitian(Σ - G * S * G')
 
-    corrector = AffineMap(G, μ, pred)
+    corrector = AffineCorrector(G, μ, pred)
     K_gt = NormalKernel(corrector, Π)
 
     Nc, Kc = invert(N1, K1)
