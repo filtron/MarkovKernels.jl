@@ -21,7 +21,7 @@ marginalise(
     N::Normal{T,U,V},
     K::DiracKernel{T,S},
 ) where {T,U,S<:AbstractAffineMap,V<:AbstractMatrix} =
-    Normal(mean(K)(mean(N)), stein(cov(N), mean(K)))
+    Normal(mean(K)(mean(N)), stein(covp(N), mean(K)))
 
 function invert(
     N::Normal{T,U,V},

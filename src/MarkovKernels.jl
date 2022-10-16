@@ -2,7 +2,7 @@ module MarkovKernels
 
 using LinearAlgebra, Statistics, Random, RecipesBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, filter, IteratorSize, HasLength
+import Base: *, +, eltype, length, size, log, ==, similar
 
 import LinearAlgebra: logdet, norm_sqr
 import Statistics: mean, cov, var, std
@@ -45,19 +45,11 @@ include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 include("kernels/compose.jl")
 export AbstractNormalKernel,
-    NormalKernel,
-    AffineNormalKernel,
-    AffineIsoNormalKernel,
-    condition,
-    compose,
-    marginalise,
-    invert,
-    DiracKernel
+    NormalKernel, AffineNormalKernel, condition, compose, marginalise, invert, DiracKernel
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")
 
 # helper functions
 include("matrix_utilities.jl")
-
 end

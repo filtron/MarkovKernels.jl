@@ -22,7 +22,7 @@ struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
 end
 
 const AffineNormalKernel{T} =
-    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,AbstractMatrix}}
+    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
 
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(AffineMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
@@ -77,7 +77,7 @@ P(y,x) = Nout(y)*Kout(x,y)
 """
 function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(covp(N), slope(mean(K)), covp(K))
+    S, G, Σ = schur_red(covp(N), mean(K), covp(K))
 
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineMap(G, mean(N), pred), Σ)

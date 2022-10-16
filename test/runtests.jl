@@ -2,6 +2,8 @@ using MarkovKernels
 using Test
 using LinearAlgebra
 
+include("normal_test_utilities.jl")
+
 include("normal_test.jl")
 include("dirac_test.jl")
 
@@ -17,9 +19,12 @@ etypes = (Float64, Complex{Float64})
 
 amtypes = (:Linear, :Affine)
 
+affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
+cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
+
 @testset "MarkovKernels.jl" begin
     for T in etypes
-        normal_test(T, n)
+        normal_test(T, n, cov_types)
         dirac_test(T, n)
     end
 
@@ -28,7 +33,7 @@ amtypes = (:Linear, :Affine)
     end
 
     for T in etypes
-        normalkernel_test(T, n)
+        normalkernel_test(T, n, affine_types, cov_types)
         dirackernel_test(T, n, m)
         likelihood_test(T, n, m)
     end
