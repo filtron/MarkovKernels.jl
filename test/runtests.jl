@@ -28,8 +28,8 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
         dirac_test(T, n)
     end
 
-    for T in etypes, MT in amtypes
-        affinemap_test(T, MT, n)
+    for T in etypes
+        affinemap_test(T, affine_types, n)
     end
 
     for T in etypes
