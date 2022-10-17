@@ -6,6 +6,7 @@ function affinemap_test(T, affine_types, n)
         @testset "AffineMap | Unary | $(T) | $(t)" begin
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
+            @test AbstractAffineMap{T}(F) == F
             @test convert(AbstractAffineMap{T}, F) == F
             @test slope(F) ≈ slopegt
             @test intercept(F) ≈ interceptgt

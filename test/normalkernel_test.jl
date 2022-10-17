@@ -1,4 +1,19 @@
-function normalkernel_test(T, n, affine_types, cov_types)
+function normalkernel_test(T, affine_types)
+    Σ = x -> hcat(exp.(abs.(x)))
+
+    for t in affine_types
+        slope, intercept, F = _make_affinemap(T, 1, 1, t)
+        K = NormalKernel{T}(F, Σ)
+        x = randn(T, 1)
+
+        @testset "NormalKernel | Unary | $(T) | $(t)" begin
+            @test mean(K)(x) == F(x)
+            @test cov(K)(x) == Σ(x)
+        end
+    end
+end
+
+function affine_normalkernel_test(T, n, affine_types, cov_types)
     kernel_type_parameters = Iterators.product(affine_types, cov_types)
     normal_type_parameters = cov_types
 
@@ -8,7 +23,7 @@ function normalkernel_test(T, n, affine_types, cov_types)
         M, cov_mat, cov_param, K = _make_normalkernel(T, n, n, atype, ctype)
         x = randn(T, n)
 
-        @testset "NormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
+        @testset "AffineNormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
             @test eltype(K) == T
             @test typeof(K) <: AffineNormalKernel
             @test mean(K)(x) == M(x)
@@ -26,7 +41,7 @@ function normalkernel_test(T, n, affine_types, cov_types)
         M2, cov_mat2, cov_param2, K2 = _make_normalkernel(T, n, n, atype2, ctype2)
         x = randn(T, n)
 
-        @testset "NormalKernel | Binary | {$(T),$(atype1),$(ctype1)} | {$(T),$(atype2),$(ctype2)}" begin
+        @testset "AffineNormalKernel | Binary | {$(T),$(atype1),$(ctype1)} | {$(T),$(atype2),$(ctype2)}" begin
             @test slope(mean(compose(K2, K1))) ≈ slope(compose(M2, M1))
             @test cov(condition(compose(K2, K1), x)) ≈
                   slope(mean(K2)) * cov_mat1 * slope(mean(K2))' + cov_mat2
