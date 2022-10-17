@@ -15,23 +15,23 @@ Standard parametrisation of Normal kernels.
 struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
-    NormalKernel{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ) 
+    NormalKernel{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
-NormalKernel(F::AbstractAffineMap, Σ) = NormalKernel{eltype(F)}(F, Σ) 
+NormalKernel(F::AbstractAffineMap, Σ) = NormalKernel{eltype(F)}(F, Σ)
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(LinearMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
     NormalKernel(AffineCorrector(Φ, b, c), Σ)
 
 const AffineNormalKernel{T} =
-NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
+    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
 
 for c in (:AbstractMatrix, :UniformScaling, :Factorization)
-    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c) 
-        T = promote_type(eltype(F), eltype(Σ)) 
-        F = convert(AbstractAffineMap{T}, F) 
-        Σ = convert($c{T}, Σ) 
+    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
+        T = promote_type(eltype(F), eltype(Σ))
+        F = convert(AbstractAffineMap{T}, F)
+        Σ = convert($c{T}, Σ)
         return NormalKernel{T}(F, symmetrise(Σ))
     end
 end

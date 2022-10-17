@@ -12,10 +12,8 @@ compose(M2::AbstractAffineMap, M1::AbstractAffineMap) =
 
 nout(M::AbstractAffineMap) = size(slope(M), 1)
 
-
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
-
 
 struct AffineMap{T,U,V} <: AbstractAffineMap{T}
     A::U
@@ -30,9 +28,10 @@ end
 slope(F::AffineMap) = F.A
 intercept(F::AffineMap) = F.b
 
-AffineMap{T}(F::AffineMap) where {T} = AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
-AbstractAffineMap{T}(F::AffineMap) where {T} = AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
-
+AffineMap{T}(F::AffineMap) where {T} =
+    AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
+AbstractAffineMap{T}(F::AffineMap) where {T} =
+    AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
 
 struct LinearMap{T,U} <: AbstractAffineMap{T}
     A::U
@@ -64,10 +63,10 @@ compose(F2::AffineCorrector, F1::AffineCorrector) =
 AbstractAffineMap{T}(F::AffineCorrector) where {T} = AffineCorrector(
     convert(AbstractMatrix{T}, F.A),
     convert(AbstractVector{T}, F.b),
-    convert(AbstractVector{T}, F.c)
-    )
+    convert(AbstractVector{T}, F.c),
+)
 AffineCorrector{T}(F::AffineCorrector) where {T} = AffineCorrector(
-        convert(AbstractMatrix{T}, F.A),
-        convert(AbstractVector{T}, F.b),
-        convert(AbstractVector{T}, F.c)
-        )
+    convert(AbstractMatrix{T}, F.A),
+    convert(AbstractVector{T}, F.b),
+    convert(AbstractVector{T}, F.c),
+)
