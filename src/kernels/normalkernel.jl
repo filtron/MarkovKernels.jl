@@ -15,19 +15,26 @@ Standard parametrisation of Normal kernels.
 struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
-    function NormalKernel(μ, Σ)
-        Σ = symmetrise(Σ)
-        new{eltype(μ),typeof(μ),typeof(Σ)}(μ, Σ)
-    end
+    NormalKernel{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ) 
 end
 
-const AffineNormalKernel{T} =
-    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
-
+NormalKernel(F::AbstractAffineMap, Σ) = NormalKernel{eltype(F)}(F, Σ) 
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(LinearMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
     NormalKernel(AffineCorrector(Φ, b, c), Σ)
+
+const AffineNormalKernel{T} =
+NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
+
+for c in (:AbstractMatrix, :UniformScaling, :Factorization)
+    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c) 
+        T = promote_type(eltype(F), eltype(Σ)) 
+        F = convert(AbstractAffineMap{T}, F) 
+        Σ = convert($c{T}, Σ) 
+        return NormalKernel{T}(F, symmetrise(Σ))
+    end
+end
 
 """
     covp(K::NormalKernel)
@@ -38,7 +45,8 @@ For computing the actual conditional covariance matrix, use cov.
 covp(K::NormalKernel) = K.Σ
 
 mean(K::NormalKernel) = K.μ
-cov(K::NormalKernel) = x -> K.Σ
+cov(K::NormalKernel) = K.Σ
+cov(K::AffineNormalKernel) = x -> K.Σ
 
 """
     condition(K::AbstractNormalKernel, x)
