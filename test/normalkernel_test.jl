@@ -3,7 +3,7 @@ function normalkernel_test(T, affine_types)
 
     for t in affine_types
         slope, intercept, F = _make_affinemap(T, 1, 1, t)
-        K = NormalKernel{T}(F, Σ)
+        K = NormalKernel(F, Σ)
         x = randn(T, 1)
 
         @testset "NormalKernel | Unary | $(T) | $(t)" begin
