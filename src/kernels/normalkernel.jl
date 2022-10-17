@@ -31,7 +31,7 @@ for c in (:AbstractMatrix, :Factorization)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
         F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{T}, Σ) # should be real(T) for Diagonal / UniformScaling 
+        Σ = convert($c{T}, Σ)
         return NormalKernel{T}(F, symmetrise(Σ))
     end
 end
@@ -40,7 +40,7 @@ for c in (:Diagonal, :UniformScaling)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
         F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{real(T)}, Σ)  
+        Σ = convert($c{real(T)}, Σ)
         return NormalKernel{T}(F, symmetrise(Σ))
     end
 end
