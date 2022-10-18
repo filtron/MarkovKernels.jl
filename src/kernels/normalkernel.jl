@@ -7,6 +7,13 @@ abstract type AbstractNormalKernel{T<:Number} <: AbstractMarkovKernel end
 
 eltype(::AbstractNormalKernel{T}) where {T} = T
 
+AbstractNormalKernel{T}(K::AbstractNormalKernel{T}) where {T} = K
+convert(::Type{T}, K::T) where {T<:AbstractNormalKernel} = K
+convert(::Type{T}, K::AbstractNormalKernel) where {T<:AbstractNormalKernel} = T(K)::T
+
+==(K1::T, K2::T) where {T<:AbstractNormalKernel} =
+    all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
+
 """
     NormalKernel
 
@@ -15,19 +22,43 @@ Standard parametrisation of Normal kernels.
 struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
-    function NormalKernel(μ, Σ)
-        Σ = symmetrise(Σ)
-        new{eltype(μ),typeof(μ),typeof(Σ)}(μ, Σ)
-    end
+    NormalKernel{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
-const AffineNormalKernel{T} =
-    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
-
+NormalKernel(F::AbstractAffineMap, Σ) = NormalKernel{eltype(F)}(F, Σ)
 NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(LinearMap(Φ), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
     NormalKernel(AffineCorrector(Φ, b, c), Σ)
+
+const AffineNormalKernel{T} =
+    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
+
+for c in (:AbstractMatrix, :Factorization)
+    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
+        T = promote_type(eltype(F), eltype(Σ))
+        F = convert(AbstractAffineMap{T}, F)
+        Σ = convert($c{T}, Σ)
+        return NormalKernel{T}(F, symmetrise(Σ))
+    end
+    @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
+        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ))
+end
+
+for c in (:Diagonal, :UniformScaling)
+    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
+        T = promote_type(eltype(F), eltype(Σ))
+        F = convert(AbstractAffineMap{T}, F)
+        Σ = convert($c{real(T)}, Σ)
+        return NormalKernel{T}(F, symmetrise(Σ))
+    end
+    @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
+        T <: Real && U <: Real || T <: Complex && U <: Complex ?
+        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{real(T)}, K.Σ)) :
+        error("T and U must both be complex or both be real")
+end
+
+AbstractNormalKernel{T}(K::NormalKernel) where {T} = NormalKernel{T}(K)
 
 """
     covp(K::NormalKernel)
@@ -38,7 +69,8 @@ For computing the actual conditional covariance matrix, use cov.
 covp(K::NormalKernel) = K.Σ
 
 mean(K::NormalKernel) = K.μ
-cov(K::NormalKernel) = x -> K.Σ
+cov(K::NormalKernel) = K.Σ
+cov(K::AffineNormalKernel) = x -> K.Σ
 
 """
     condition(K::AbstractNormalKernel, x)

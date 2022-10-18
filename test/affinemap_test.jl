@@ -3,8 +3,17 @@ function affinemap_test(T, affine_types, n)
         slopegt, interceptgt, F = _make_affinemap(T, n, n, t)
         x = randn(T, n)
 
+        eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
+
         @testset "AffineMap | Unary | $(T) | $(t)" begin
             @test eltype(F) == T
+            @test convert(typeof(F), F) == F
+            for U in eltypes
+                eltype(AbstractAffineMap{U}(F)) == U
+                convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)
+            end
+            @test AbstractAffineMap{T}(F) == F
+            @test convert(AbstractAffineMap{T}, F) == F
             @test slope(F) ≈ slopegt
             @test intercept(F) ≈ interceptgt
             @test F(x) ≈ slopegt * x + interceptgt
