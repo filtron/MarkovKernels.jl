@@ -7,6 +7,12 @@ abstract type AbstractNormal{T<:Number} <: AbstractDistribution end
 
 eltype(::AbstractNormal{T}) where {T} = T
 
+AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
+convert(::Type{T}, N::T) where {T<:AbstractNormal} = N
+convert(::Type{T}, N::AbstractNormal) where {T<:AbstractNormal} = T(N)::T
+
+==(N1::T, N2::T) where {T<:AbstractNormal} = all(f -> getfield(N1, f) == getfield(N2, f), 1:nfields(N1))
+
 """
     Normal{T,U,V}
 
@@ -15,18 +21,34 @@ Standard parametrisation of the normal distribution with element type T.
 struct Normal{T,U,V} <: AbstractNormal{T}
     μ::U
     Σ::V
-    function Normal(μ::AbstractVector, Σ)
-        T = promote_type(eltype(μ), eltype(Σ))
-        Σ = symmetrise(Σ)
-        new{T,typeof(μ),typeof(Σ)}(μ, Σ)
-    end
+    Normal{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
+
+for c in (:AbstractMatrix, :Factorization)
+    @eval function Normal(μ::AbstractVector, Σ::$c)
+        T = promote_type(eltype(μ), eltype(Σ))
+        return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{T}, Σ)))
+    end
+    @eval Normal{T}(K::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
+        Normal(convert(AbstractVector{T}, K.μ), convert($c{T}, K.Σ))
+end
+
+for c in (:Diagonal, :UniformScaling)
+    @eval function Normal(μ::AbstractVector, Σ::$c)
+        T = promote_type(eltype(μ), eltype(Σ))
+        return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{real(T)}, Σ)))
+    end
+    @eval Normal{T}(K::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
+        T <: Real && U <: Real || T <: Complex && U <: Complex ?
+        Normal(convert(AbstractVector{T}, K.μ), convert($c{real(T)}, K.Σ)) :
+        error("T and U must both be complex or both be real")
+end
+
+AbstractNormal{T}(K::Normal) where {T} = Normal{T}(K)
 
 const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
 IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
 
-similar(N::Normal) = Normal(similar(N.μ), similar(N.Σ))
-==(N1::Normal, N2::Normal) = N1.μ == N2.μ && N1.Σ == N2.Σ
 """
     dim(N::AbstractNormal)
 

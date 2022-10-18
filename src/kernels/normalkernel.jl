@@ -12,7 +12,7 @@ convert(::Type{T}, K::T) where {T<:AbstractNormalKernel} = K
 convert(::Type{T}, K::AbstractNormalKernel) where {T<:AbstractNormalKernel} = T(K)::T
 
 ==(K1::T, K2::T) where {T<:AbstractNormalKernel} =
-    all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
+   all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
 
 """
     NormalKernel
@@ -37,9 +37,7 @@ const AffineNormalKernel{T} =
 for c in (:AbstractMatrix, :Factorization)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
-        F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{T}, Σ)
-        return NormalKernel{T}(F, symmetrise(Σ))
+        return NormalKernel{T}(convert(AbstractAffineMap{T}, F), symmetrise(convert($c{T}, Σ)))
     end
     @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
         NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ))
@@ -48,9 +46,7 @@ end
 for c in (:Diagonal, :UniformScaling)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
-        F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{real(T)}, Σ)
-        return NormalKernel{T}(F, symmetrise(Σ))
+        return NormalKernel{T}(convert(AbstractAffineMap{T}, F), symmetrise(convert($c{real(T)}, Σ)))
     end
     @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
         T <: Real && U <: Real || T <: Complex && U <: Complex ?

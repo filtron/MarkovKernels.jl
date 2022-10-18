@@ -5,6 +5,8 @@ function normal_test(T, n, cov_types)
 
     x = randn(T, n)
 
+    eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
+
     for i in 1:ncovps
         @testset "Normal | Unary | $(T) | $(cov_types[i])" begin
             N = normals[i]
@@ -13,6 +15,11 @@ function normal_test(T, n, cov_types)
             covpar = cov_parameters[i]
 
             @test eltype(N) == T
+            @test convert(typeof(N), N) == N
+            for U in eltypes
+                eltype(AbstractNormal{U}(N)) == U
+                convert(AbstractNormal{U}, N) == AbstractNormal{U}(N)
+            end
             @test N == N
             @test mean(N) == μ
             @test cov(N) ≈ covmat
