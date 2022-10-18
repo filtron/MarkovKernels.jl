@@ -5,7 +5,7 @@ function dirac_test(T, n)
 
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
-    @testset "Dirac | $(T) " begin 
+    @testset "Dirac | $(T) " begin
         @test eltype(D) == T
         @test convert(typeof(D), D) == D
         for U in eltypes

@@ -11,7 +11,8 @@ AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 convert(::Type{T}, N::T) where {T<:AbstractNormal} = N
 convert(::Type{T}, N::AbstractNormal) where {T<:AbstractNormal} = T(N)::T
 
-==(N1::T, N2::T) where {T<:AbstractNormal} = all(f -> getfield(N1, f) == getfield(N2, f), 1:nfields(N1))
+==(N1::T, N2::T) where {T<:AbstractNormal} =
+    all(f -> getfield(N1, f) == getfield(N2, f), 1:nfields(N1))
 
 """
     Normal{T,U,V}
@@ -31,7 +32,7 @@ for c in (:AbstractMatrix, :Factorization)
     end
     @eval Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
         T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        Normal(convert(AbstractVector{T}, N.μ), convert($c{T}, N.Σ)) : 
+        Normal(convert(AbstractVector{T}, N.μ), convert($c{T}, N.Σ)) :
         error("T and U must both be complex or both be real")
 end
 
