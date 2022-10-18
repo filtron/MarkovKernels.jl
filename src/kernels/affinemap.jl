@@ -1,17 +1,19 @@
-# types for representing affine conditional means
 abstract type AbstractAffineMap{T<:Number} end
 
 eltype(::AbstractAffineMap{T}) where {T} = T
 
-(M::AbstractAffineMap)(x) = slope(M) * x + intercept(M)
-compose(M2::AbstractAffineMap, M1::AbstractAffineMap) =
-    AffineMap(slope(M2) * slope(M1), slope(M2) * intercept(M1) + intercept(M2))
-*(M2::AbstractAffineMap, M1::AbstractAffineMap) = compose(M2, M1)
-nout(M::AbstractAffineMap) = size(slope(M), 1)
+(F::AbstractAffineMap)(x) = slope(F) * x + intercept(F)
+compose(F2::AbstractAffineMap, F1::AbstractAffineMap) =
+    AffineMap(slope(F2) * slope(F1), slope(F2) * intercept(F1) + intercept(F2))
+*(F2::AbstractAffineMap, F1::AbstractAffineMap) = compose(F2, F1)
+nout(F::AbstractAffineMap) = size(slope(F), 1)
 
 AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
+
+==(F1::T, F2::T) where {T<:AbstractAffineMap} =
+    all(f -> getfield(F1, f) == getfield(F2, f), 1:nfields(F1))
 
 struct AffineMap{T,U,V} <: AbstractAffineMap{T}
     A::U
@@ -25,7 +27,6 @@ struct AffineMap{T,U,V} <: AbstractAffineMap{T}
 end
 slope(F::AffineMap) = F.A
 intercept(F::AffineMap) = F.b
-==(F1::AffineMap, F2::AffineMap) = F1.A == F2.A && F1.b == F2.b
 
 AffineMap{T}(F::AffineMap) where {T} =
     AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
@@ -37,7 +38,6 @@ struct LinearMap{T,U} <: AbstractAffineMap{T}
 end
 slope(F::LinearMap) = F.A
 intercept(F::LinearMap) = zeros(eltype(F), size(slope(F), 1))
-==(F1::LinearMap, F2::LinearMap) = F1.A == F2.A
 compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
 
 LinearMap{T}(F::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, F.A))
@@ -57,7 +57,6 @@ struct AffineCorrector{T,U,V,S} <: AbstractAffineMap{T}
 end
 slope(F::AffineCorrector) = F.A
 intercept(F::AffineCorrector) = F.b - F.A * F.c
-==(F1::AffineCorrector, F2::AffineCorrector) = F1.A == F2.A && F1.b == F2.b && F1.c == F2.c
 compose(F2::AffineCorrector, F1::AffineCorrector) =
     AffineCorrector(F2.A * F1.A, F2(F1.b), F1.c)
 
