@@ -29,8 +29,10 @@ for c in (:AbstractMatrix, :Factorization)
         T = promote_type(eltype(μ), eltype(Σ))
         return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{T}, Σ)))
     end
-    @eval Normal{T}(K::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
-        Normal(convert(AbstractVector{T}, K.μ), convert($c{T}, K.Σ))
+    @eval Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
+        T <: Real && U <: Real || T <: Complex && U <: Complex ?
+        Normal(convert(AbstractVector{T}, N.μ), convert($c{T}, N.Σ)) : 
+        error("T and U must both be complex or both be real")
 end
 
 for c in (:Diagonal, :UniformScaling)
@@ -38,9 +40,9 @@ for c in (:Diagonal, :UniformScaling)
         T = promote_type(eltype(μ), eltype(Σ))
         return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{real(T)}, Σ)))
     end
-    @eval Normal{T}(K::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
+    @eval Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
         T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        Normal(convert(AbstractVector{T}, K.μ), convert($c{real(T)}, K.Σ)) :
+        Normal(convert(AbstractVector{T}, N.μ), convert($c{real(T)}, N.Σ)) :
         error("T and U must both be complex or both be real")
 end
 

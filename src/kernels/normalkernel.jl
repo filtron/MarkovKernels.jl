@@ -40,7 +40,9 @@ for c in (:AbstractMatrix, :Factorization)
         return NormalKernel{T}(convert(AbstractAffineMap{T}, F), symmetrise(convert($c{T}, Σ)))
     end
     @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
-        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ))
+        T <: Real && U <: Real || T <: Complex && U <: Complex ?
+        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ)) : 
+        error("T and U must both be complex or both be real")
 end
 
 for c in (:Diagonal, :UniformScaling)

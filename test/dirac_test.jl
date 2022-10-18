@@ -1,19 +1,24 @@
 
 function dirac_test(T, n)
-    μ1 = randn(T, n)
-    D1 = Dirac(μ1)
-    D12 = Dirac(μ1)
+    μ = randn(T, n)
+    D = Dirac(μ)
 
-    @testset "Dirac | $(T) " begin
-        @test typeof(similar(D1)) == typeof(D1)
-        @test D1 == D12
-        @test mean(D1) == μ1
-        @test cov(D1) == zeros(T, n, n)
-        @test var(D1) == zeros(T, n)
-        @test std(D1) == zeros(T, n)
-        @test rand(D1) == mean(D1)
+    eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
-        @test eltype(var(D1)) <: Real
-        @test eltype(std(D1)) <: Real
+    @testset "Dirac | $(T) " begin 
+        @test eltype(D) == T
+        @test convert(typeof(D), D) == D
+        for U in eltypes
+            eltype(AbstractDirac{U}(D)) == U
+            convert(AbstractDirac{U}, D) == AbstractDirac{U}(D)
+        end
+        @test mean(D) == μ
+        @test cov(D) == Diagonal(zeros(T, n))
+        @test var(D) == zeros(T, n)
+        @test std(D) == zeros(T, n)
+        @test rand(D) == mean(D)
+
+        @test eltype(var(D)) <: Real
+        @test eltype(std(D)) <: Real
     end
 end
