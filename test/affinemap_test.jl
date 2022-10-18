@@ -9,7 +9,8 @@ function affinemap_test(T, affine_types, n)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
             for U in eltypes
-                eltype(AbstractAffineMap{U}(F)) == U
+                eltype(AbstractAffineMap{U}(F)) == U 
+                convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F) 
             end
             @test AbstractAffineMap{T}(F) == F
             @test convert(AbstractAffineMap{T}, F) == F

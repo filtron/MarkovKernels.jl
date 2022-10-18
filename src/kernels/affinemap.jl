@@ -9,6 +9,7 @@ compose(M2::AbstractAffineMap, M1::AbstractAffineMap) =
 *(M2::AbstractAffineMap, M1::AbstractAffineMap) = compose(M2, M1)
 nout(M::AbstractAffineMap) = size(slope(M), 1)
 
+AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
 
@@ -28,7 +29,6 @@ intercept(F::AffineMap) = F.b
 
 AffineMap{T}(F::AffineMap) where {T} =
     AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
-AbstractAffineMap{T}(F::AffineMap{T}) where {T} = F
 AbstractAffineMap{T}(F::AffineMap) where {T} = AffineMap{T}(F)
 
 struct LinearMap{T,U} <: AbstractAffineMap{T}
@@ -41,7 +41,6 @@ intercept(F::LinearMap) = zeros(eltype(F), size(slope(F), 1))
 compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
 
 LinearMap{T}(F::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, F.A))
-AbstractAffineMap{T}(F::LinearMap{T}) where {T} = F
 AbstractAffineMap{T}(F::LinearMap) where {T} = LinearMap{T}(F)
 
 struct AffineCorrector{T,U,V,S} <: AbstractAffineMap{T}
@@ -67,5 +66,4 @@ AffineCorrector{T}(F::AffineCorrector) where {T} = AffineCorrector(
     convert(AbstractVector{T}, F.b),
     convert(AbstractVector{T}, F.c),
 )
-AbstractAffineMap{T}(F::AffineCorrector{T}) where {T} = F
 AbstractAffineMap{T}(F::AffineCorrector) where {T} = AffineCorrector{T}(F)
