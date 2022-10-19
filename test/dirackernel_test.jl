@@ -9,6 +9,7 @@ function dirackernel_test(T, n, affine_types, cov_types)
         @testset "AffineDiracKernel | Unary | $(T) | $(at)" begin
             @test eltype(K) == T
             @test typeof(K) <: AffineDiracKernel
+            @test K == DiracKernel(mean(K)...)
             @test convert(typeof(K), K) == K
             for U in eltypes
                 eltype(AbstractDiracKernel{U}(K)) == U
@@ -47,6 +48,18 @@ function dirackernel_test(T, n, affine_types, cov_types)
         end
     end
 
+    for dk1 in affine_types, dk2 in affine_types
+        _slope1, _intercept1, F1 = _make_affinemap(T, n, n, dk1)
+        K1 = DiracKernel(F1)
+        _slope2, _intercept2, F2 = _make_affinemap(T, n, n, dk2)
+        K2 = DiracKernel(F2)
+
+        @testset "AffineDiracKernel {$(T),$(dk1)} | AffineDiracKernel {$(T),$(dk2)}" begin
+            @test mean(compose(K2, K1)) == compose(F2, F1)
+            @test mean(compose(K1, K2)) == compose(F1, F2)
+        end
+    end
+
     normal_kernel_type_parameters = Iterators.product(affine_types, cov_types)
 
     for dk_at in affine_types, nkt in normal_kernel_type_parameters
@@ -58,7 +71,7 @@ function dirackernel_test(T, n, affine_types, cov_types)
 
         x = randn(T, n)
 
-        @testset "AffineDiracKernel {$(T),$(dk_at)} | AffineNormaKernel {$(T),$(nk_at),$(nk_ct)}" begin
+        @testset "AffineDiracKernel {$(T),$(dk_at)} | AffineNormalKernel {$(T),$(nk_at),$(nk_ct)}" begin
             @test mean(compose(DK, NK)) == compose(DF, NF)
             @test mean(compose(NK, DK)) == compose(NF, DF)
 

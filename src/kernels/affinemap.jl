@@ -26,6 +26,11 @@ struct AffineMap{T,U,V} <: AbstractAffineMap{T}
         new{T,typeof(A),typeof(b)}(A, b)
     end
 end
+
+Base.iterate(F::AffineMap) = (F.A, Val(:b))
+Base.iterate(F::AffineMap, ::Val{:b}) = (F.b, Val(:done))
+Base.iterate(F::AffineMap, ::Val{:done}) = nothing
+
 slope(F::AffineMap) = F.A
 intercept(F::AffineMap) = F.b
 
@@ -37,8 +42,13 @@ struct LinearMap{T,U} <: AbstractAffineMap{T}
     A::U
     LinearMap(A::AbstractMatrix) = new{eltype(A),typeof(A)}(A)
 end
+
+Base.iterate(F::LinearMap) = (F.A, Val(:done))
+Base.iterate(F::LinearMap, ::Val{:done}) = nothing
+
 slope(F::LinearMap) = F.A
 intercept(F::LinearMap) = zeros(eltype(F), size(slope(F), 1))
+(F::LinearMap)(x) = slope(F) * x
 compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
 
 LinearMap{T}(F::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, F.A))
@@ -56,8 +66,15 @@ struct AffineCorrector{T,U,V,S} <: AbstractAffineMap{T}
         new{T,typeof(A),typeof(b),typeof(c)}(A, b, c)
     end
 end
+
+Base.iterate(F::AffineCorrector) = (F.A, Val(:b))
+Base.iterate(F::AffineCorrector, ::Val{:b}) = (F.b, Val(:c))
+Base.iterate(F::AffineCorrector, ::Val{:c}) = (F.c, Val(:done))
+Base.iterate(F::AffineCorrector, ::Val{:done}) = nothing
+
 slope(F::AffineCorrector) = F.A
 intercept(F::AffineCorrector) = F.b - F.A * F.c
+(F::AffineCorrector)(x) = F.b + slope(F) * (x - F.c)
 compose(F2::AffineCorrector, F1::AffineCorrector) =
     AffineCorrector(F2.A * F1.A, F2(F1.b), F1.c)
 
