@@ -46,7 +46,15 @@ include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 include("kernels/compose.jl")
 export AbstractNormalKernel,
-    NormalKernel, AffineNormalKernel, condition, compose, marginalise, invert, AbstractDiracKernel, DiracKernel, AffineDiracKernel
+    NormalKernel,
+    AffineNormalKernel,
+    condition,
+    compose,
+    marginalise,
+    invert,
+    AbstractDiracKernel,
+    DiracKernel,
+    AffineDiracKernel
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

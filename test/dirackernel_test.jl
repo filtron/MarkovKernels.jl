@@ -1,7 +1,5 @@
 function dirackernel_test(T, n, affine_types, cov_types)
-
     for at in affine_types
-
         slope, intercept, F = _make_affinemap(T, n, n, at)
         K = DiracKernel(F)
         x = randn(T, n)
@@ -22,6 +20,33 @@ function dirackernel_test(T, n, affine_types, cov_types)
         end
     end
 
+    for dk_at in affine_types, n_ct in cov_types
+        _slope, _intercept, DF = _make_affinemap(T, n - 1, n, dk_at)
+        DK = DiracKernel(DF)
+        m, ncov_mat, ncov_param, N = _make_normal(T, n, n_ct)
+
+        NC, KC = invert(N, DK)
+        x = randn(T, n - 1)
+
+        pred, S, G, Π = _schur(ncov_mat, m, slope(DF)) # _schur should not return pred
+        pred = DF(m)
+        Ngt = Normal(pred, S)
+        Kgt = NormalKernel(G, m, pred, Π)
+
+        @testset "AffineDiracKernel {$(T),$(dk_at)} | Normal {$(T),$(n_ct)}" begin
+            @test mean(marginalise(N, DK)) ≈ DF(m)
+            @test cov(marginalise(N, DK)) ≈ slope(DF) * ncov_mat * slope(DF)'
+
+            @test mean(NC) ≈ mean(Ngt)
+            @test cov(NC) ≈ cov(Ngt)
+
+            @test slope(mean(KC)) ≈ slope(mean(Kgt))
+            @test intercept(mean(KC)) ≈ intercept(mean(Kgt))
+            @test cov(condition(KC, x)) ≈ cov(condition(Kgt, x))
+            @test mean(condition(KC, x)) ≈ mean(condition(Kgt, x))
+        end
+    end
+
     normal_kernel_type_parameters = Iterators.product(affine_types, cov_types)
 
     for dk_at in affine_types, nkt in normal_kernel_type_parameters
@@ -37,62 +62,9 @@ function dirackernel_test(T, n, affine_types, cov_types)
             @test mean(compose(DK, NK)) == compose(DF, NF)
             @test mean(compose(NK, DK)) == compose(NF, DF)
 
-            @test cov(condition(compose(DK, NK), x)) ≈ slope(mean(DK))*cov_mat*slope(mean(DK))'
+            @test cov(condition(compose(DK, NK), x)) ≈
+                  slope(mean(DK)) * cov_mat * slope(mean(DK))'
             @test cov(condition(compose(NK, DK), x)) ≈ cov_mat
         end
-
-    end
-
-
-
-
-    RV = randn(T, m, m)
-    Σ = Hermitian(RV' * RV)
-    μ = randn(T, m)
-    N1 = Normal(μ, Σ)
-
-    Φ1 = randn(T, n, m)
-    K1 = DiracKernel(Φ1)
-
-
-    Φ2 = randn(T, m, n)
-    K2 = DiracKernel(Φ2)
-
-    K3 = DiracKernel(Φ2 * Φ1)
-
-    x = randn(T, m)
-
-    D12 = Dirac(Φ1 * x)
-
-    pred = Φ1 * μ
-    S = Hermitian(Φ1 * Σ * Φ1')
-    G = Σ * Φ1' / S
-    N_gt = Normal(pred, S)
-    Π = Hermitian(Σ - G * S * G')
-
-    corrector = AffineCorrector(G, μ, pred)
-    K_gt = NormalKernel(corrector, Π)
-
-    Nc, Kc = invert(N1, K1)
-
-    @testset "DiracKernel | $(T)" begin
-        @test eltype(K1) == T
-
-        @test mean(K1)(x) ≈ Φ1 * x
-        @test cov(K1)(x) == Diagonal(zeros(T, size(Φ1, 1)))
-
-        @test condition(K1, x) == D12
-
-        @test slope(mean(compose(K2, K1))) ≈ slope(K3.μ)
-        @test cov(compose(K2, K1))(x) ≈ cov(K3)(x)
-
-        @test mean(marginalise(N1, K1)) ≈ Φ1 * μ
-        @test cov(marginalise(N1, K1)) ≈ Hermitian(Φ1 * Σ * Φ1')
-
-        @test mean(Nc) ≈ mean(N_gt)
-        @test cov(Nc) ≈ cov(N_gt)
-        @test cov(Kc)(x) ≈ cov(K_gt)(x)
-        @test slope(mean(Kc)) ≈ slope(mean(K_gt))
-        @test intercept(mean(Kc)) ≈ intercept(mean(K_gt))
     end
 end

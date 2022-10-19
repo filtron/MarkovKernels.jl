@@ -110,3 +110,13 @@ function _schur(Σ, μ, C, R)
 
     return pred, S, G, Π
 end
+
+function _schur(Σ, μ, C)
+    pred = C * μ
+
+    S = Hermitian(C * Σ * C')
+    G = Σ * C' / S
+    Π = Hermitian(Σ - G * S * G')
+
+    return pred, S, G, Π
+end

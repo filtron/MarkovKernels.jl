@@ -50,7 +50,7 @@ function _make_affinemap(T, n::Int, m::Int, t::Symbol)
     elseif t == :AffineCorrector
         A = randn(T, n, m)
         b = randn(T, n)
-        c = randn(T, n)
+        c = randn(T, m)
         slope = A
         intercept = b - A * c
         F = AffineCorrector(A, b, c)
