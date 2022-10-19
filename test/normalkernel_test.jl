@@ -28,6 +28,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         @testset "AffineNormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
             @test eltype(K) == T
             @test typeof(K) <: AffineNormalKernel
+            @test K == NormalKernel(mean(K)..., cov_param)
             @test convert(typeof(K), K) == K
             for U in eltypes
                 eltype(AbstractNormalKernel{U}(K)) == U
@@ -52,7 +53,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
             @test slope(mean(compose(K2, K1))) ≈ slope(compose(M2, M1))
             @test cov(condition(compose(K2, K1), x)) ≈
                   slope(mean(K2)) * cov_mat1 * slope(mean(K2))' + cov_mat2
-            # insert test for correct covp 
+            # insert test for correct covp
         end
     end
 
@@ -65,7 +66,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         NC, KC = invert(N, K)
         x = randn(T, n)
 
-        pred, S, G, Π = _schur(ncov_mat, m, slope(M), kcov_mat) # _schur should not return pred 
+        pred, S, G, Π = _schur(ncov_mat, m, slope(M), kcov_mat) # _schur should not return pred
         pred = M(m)
         Ngt = Normal(pred, S)
         Kgt = NormalKernel(G, m, pred, Π)

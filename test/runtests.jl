@@ -35,7 +35,7 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
     for T in etypes
         normalkernel_test(T, affine_types)
         affine_normalkernel_test(T, n, affine_types, cov_types)
-        dirackernel_test(T, n, m)
+        dirackernel_test(T, n, affine_types, cov_types)
         likelihood_test(T, n, m)
     end
 end

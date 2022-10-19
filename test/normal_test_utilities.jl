@@ -1,4 +1,4 @@
-# plain implementations of operations on Normal distributions / Normal kernels 
+# plain implementations of operations on Normal distributions / Normal kernels
 function _make_cov(T, n, s::Symbol)
     if s === :Matrix
         R = randn(T, n, n)
@@ -50,24 +50,8 @@ end
 
 function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
     cov_param, cov_mat = _make_cov(T, n, ctype)
-
-    if atype === :LinearMap
-        A = randn(T, n, m)
-        M = LinearMap(A)
-        K = NormalKernel(A, cov_param)
-    elseif atype === :AffineMap
-        A = randn(T, n, m)
-        b = randn(T, n)
-        M = AffineMap(A, b)
-        K = NormalKernel(A, b, cov_param)
-    elseif atype === :AffineCorrector
-        A = randn(T, n, m)
-        b = randn(T, n)
-        c = randn(T, m)
-        M = AffineCorrector(A, b, c)
-        K = NormalKernel(A, b, c, cov_param)
-    end
-
+    slope, intercept, M = _make_affinemap(T, n, m, atype)
+    K = NormalKernel(M, cov_param)
     return M, cov_mat, cov_param, K
 end
 
@@ -121,6 +105,16 @@ function _schur(Σ, μ, C, R)
     pred = C * μ
 
     S = Hermitian(C * Σ * C' + R)
+    G = Σ * C' / S
+    Π = Hermitian(Σ - G * S * G')
+
+    return pred, S, G, Π
+end
+
+function _schur(Σ, μ, C)
+    pred = C * μ
+
+    S = Hermitian(C * Σ * C')
     G = Σ * C' / S
     Π = Hermitian(Σ - G * S * G')
 
