@@ -1,6 +1,7 @@
 using MarkovKernels
 using Test
 using LinearAlgebra
+using Plots
 
 include("normal_test_utilities.jl")
 
@@ -11,6 +12,8 @@ include("affinemap_test.jl")
 include("normalkernel_test.jl")
 include("dirackernel_test.jl")
 include("likelihood_test.jl")
+
+include("normal_plotting_test.jl")
 
 n = 2
 m = 3
@@ -38,4 +41,6 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
         dirackernel_test(T, n, affine_types, cov_types)
         likelihood_test(T, n, m)
     end
+
+    normal_plotting_test()
 end
