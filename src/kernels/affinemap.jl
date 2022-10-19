@@ -12,6 +12,7 @@ AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
 
+# this falls back to === in Base if F1 and F2 are not of same eltype?
 ==(F1::T, F2::T) where {T<:AbstractAffineMap} =
     all(f -> getfield(F1, f) == getfield(F2, f), 1:nfields(F1))
 

@@ -37,20 +37,24 @@ const AffineNormalKernel{T} =
 for c in (:AbstractMatrix, :Factorization)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
-        F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{T}, Σ)
-        return NormalKernel{T}(F, symmetrise(Σ))
+        return NormalKernel{T}(
+            convert(AbstractAffineMap{T}, F),
+            symmetrise(convert($c{T}, Σ)),
+        )
     end
     @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
-        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ))
+        T <: Real && U <: Real || T <: Complex && U <: Complex ?
+        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ)) :
+        error("T and U must both be complex or both be real")
 end
 
 for c in (:Diagonal, :UniformScaling)
     @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
         T = promote_type(eltype(F), eltype(Σ))
-        F = convert(AbstractAffineMap{T}, F)
-        Σ = convert($c{real(T)}, Σ)
-        return NormalKernel{T}(F, symmetrise(Σ))
+        return NormalKernel{T}(
+            convert(AbstractAffineMap{T}, F),
+            symmetrise(convert($c{real(T)}, Σ)),
+        )
     end
     @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
         T <: Real && U <: Real || T <: Complex && U <: Complex ?
