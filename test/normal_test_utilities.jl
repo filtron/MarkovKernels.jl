@@ -101,22 +101,18 @@ function _kld(T, μ1, Σ1, μ2, Σ2)
 end
 
 # this should call symmetrise
-function _schur(Σ, μ, C, R)
-    pred = C * μ
-
+function _schur(Σ, C, R)
     S = Hermitian(C * Σ * C' + R)
     G = Σ * C' / S
     Π = Hermitian(Σ - G * S * G')
 
-    return pred, S, G, Π
+    return S, G, Π
 end
 
-function _schur(Σ, μ, C)
-    pred = C * μ
-
+function _schur(Σ, C)
     S = Hermitian(C * Σ * C')
     G = Σ * C' / S
     Π = Hermitian(Σ - G * S * G')
 
-    return pred, S, G, Π
+    return S, G, Π
 end
