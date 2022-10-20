@@ -41,7 +41,7 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
         end
     end
 
-    @testset "Kernels" begin 
+    @testset "Kernels" begin
         for T in etypes
             normalkernel_test(T, affine_types)
             affine_normalkernel_test(T, n, affine_types, cov_types)
@@ -50,7 +50,7 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
     end
 
     @testset "Likelihoods" begin
-        for T in etypes  
+        for T in etypes
             likelihood_test(T, n, m, affine_types, cov_types)
         end
     end

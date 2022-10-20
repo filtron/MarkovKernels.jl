@@ -28,7 +28,7 @@ end
 measurement_model(L::LogLike) = L.K
 measurement(L::LogLike) = L.y
 
-(L::LogLike)(x) = logpdf(condition(measurement_model(L),x), measurement(L))
+(L::LogLike)(x) = logpdf(condition(measurement_model(L), x), measurement(L))
 
 function bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
     M, C = invert(D, K)

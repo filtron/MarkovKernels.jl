@@ -8,7 +8,7 @@ function normalkernel_test(T, affine_types)
 
         @testset "NormalKernel | Unary | $(T) | $(t)" begin
             @test mean(K)(x) == F(x)
-            @test cov(K)(x) == Σ(x) 
+            @test cov(K)(x) == Σ(x)
             @test condition(K, x) == Normal(F(x), Σ(x))
         end
     end
