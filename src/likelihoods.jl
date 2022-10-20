@@ -1,17 +1,39 @@
-abstract type AbstractLikelihood end
+"""
+    AbstractLikelihood{T<:Number} 
 
-struct Likelihood{U<:AbstractMarkovKernel,V} <: AbstractLikelihood
+Abstract type for representing likelihoods 
+"""
+abstract type AbstractLogLike{T<:Number} end
+
+eltype(::AbstractLogLike{T}) where {T} = T
+
+AbstractLogLike{T}(L::AbstractLogLike{T}) where {T} = L
+convert(::Type{T}, L::T) where {T<:AbstractLogLike} = L
+convert(::Type{T}, K::AbstractLogLike) where {T<:AbstractLogLike} = T(K)::T
+
+==(L1::T, L2::T) where {T<:AbstractLogLike} =
+    all(f -> getfield(L1, f) == getfield(L2, f), 1:nfields(L1))
+
+struct LogLike{T,U,V} <: AbstractLogLike{T}
     K::U
     y::V
+    LogLike{T}(K, y) where {T} = new{T,typeof(K),typeof(y)}(K, y)
 end
 
-measurement_model(L::Likelihood) = L.K
-measurement(L::Likelihood) = L.y
+function LogLike(K::AbstractMarkovKernel{T}, y::AbstractVector{T}) where {T}
+    # insert conversion
+    LogLike{T}(K, y)
+end
 
-function bayes_rule(D::AbstractDistribution, y, K::AbstractMarkovKernel)
+measurement_model(L::LogLike) = L.K
+measurement(L::LogLike) = L.y
+
+(L::LogLike)(x) = logpdf(condition(measurement_model(L),x), measurement(L))
+
+function bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
     M, C = invert(D, K)
     return condition(C, y), logpdf(M, y)
 end
 
-bayes_rule(D::AbstractDistribution, L::AbstractLikelihood) =
-    bayes_rule(D, measurement(L), measurement_model(L))
+bayes_rule(D::AbstractDistribution, L::AbstractLogLike) =
+    bayes_rule(D, measurement_model(L), measurement(L))

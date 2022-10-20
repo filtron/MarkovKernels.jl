@@ -3,9 +3,7 @@
 
 Abstract type for representing normal distributed random vectors taking values in T.
 """
-abstract type AbstractNormal{T<:Number} <: AbstractDistribution end
-
-eltype(::AbstractNormal{T}) where {T} = T
+abstract type AbstractNormal{T} <: AbstractDistribution{T} end
 
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 convert(::Type{T}, N::T) where {T<:AbstractNormal} = N

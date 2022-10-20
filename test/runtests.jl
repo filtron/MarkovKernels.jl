@@ -5,17 +5,17 @@ using Plots
 
 include("normal_test_utilities.jl")
 
-include("normal_test.jl")
-include("dirac_test.jl")
-include("normal_plotting_test.jl")
+include("distributions/normal_test.jl")
+include("distributions/dirac_test.jl")
+include("distributions/normal_plotting_test.jl")
 
-include("affinemap_test.jl")
+include("kernels/affinemap_test.jl")
+include("kernels/normalkernel_test.jl")
+include("kernels/dirackernel_test.jl")
+include("kernels/compose_test.jl")
 
-include("normalkernel_test.jl")
-include("dirackernel_test.jl")
 include("likelihood_test.jl")
 
-include("compose_test.jl")
 include("marginalise_test.jl")
 include("invert_test.jl")
 
@@ -35,15 +35,24 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
         normal_plotting_test()
     end
 
-    for T in etypes
-        affinemap_test(T, affine_types, n)
+    @testset "AffineMaps" begin
+        for T in etypes
+            affinemap_test(T, affine_types, n)
+        end
     end
 
-    for T in etypes
-        normalkernel_test(T, affine_types)
-        affine_normalkernel_test(T, n, affine_types, cov_types)
-        dirackernel_test(T, n, affine_types, cov_types)
-        likelihood_test(T, n, m)
+    @testset "Kernels" begin 
+        for T in etypes
+            normalkernel_test(T, affine_types)
+            affine_normalkernel_test(T, n, affine_types, cov_types)
+            dirackernel_test(T, n, affine_types, cov_types)
+        end
+    end
+
+    @testset "Likelihoods" begin
+        for T in etypes  
+            likelihood_test(T, n, m, affine_types, cov_types)
+        end
     end
 
     @testset "compose" begin

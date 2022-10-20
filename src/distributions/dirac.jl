@@ -1,6 +1,4 @@
-abstract type AbstractDirac{T<:Number} <: AbstractDistribution end
-
-eltype(::AbstractDirac{T}) where {T} = T
+abstract type AbstractDirac{T} <: AbstractDistribution{T} end
 
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 convert(::Type{T}, D::T) where {T<:AbstractDirac} = D

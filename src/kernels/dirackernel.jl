@@ -1,6 +1,4 @@
-abstract type AbstractDiracKernel{T<:Number} <: AbstractMarkovKernel end
-
-eltype(::AbstractDiracKernel{T}) where {T} = T
+abstract type AbstractDiracKernel{T} <: AbstractMarkovKernel{T} end
 
 AbstractDiracKernel{T}(K::AbstractDiracKernel{T}) where {T} = K
 convert(::Type{T}, K::T) where {T<:AbstractDiracKernel} = K
