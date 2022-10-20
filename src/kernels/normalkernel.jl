@@ -85,16 +85,6 @@ condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
 condition(K::AffineNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
 """
-    compose(K2::AffineNormalKernel, K1::AffineNormalKernel)
-
-Returns K3, the composition of K2 ∘ K1 i.e,
-
-K3(y,x) = ∫ K2(y,z) K1(z,x) dz
-"""
-compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T} =
-    NormalKernel(compose(mean(K2), mean(K1)), stein(covp(K1), mean(K2), covp(K2)))
-
-"""
     marginalise(N::AbstractNormal, K::AffineNormalKernel)
 
 Returns M, K marginalised with respect to N i.e,

@@ -47,37 +47,4 @@ function dirackernel_test(T, n, affine_types, cov_types)
             @test mean(condition(KC, x)) ≈ mean(condition(Kgt, x))
         end
     end
-
-    for dk1 in affine_types, dk2 in affine_types
-        _slope1, _intercept1, F1 = _make_affinemap(T, n, n, dk1)
-        K1 = DiracKernel(F1)
-        _slope2, _intercept2, F2 = _make_affinemap(T, n, n, dk2)
-        K2 = DiracKernel(F2)
-
-        @testset "AffineDiracKernel {$(T),$(dk1)} | AffineDiracKernel {$(T),$(dk2)}" begin
-            @test mean(compose(K2, K1)) == compose(F2, F1)
-            @test mean(compose(K1, K2)) == compose(F1, F2)
-        end
-    end
-
-    normal_kernel_type_parameters = Iterators.product(affine_types, cov_types)
-
-    for dk_at in affine_types, nkt in normal_kernel_type_parameters
-        nk_at, nk_ct = nkt
-
-        _slope, _intercept, DF = _make_affinemap(T, n, n, dk_at)
-        DK = DiracKernel(DF)
-        NF, cov_mat, cov_param, NK = _make_normalkernel(T, n, n, nk_at, nk_ct)
-
-        x = randn(T, n)
-
-        @testset "AffineDiracKernel {$(T),$(dk_at)} | AffineNormalKernel {$(T),$(nk_at),$(nk_ct)}" begin
-            @test mean(compose(DK, NK)) == compose(DF, NF)
-            @test mean(compose(NK, DK)) == compose(NF, DF)
-
-            @test cov(condition(compose(DK, NK), x)) ≈
-                  slope(mean(DK)) * cov_mat * slope(mean(DK))'
-            @test cov(condition(compose(NK, DK), x)) ≈ cov_mat
-        end
-    end
 end

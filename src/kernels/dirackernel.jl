@@ -39,9 +39,6 @@ cov(K::AffineDiracKernel{T}) where {T} = x -> Diagonal(zeros(T, nout(mean(K))))
 
 condition(K::DiracKernel, x) = Dirac(mean(K)(x))
 
-compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
-    DiracKernel(compose(mean(K2), mean(K1)))
-
 marginalise(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
     Normal(mean(K)(mean(N)), stein(covp(N), mean(K)))
 
