@@ -57,7 +57,7 @@ include("kernels/compose.jl")
 export compose
 
 include("marginalise.jl")
-export marginalise 
+export marginalise
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

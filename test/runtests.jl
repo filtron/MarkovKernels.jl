@@ -51,10 +51,9 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
         end
     end
 
-    @testset "marginalise" begin 
-        for T in etypes 
+    @testset "marginalise" begin
+        for T in etypes
             marginalise_test(T, n, m, affine_types, cov_types)
         end
     end
-
 end
