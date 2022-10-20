@@ -16,9 +16,10 @@ include("dirackernel_test.jl")
 include("likelihood_test.jl")
 
 include("compose_test.jl")
+include("marginalise_test.jl")
 
 n = 2
-m = 3
+m = 2
 
 etypes = (Float64, Complex{Float64})
 affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
@@ -49,4 +50,11 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
             compose_test(T, n, affine_types, cov_types)
         end
     end
+
+    @testset "marginalise" begin 
+        for T in etypes 
+            marginalise_test(T, n, m, affine_types, cov_types)
+        end
+    end
+
 end

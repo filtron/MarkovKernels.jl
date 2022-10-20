@@ -56,9 +56,6 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         Kgt = NormalKernel(G, m, pred, Π)
 
         @testset "NormalKernel | {$(T),$(katype),$(kctype)} | Normal | {$(T),$(nctype)}" begin
-            @test mean(marginalise(N, K)) ≈ M(m)
-            @test cov(marginalise(N, K)) ≈ slope(M) * ncov_mat * slope(M)' + kcov_mat
-
             @test mean(NC) ≈ mean(Ngt)
             @test cov(NC) ≈ cov(Ngt)
 

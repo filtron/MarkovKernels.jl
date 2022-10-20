@@ -85,16 +85,6 @@ condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
 condition(K::AffineNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
 """
-    marginalise(N::AbstractNormal, K::AffineNormalKernel)
-
-Returns M, K marginalised with respect to N i.e,
-
-M(y) = ∫ K(y,x)N(x) dx
-"""
-marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} =
-    Normal(mean(K)(mean(N)), stein(covp(N), mean(K), covp(K)))
-
-"""
     invert(N::AbstractNorma, K::AffineNormalKernel)
 
 Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, x) i.e

@@ -39,9 +39,6 @@ cov(K::AffineDiracKernel{T}) where {T} = x -> Diagonal(zeros(T, nout(mean(K))))
 
 condition(K::DiracKernel, x) = Dirac(mean(K)(x))
 
-marginalise(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
-    Normal(mean(K)(mean(N)), stein(covp(N), mean(K)))
-
 function invert(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T}
     pred = mean(K)(mean(N))
     S, G, Σ = schur_red(covp(N), mean(K))
