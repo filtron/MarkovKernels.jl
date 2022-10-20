@@ -48,7 +48,6 @@ export AbstractNormalKernel,
     NormalKernel,
     AffineNormalKernel,
     condition,
-    invert,
     AbstractDiracKernel,
     DiracKernel,
     AffineDiracKernel
@@ -58,6 +57,9 @@ export compose
 
 include("marginalise.jl")
 export marginalise
+
+include("invert.jl")
+export invert
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

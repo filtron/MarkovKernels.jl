@@ -40,29 +40,4 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
             @test condition(K, x) == Normal(M(x), cov_param)
         end
     end
-
-    for kt in kernel_type_parameters, nt in normal_type_parameters
-        katype, kctype = kt
-        nctype = nt
-        M, kcov_mat, kcov_param, K = _make_normalkernel(T, n, n, katype, kctype)
-        m, ncov_mat, ncov_param, N = _make_normal(T, n, nctype)
-
-        NC, KC = invert(N, K)
-        x = randn(T, n)
-
-        pred, S, G, Π = _schur(ncov_mat, m, slope(M), kcov_mat) # _schur should not return pred
-        pred = M(m)
-        Ngt = Normal(pred, S)
-        Kgt = NormalKernel(G, m, pred, Π)
-
-        @testset "NormalKernel | {$(T),$(katype),$(kctype)} | Normal | {$(T),$(nctype)}" begin
-            @test mean(NC) ≈ mean(Ngt)
-            @test cov(NC) ≈ cov(Ngt)
-
-            @test slope(mean(KC)) ≈ slope(mean(Kgt))
-            @test intercept(mean(KC)) ≈ intercept(mean(Kgt))
-            @test cov(condition(KC, x)) ≈ cov(condition(Kgt, x))
-            @test mean(condition(KC, x)) ≈ mean(condition(Kgt, x))
-        end
-    end
 end

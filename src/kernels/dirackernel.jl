@@ -39,15 +39,5 @@ cov(K::AffineDiracKernel{T}) where {T} = x -> Diagonal(zeros(T, nout(mean(K))))
 
 condition(K::DiracKernel, x) = Dirac(mean(K)(x))
 
-function invert(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T}
-    pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(covp(N), mean(K))
-
-    Nout = Normal(pred, S)
-    Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
-
-    return Nout, Kout
-end
-
 rand(RNG::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector) = mean(condition(K, x))
 rand(K::AbstractDiracKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)

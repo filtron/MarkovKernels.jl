@@ -84,23 +84,6 @@ Returns a Normal distribution corresponding to K evaluated at x.
 condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
 condition(K::AffineNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
-"""
-    invert(N::AbstractNorma, K::AffineNormalKernel)
-
-Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, x) i.e
-
-P(y,x) = Nout(y)*Kout(x,y)
-"""
-function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
-    pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(covp(N), mean(K), covp(K))
-
-    Nout = Normal(pred, S)
-    Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
-
-    return Nout, Kout
-end
-
 rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
     rand(RNG, condition(K, x))
 rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)

@@ -14,7 +14,8 @@ function likelihood_test(T, n, m)
     y = rand(condition(K1, x))
     L = Likelihood(K1, y)
 
-    pred, S, G, Π = _schur(Σ, μ, Φ1, Q1)
+    S, G, Π = _schur(Σ, Φ1, Q1)
+    pred = Φ1 * μ
     C = Normal(μ + G * (y - pred), Π)
     M = Normal(pred, S)
     Cgt1, loglike1 = bayes_rule(N, y, K1)

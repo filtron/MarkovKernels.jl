@@ -17,8 +17,9 @@ include("likelihood_test.jl")
 
 include("compose_test.jl")
 include("marginalise_test.jl")
+include("invert_test.jl")
 
-n = 2
+n = 1
 m = 2
 
 etypes = (Float64, Complex{Float64})
@@ -54,6 +55,12 @@ cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
     @testset "marginalise" begin
         for T in etypes
             marginalise_test(T, n, m, affine_types, cov_types)
+        end
+    end
+
+    @testset "invert" begin
+        for T in etypes
+            invert_test(T, n, m, affine_types, cov_types)
         end
     end
 end
