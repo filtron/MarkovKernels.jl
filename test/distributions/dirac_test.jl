@@ -7,10 +7,9 @@ function dirac_test(T, n)
 
     @testset "Dirac | $(T) " begin
         @test eltype(D) == T
-        @test convert(typeof(D), D) == D
         for U in eltypes
+            AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)
             eltype(AbstractDirac{U}(D)) == U
-            convert(AbstractDirac{U}, D) == AbstractDirac{U}(D)
         end
         @test mean(D) == μ
         @test cov(D) == Diagonal(zeros(T, n))

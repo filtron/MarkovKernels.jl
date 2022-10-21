@@ -12,8 +12,10 @@ function dirackernel_test(T, n, affine_types, cov_types)
             @test K == DiracKernel(mean(K)...)
             @test convert(typeof(K), K) == K
             for U in eltypes
-                eltype(AbstractDiracKernel{U}(K)) == U
-                convert(AbstractDiracKernel{U}, K) == AbstractDiracKernel{U}(K)
+                @test AbstractMarkovKernel{U}(K) ==
+                      AbstractDiracKernel{U}(K) ==
+                      DiracKernel{U}(K)
+                @test eltype(AbstractDiracKernel{U}(K)) == U
             end
             @test mean(K)(x) == F(x)
             @test cov(K)(x) == Diagonal(zeros(T, n))

@@ -8,15 +8,15 @@ import LinearAlgebra: logdet, norm_sqr
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
-abstract type AbstractDistribution end
+abstract type AbstractDistribution{T<:Number} end
 
-abstract type AbstractMarkovKernel end
+eltype(::AbstractDistribution{T}) where {T} = T
+
+abstract type AbstractMarkovKernel{T<:Number} end
+
+eltype(::AbstractMarkovKernel{T}) where {T} = T
 
 export AbstractDistribution, AbstractMarkovKernel
-
-# defines observation likelihoods
-include("likelihoods.jl")
-export AbstractLikelihood, Likelihood, measurement_model, measurement, bayes_rule
 
 include("distributions/normal.jl")  # normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
@@ -37,7 +37,7 @@ export AbstractNormal,
     AbstractDirac,
     Dirac
 
-# defines conditional mean for normal kernels
+# defines affine conditional mean for normal kernels
 include("kernels/affinemap.jl")
 export AbstractAffineMap,
     AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
@@ -60,6 +60,10 @@ export marginalise
 
 include("invert.jl")
 export invert
+
+# defines observation likelihoods
+include("likelihoods.jl")
+export AbstractLogLike, LogLike, measurement_model, measurement, bayes_rule
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

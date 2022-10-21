@@ -3,13 +3,7 @@
 
 Abstract type for representing normal distributed random vectors taking values in T.
 """
-abstract type AbstractNormal{T<:Number} <: AbstractDistribution end
-
-eltype(::AbstractNormal{T}) where {T} = T
-
-AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
-convert(::Type{T}, N::T) where {T<:AbstractNormal} = N
-convert(::Type{T}, N::AbstractNormal) where {T<:AbstractNormal} = T(N)::T
+abstract type AbstractNormal{T} <: AbstractDistribution{T} end
 
 ==(N1::T, N2::T) where {T<:AbstractNormal} =
     all(f -> getfield(N1, f) == getfield(N2, f), 1:nfields(N1))
@@ -47,10 +41,12 @@ for c in (:Diagonal, :UniformScaling)
         error("T and U must both be complex or both be real")
 end
 
-AbstractNormal{T}(K::Normal) where {T} = Normal{T}(K)
-
 const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
 IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
+
+AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
+AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
+AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
 
 """
     dim(N::AbstractNormal)

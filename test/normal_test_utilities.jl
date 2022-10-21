@@ -31,23 +31,6 @@ function _make_normal(T, n, s::Symbol)
     return mean, covariance_matrix, covariance_parameter, N
 end
 
-function _make_normals(T, n, cov_types)
-    means = []
-    cov_matrices = []
-    cov_parameters = []
-    normals = []
-
-    for i in 1:length(cov_types)
-        mean, cov_matrix, cov_param, normal = _make_normal(T, n, cov_types[i])
-        push!(means, mean)
-        push!(cov_matrices, cov_matrix)
-        push!(cov_parameters, cov_param)
-        push!(normals, normal)
-    end
-
-    return means, cov_matrices, cov_parameters, normals
-end
-
 function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
     cov_param, cov_mat = _make_cov(T, n, ctype)
     slope, intercept, M = _make_affinemap(T, n, m, atype)

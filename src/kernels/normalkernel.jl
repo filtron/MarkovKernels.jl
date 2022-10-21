@@ -3,13 +3,7 @@
 
 Abstract type for representing Normal kernels taking values in T.
 """
-abstract type AbstractNormalKernel{T<:Number} <: AbstractMarkovKernel end
-
-eltype(::AbstractNormalKernel{T}) where {T} = T
-
-AbstractNormalKernel{T}(K::AbstractNormalKernel{T}) where {T} = K
-convert(::Type{T}, K::T) where {T<:AbstractNormalKernel} = K
-convert(::Type{T}, K::AbstractNormalKernel) where {T<:AbstractNormalKernel} = T(K)::T
+abstract type AbstractNormalKernel{T} <: AbstractMarkovKernel{T} end
 
 ==(K1::T, K2::T) where {T<:AbstractNormalKernel} =
     all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
@@ -62,6 +56,8 @@ for c in (:Diagonal, :UniformScaling)
         error("T and U must both be complex or both be real")
 end
 
+AbstractMarkovKernel{T}(K::AbstractNormalKernel) where {T} = AbstractNormalKernel{T}(K)
+AbstractNormalKernel{T}(K::AbstractNormalKernel{T}) where {T} = K
 AbstractNormalKernel{T}(K::NormalKernel) where {T} = NormalKernel{T}(K)
 
 """

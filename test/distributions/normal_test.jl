@@ -1,24 +1,26 @@
 function normal_test(T, n, cov_types)
     ncovps = length(cov_types)
 
-    means, cov_matrices, cov_parameters, normals = _make_normals(T, n, cov_types)
+    means, ncov_mats, ncov_params, normals =
+        collect(zip(map(x -> _make_normal(T, n, x), cov_types)...))
 
     x = randn(T, n)
 
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
-    for i in 1:ncovps
-        @testset "Normal | Unary | $(T) | $(cov_types[i])" begin
+    @testset "Normal | Unary | $(T)" begin
+        @test IsoNormal(x, one(real(T))) == Normal(x, one(T) * I)
+
+        for i in 1:ncovps
             N = normals[i]
             μ = means[i]
-            covmat = cov_matrices[i]
-            covpar = cov_parameters[i]
+            covmat = ncov_mats[i]
+            covpar = ncov_params[i]
 
             @test eltype(N) == T
-            @test convert(typeof(N), N) == N
             for U in eltypes
-                eltype(AbstractNormal{U}(N)) == U
-                convert(AbstractNormal{U}, N) == AbstractNormal{U}(N)
+                @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
+                @test eltype(AbstractNormal{U}(N)) == U
             end
             @test N == N
             @test mean(N) == μ
@@ -41,19 +43,20 @@ function normal_test(T, n, cov_types)
         end
     end
 
-    means2, cov_matrices2, cov_parameters2, normals2 = _make_normals(T, n, cov_types)
+    means2, ncov_mats2, ncov_params2, normals2 =
+        collect(zip(map(x -> _make_normal(T, n, x), cov_types)...))
 
-    for i in 1:ncovps, j in i:ncovps
-        @testset "Normal | Binary | $(T) | $(cov_types[i]) / $(cov_types[j])" begin
+    @testset "Normal | Binary | $(T)" begin
+        for i in 1:ncovps, j in i:ncovps
             N1 = normals[i]
             μ1 = means[i]
-            covmat1 = cov_matrices[i]
-            covpar1 = cov_parameters[i]
+            covmat1 = ncov_mats[i]
+            covpar1 = ncov_params[i]
 
             N2 = normals2[j]
             μ2 = means2[j]
-            covmat2 = cov_matrices2[j]
-            covpar2 = cov_parameters2[j]
+            covmat2 = ncov_mats2[j]
+            covpar2 = ncov_params2[j]
 
             @test kldivergence(N1, N2) ≈ _kld(T, μ1, covmat1, μ2, covmat2)
             @test kldivergence(N2, N1) ≈ _kld(T, μ2, covmat2, μ1, covmat1)

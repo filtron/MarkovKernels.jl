@@ -1,10 +1,5 @@
-abstract type AbstractDiracKernel{T<:Number} <: AbstractMarkovKernel end
-
-eltype(::AbstractDiracKernel{T}) where {T} = T
-
-AbstractDiracKernel{T}(K::AbstractDiracKernel{T}) where {T} = K
-convert(::Type{T}, K::T) where {T<:AbstractDiracKernel} = K
-convert(::Type{T}, K::AbstractDiracKernel) where {T<:AbstractDiracKernel} = T(K)::T
+# maybe dont need Abstract Dirac ?
+abstract type AbstractDiracKernel{T} <: AbstractMarkovKernel{T} end
 
 ==(K1::T, K2::T) where {T<:AbstractDiracKernel} =
     all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
@@ -32,6 +27,8 @@ DiracKernel{T}(K::DiracKernel{U,V}) where {T,U,V<:AbstractAffineMap} =
     DiracKernel(convert(AbstractAffineMap{T}, K.μ)) :
     error("T and U must both be complex or both be real")
 
+AbstractMarkovKernel{T}(K::AbstractDiracKernel) where {T} = AbstractDiracKernel{T}(K)
+AbstractDiracKernel{T}(K::AbstractDiracKernel{T}) where {T} = K
 AbstractDiracKernel{T}(K::DiracKernel) where {T} = DiracKernel{T}(K)
 
 mean(K::DiracKernel) = K.μ

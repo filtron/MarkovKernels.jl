@@ -1,10 +1,5 @@
-abstract type AbstractDirac{T<:Number} <: AbstractDistribution end
-
-eltype(::AbstractDirac{T}) where {T} = T
-
-AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
-convert(::Type{T}, D::T) where {T<:AbstractDirac} = D
-convert(::Type{T}, D::AbstractDirac) where {T<:AbstractDirac} = T(D)::T
+# maybe dont need Abstract Dirac ?
+abstract type AbstractDirac{T} <: AbstractDistribution{T} end
 
 ==(D1::T, D2::T) where {T<:AbstractDirac} =
     all(f -> getfield(D1, f) == getfield(D2, f), 1:nfields(D1))
@@ -21,6 +16,8 @@ Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector} =
     Dirac(convert(AbstractVector{T}, D.μ)) :
     error("T and U must both be complex or both be real")
 
+AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
+AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
 
 dim(D::Dirac) = length(D.μ)

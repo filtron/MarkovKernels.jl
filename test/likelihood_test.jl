@@ -1,32 +1,71 @@
-function likelihood_test(T, n, m)
-    Φ1 = randn(T, n, m)
-    RQ1 = randn(T, n, n)
-    Q1 = RQ1' * RQ1
-    K1 = NormalKernel(Φ1, Q1)
+function likelihood_test(T, n, m, affine_types, cov_types)
+    dirac_slopes, dirac_intercepts, dirac_amaps =
+        collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
+    dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
 
-    μ = randn(T, m)
-    RΣ = randn(T, m, m)
-    Σ = RΣ' * RΣ
+    normal_kernel_types = Iterators.product(affine_types, cov_types)
+    normal_amaps, kcov_mats, kcov_params, normal_kernels =
+        collect(zip(map(x -> _make_normalkernel(T, n, m, x...), normal_kernel_types)...))
 
-    N = Normal(μ, Σ)
+    means, ncov_mats, ncov_params, normals =
+        collect(zip(map(x -> _make_normal(T, m, x), cov_types)...))
 
-    x = rand(N)
-    y = rand(condition(K1, x))
-    L = Likelihood(K1, y)
+    y = randn(T, n)
+    x = randn(T, m)
 
-    S, G, Π = _schur(Σ, Φ1, Q1)
-    pred = Φ1 * μ
-    C = Normal(μ + G * (y - pred), Π)
-    M = Normal(pred, S)
-    Cgt1, loglike1 = bayes_rule(N, y, K1)
-    Cgt2, loglike2 = bayes_rule(N, L)
+    normal_loglikes =
+        map(x -> LogLike(x...), zip(normal_kernels, fill(y, length(normal_kernels))))
+    dirac_loglikes =
+        map(x -> LogLike(x...), zip(dirac_kernels, fill(y, length(dirac_kernels))))
 
-    @testset "Normal Likelihood | $(T) " begin
-        @test measurement(L) == y
-        @test slope(mean(measurement_model(L))) == Φ1
+    @testset "LogLike | AffineNormal" begin
+        for i in 1:length(normal_loglikes)
+            L = normal_loglikes[i]
+            K = normal_kernels[i]
+            @test L == LogLike(K, y)
+            @test measurement(L) == y
+            @test measurement_model(L) == K
+            @test L(x) ≈ logpdf(condition(K, x), y)
+        end
+    end
 
-        @test mean(C) ≈ mean(Cgt1) ≈ mean(Cgt2)
-        @test cov(C) ≈ cov(Cgt1) ≈ cov(Cgt2)
-        @test logpdf(M, y) ≈ loglike1 ≈ loglike2
+    @testset "LogLike | AffineDirac" begin
+        for i in 1:length(dirac_loglikes)
+            L = dirac_loglikes[i]
+            K = dirac_kernels[i]
+            @test L == LogLike(K, y)
+            @test measurement(L) == y
+            @test measurement_model(L) == K
+        end
+    end
+
+    @testset "Loglike | AffineNormal | bayes_rule" begin
+        for i in 1:length(normals), j in 1:length(normal_kernels)
+            L = normal_loglikes[j]
+            K = normal_kernels[j]
+            N = normals[i]
+
+            M, KC = invert(N, K)
+
+            NC, loglike = bayes_rule(N, L)
+            @test mean(NC) ≈ mean(condition(KC, y))
+            @test cov(NC) ≈ cov(condition(KC, y))
+            @test loglike ≈ logpdf(M, y)
+        end
+    end
+
+    @testset "Loglike | AffineDirac | bayes_rule" begin
+        for i in 1:length(normals), j in 1:length(dirac_kernels)
+            L = dirac_loglikes[j]
+            K = dirac_kernels[j]
+            N = normals[i]
+
+            M, KC = invert(N, K)
+
+            NC, loglike = bayes_rule(N, L)
+            @test mean(NC) ≈ mean(condition(KC, y))
+            @test cov(NC) ≈ cov(condition(KC, y))
+            @test loglike ≈ logpdf(M, y)
+        end
     end
 end
