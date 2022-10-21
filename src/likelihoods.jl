@@ -8,8 +8,6 @@ abstract type AbstractLogLike{T<:Number} end
 eltype(::AbstractLogLike{T}) where {T} = T
 
 AbstractLogLike{T}(L::AbstractLogLike{T}) where {T} = L
-convert(::Type{T}, L::T) where {T<:AbstractLogLike} = L
-convert(::Type{T}, K::AbstractLogLike) where {T<:AbstractLogLike} = T(K)::T
 
 ==(L1::T, L2::T) where {T<:AbstractLogLike} =
     all(f -> getfield(L1, f) == getfield(L2, f), 1:nfields(L1))
