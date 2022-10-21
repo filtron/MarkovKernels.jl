@@ -10,11 +10,12 @@ struct Dirac{T,U} <: AbstractDirac{T}
 end
 
 Dirac(μ::AbstractVector) = Dirac{eltype(μ)}(μ)
-
 Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector} =
-    T <: Real && U <: Real || T <: Complex && U <: Complex ?
+    all(x -> x <: Real, (T, U)) || all(x -> x <: Complex, (T, U)) ?
     Dirac(convert(AbstractVector{T}, D.μ)) :
-    error("T and U must both be complex or both be real")
+    error(
+        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
+    )
 
 AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D

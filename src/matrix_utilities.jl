@@ -1,9 +1,21 @@
-
-# fix logdet for Hermitian matrices
 function LinearAlgebra.logdet(H::Hermitian)
     mag, sign = logabsdet(H)
     resign = real(sign)
     return mag + log(resign)
+end
+
+"""
+rlogdet(A)  
+
+Equivalent to logdet(A) if A is Hermitian. 
+Throws InexactError if the sign of the determinant can not be converted to a real type. 
+Throws DomainError if the real value of the sign is non-positive. 
+"""
+rlogdet(A) = logdet(A)
+rlogdet(H::Hermitian) = logdet(H)
+function rlogdet(A::AbstractMatrix{T}) where {T}
+    mag, sign = logabsdet(A)
+    return mag + log(convert(real(T), sign))
 end
 
 """
@@ -42,7 +54,7 @@ Computes the output of the stein  operator
 
     stein(Σ, Φ)
 
-Same as stein(Σ, Φ, 0.0I)
+Mathematically, the same as stein(Σ, Φ, R) for R = 0.
 """
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
 stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)

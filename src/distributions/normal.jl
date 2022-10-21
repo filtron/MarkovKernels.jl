@@ -19,26 +19,17 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Normal{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
-for c in (:AbstractMatrix, :Factorization)
-    @eval function Normal(μ::AbstractVector, Σ::$c)
-        T = promote_type(eltype(μ), eltype(Σ))
-        return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{T}, Σ)))
-    end
-    @eval Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
-        T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        Normal(convert(AbstractVector{T}, N.μ), convert($c{T}, N.Σ)) :
-        error("T and U must both be complex or both be real")
+function Normal(μ::AbstractVector, Σ::CovarianceParameter)
+    T = promote_type(eltype(μ), eltype(Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
-for c in (:Diagonal, :UniformScaling)
-    @eval function Normal(μ::AbstractVector, Σ::$c)
-        T = promote_type(eltype(μ), eltype(Σ))
-        return Normal{T}(convert(AbstractVector{T}, μ), symmetrise(convert($c{real(T)}, Σ)))
-    end
-    @eval Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:$c} =
-        T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        Normal(convert(AbstractVector{T}, N.μ), convert($c{real(T)}, N.Σ)) :
-        error("T and U must both be complex or both be real")
+function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
+    T <: Real && U <: Real || T <: Complex && U <: Complex ?
+    Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) :
+    error(
+        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
+    )
 end
 
 const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
@@ -94,9 +85,9 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 Returns the logarithm of the probability density function of N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
+    -_nscale(T) * (dim(N) * log(_piconst(T)) + rlogdet(covp(N)) + norm_sqr(residual(N, x)))
 logpdf(N::IsoNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(N.Σ.λ)) + norm_sqr(residual(N, x)))
+    -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(abs(N.Σ.λ))) + norm_sqr(residual(N, x)))
 
 """
     entropy(N::AbstractNormal)
@@ -104,9 +95,9 @@ logpdf(N::IsoNormal{T}, x) where {T} =
 Returns the entropy of N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
+    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + rlogdet(covp(N)))
 entropy(N::IsoNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(covp(N).λ))
+    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(abs(covp(N).λ)))
 
 """
     kldivergence(N1::AbstractNormal,N2::AbstractNormal)
@@ -117,11 +108,11 @@ function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Nu
     root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
     _nscale(T) * (
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
-        real(T)(2) * real(logdet(root_ratio))
+        real(T)(2) * rlogdet(root_ratio)
     )
 end
 function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
-    ratio = covp(N2).λ \ covp(N1).λ
+    ratio = abs(covp(N2).λ \ covp(N1).λ)
     _nscale(T) *
     (dim(N1) * ratio + norm_sqr(residual(N2, mean(N1))) - dim(N1) - dim(N1) * log(ratio))
 end
