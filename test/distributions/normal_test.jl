@@ -8,8 +8,10 @@ function normal_test(T, n, cov_types)
 
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
-    for i in 1:ncovps
-        @testset "Normal | Unary | $(T) | $(cov_types[i])" begin
+    @testset "Normal | Unary | $(T)" begin
+        @test IsoNormal(x, one(real(T))) == Normal(x, one(T) * I)
+
+        for i in 1:ncovps
             N = normals[i]
             μ = means[i]
             covmat = ncov_mats[i]
@@ -44,8 +46,8 @@ function normal_test(T, n, cov_types)
     means2, ncov_mats2, ncov_params2, normals2 =
         collect(zip(map(x -> _make_normal(T, n, x), cov_types)...))
 
-    for i in 1:ncovps, j in i:ncovps
-        @testset "Normal | Binary | $(T) | $(cov_types[i]) / $(cov_types[j])" begin
+    @testset "Normal | Binary | $(T)" begin
+        for i in 1:ncovps, j in i:ncovps
             N1 = normals[i]
             μ1 = means[i]
             covmat1 = ncov_mats[i]

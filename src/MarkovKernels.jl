@@ -11,17 +11,12 @@ import Random: rand, GLOBAL_RNG
 abstract type AbstractDistribution{T<:Number} end
 
 eltype(::AbstractDistribution{T}) where {T} = T
-AbstractDistribution{T}(D::AbstractDistribution{T}) where {T} = D
 
 abstract type AbstractMarkovKernel{T<:Number} end
+
 eltype(::AbstractMarkovKernel{T}) where {T} = T
-AbstractMarkovKernel{T}(K::AbstractMarkovKernel{T}) where {T} = K
 
 export AbstractDistribution, AbstractMarkovKernel
-
-# defines observation likelihoods
-include("likelihoods.jl")
-export AbstractLogLike, LogLike, measurement_model, measurement, bayes_rule
 
 include("distributions/normal.jl")  # normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
@@ -65,6 +60,10 @@ export marginalise
 
 include("invert.jl")
 export invert
+
+# defines observation likelihoods
+include("likelihoods.jl")
+export AbstractLogLike, LogLike, measurement_model, measurement, bayes_rule
 
 # general sampling functions for kernels and Markov processes
 include("sampling.jl")

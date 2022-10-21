@@ -1,27 +1,20 @@
 """
-    AbstractLikelihood{T<:Number} 
+    AbstractLikelihood{T<:Number}
 
-Abstract type for representing likelihoods 
+Abstract type for representing likelihoods
 """
-abstract type AbstractLogLike{T<:Number} end
-
-eltype(::AbstractLogLike{T}) where {T} = T
-
-AbstractLogLike{T}(L::AbstractLogLike{T}) where {T} = L
+abstract type AbstractLogLike end
 
 ==(L1::T, L2::T) where {T<:AbstractLogLike} =
     all(f -> getfield(L1, f) == getfield(L2, f), 1:nfields(L1))
 
-struct LogLike{T,U,V} <: AbstractLogLike{T}
+struct LogLike{U,V} <: AbstractLogLike
     K::U
     y::V
-    LogLike{T}(K, y) where {T} = new{T,typeof(K),typeof(y)}(K, y)
+    LogLike{U,V}(K, y) where {U,V} = new{U,V}(K, y)
 end
 
-function LogLike(K::AbstractMarkovKernel{T}, y::AbstractVector{T}) where {T}
-    # insert conversion
-    LogLike{T}(K, y)
-end
+LogLike(K::AbstractMarkovKernel, y) = LogLike{typeof(K),typeof(y)}(K, y)
 
 measurement_model(L::LogLike) = L.K
 measurement(L::LogLike) = L.y
