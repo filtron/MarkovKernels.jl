@@ -23,6 +23,7 @@ function likelihood_test(T, n, m, affine_types, cov_types)
             L = normal_loglikes[i]
             K = normal_kernels[i]
             @test eltype(L) == T
+            @test L == LogLike(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
             @test L(x) ≈ logpdf(condition(K, x), y)
@@ -34,6 +35,7 @@ function likelihood_test(T, n, m, affine_types, cov_types)
             L = dirac_loglikes[i]
             K = dirac_kernels[i]
             @test eltype(L) == T
+            @test L == LogLike(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
         end

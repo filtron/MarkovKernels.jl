@@ -11,14 +11,11 @@ import Random: rand, GLOBAL_RNG
 abstract type AbstractDistribution{T<:Number} end
 
 eltype(::AbstractDistribution{T}) where {T} = T
-
-# why does this not run for 
-# N = Normal(zeros(2), Diagonal(ones(2)))
-# convert(typeof(N), N) ?
-#convert(::Type{T}, K::T) where {T<:AbstractDistribution} = K 
+AbstractDistribution{T}(D::AbstractDistribution{T}) where {T} = D
 
 abstract type AbstractMarkovKernel{T<:Number} end
 eltype(::AbstractMarkovKernel{T}) where {T} = T
+AbstractMarkovKernel{T}(K::AbstractMarkovKernel{T}) where {T} = K
 
 export AbstractDistribution, AbstractMarkovKernel
 
