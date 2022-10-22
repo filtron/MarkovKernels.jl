@@ -69,7 +69,7 @@ _stein(Σ, Φ, Q::Cholesky) = _stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
 _stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 """
-    schur_red(Π, C, R)
+    schur_reduce(Π, C, R)
 
 Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
 
@@ -80,19 +80,20 @@ where S = C*Π*C' + R.
 In terms of Kalman filtering, if Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 
-    schur_red(Π, C)
+    schur_reduce(Π, C)
 
 Mathematically, the same as schur_red(Π, C, R) for R = 0
 """
-schur_red(Π, C::AbstractMatrix) = _schur_red(Π, C)
-schur_red(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
+schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
+schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
 
-schur_red(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
-schur_red(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
-schur_red(Π::CholeskyCompatible, C::AbstractMatrix, R::Cholesky) = _schur_red_chol(Π, C, R)
+schur_reduce(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
+schur_reduce(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
+schur_reduce(Π::CholeskyCompatible, C::AbstractMatrix, R::Cholesky) =
+    _schur_red_chol(Π, C, R)
 
-schur_red(Π, C::AbstractAffineMap) = schur_red(Π, slope(C))
-schur_red(Π, C::AbstractAffineMap, R) = schur_red(Π, slope(C), R)
+schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
+schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
 function _schur_red(Π, C)
     K = Π * C'
