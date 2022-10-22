@@ -39,10 +39,8 @@ lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
 # project matrix onto symmetric matrix
+symmetrise(Σ) = Σ
 symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
-symmetrise(Σ::Diagonal) = Σ
-symmetrise(Σ::UniformScaling) = Σ
-symmetrise(C::Cholesky) = C
 
 const CholeskyCompatible = Union{Diagonal,UniformScaling}
 

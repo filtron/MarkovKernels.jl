@@ -11,8 +11,9 @@ import Random: rand, GLOBAL_RNG
 const CovarianceParameter{T} = Union{AbstractMatrix{T},UniformScaling{T},Factorization{T}}
 for P in (:AbstractMatrix, :UniformScaling, :Factorization)
     @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)
-    @eval convert(::Type{CovarianceParameter{T}}, Σ::$P) where {T} = convert($P{T}, Σ)
 end
+convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
+    CovarianceParameter{T}(Σ)
 
 export CovarianceParameter
 
