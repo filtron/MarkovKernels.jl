@@ -20,7 +20,7 @@ function dirackernel_test(T, n, affine_types, cov_types)
             @test mean(K)(x) == F(x)
             @test cov(K)(x) == Diagonal(zeros(T, n))
             @test condition(K, x) == Dirac(F(x))
-            @test eltype(rand(K, x)) == T 
+            @test eltype(rand(K, x)) == T
         end
     end
 end

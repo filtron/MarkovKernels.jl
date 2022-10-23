@@ -48,7 +48,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
             @test cov(K)(x) == cov_param
             @test covp(K) == cov_param
             @test condition(K, x) == Normal(M(x), cov_param)
-            @test eltype(rand(K, x)) == T 
+            @test eltype(rand(K, x)) == T
         end
     end
 end
