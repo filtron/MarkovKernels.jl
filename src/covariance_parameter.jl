@@ -17,8 +17,7 @@ lsqrt(A::AbstractMatrix) = cholesky(A).L
 lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
-const FactorizationCompatible{T,V} =
-    Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}},UniformScaling{T}}
+const FactorizationCompatible{T,V} = Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}
 
 """
     stein(Σ, Φ, Q)
@@ -51,7 +50,7 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 
 [C*Π*C' + R C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C' + R)*[I; K]'
 
-In terms of Kalman filtering, if Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
+In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 
     schur_reduce(Π, C)
