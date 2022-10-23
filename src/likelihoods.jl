@@ -1,10 +1,3 @@
-"""
-    AbstractLikelihood{T<:Number}
-
-Abstract type for representing likelihoods
-"""
-abstract type AbstractLogLike end
-
 ==(L1::T, L2::T) where {T<:AbstractLogLike} =
     all(f -> getfield(L1, f) == getfield(L2, f), 1:nfields(L1))
 

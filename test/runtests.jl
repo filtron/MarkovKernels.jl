@@ -9,7 +9,7 @@ include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
 include("distributions/normal_plotting_test.jl")
 
-include("kernels/affinemap_test.jl")
+include("affinemap_test.jl")
 include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
 include("kernels/compose_test.jl")
