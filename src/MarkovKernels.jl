@@ -8,21 +8,12 @@ import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
-const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+include("affinemap.jl")
+export AbstractAffineMap,
+    AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
 
-# maybe not needed
-#const DiagonalCovarianceParameter{T,V} =
-#    Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}}}
-
-for P in (:UniformScaling, :Factorization)
-    @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)
-end
-CovarianceParameter{T}(Σ::HermOrSym) where {T} = convert(AbstractMatrix{T}, Σ)
-
-convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
-    CovarianceParameter{T}(Σ)
-
-export CovarianceParameter, DiagonalCovarianceParameter
+include("covariance_parameter.jl")
+export CovarianceParameter, FactorizationCompatible, lsqrt, stein, schur_reduce
 
 abstract type AbstractDistribution{T<:Number} end
 
@@ -53,11 +44,6 @@ export AbstractNormal,
     AbstractDirac,
     Dirac
 
-# defines affine conditional mean for normal kernels
-include("kernels/affinemap.jl")
-export AbstractAffineMap,
-    AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
-
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 export AbstractNormalKernel,
@@ -85,7 +71,6 @@ export AbstractLogLike, LogLike, measurement_model, measurement, bayes_rule
 include("sampling.jl")
 
 # helper functions
-include("matrix_utilities.jl")
-export lsqrt, stein, schur_reduce
+include("matrix_utils.jl")
 
 end

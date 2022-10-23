@@ -1,20 +1,12 @@
-function LinearAlgebra.logdet(H::Hermitian)
-    mag, sign = logabsdet(H)
-    resign = real(sign)
-    return mag + log(resign)
-end
-LinearAlgebra.logdet(H::HermOrSym{T,<:Diagonal}) where {T} = real(logdet(parent(H)))
+const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
 
-"""
-    rsqrt2cholU(pre_array::AbstractMatrix)
-
-Computes the upper triangular cholesky factor of the matrix pre_array'*pre_array
-"""
-function rsqrt2cholU(pre_array)
-    right = qr(pre_array).R
-    right_pos = conj.(sign.(Diagonal(right))) * right
-    return UpperTriangular(right_pos)
+for P in (:UniformScaling, :Factorization)
+    @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)
 end
+CovarianceParameter{T}(Σ::HermOrSym) where {T} = convert(AbstractMatrix{T}, Σ)
+
+convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
+    CovarianceParameter{T}(Σ)
 
 """
     lsqrt(A) 
@@ -25,14 +17,8 @@ lsqrt(A::AbstractMatrix) = cholesky(A).L
 lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
-"""
-    symmetrise(Σ::AbstractMatrix{T}) 
-
-Wraps Σ in a Symmetric or Hermitian matrix for T<:Real and T<:Complex, respectively. 
-"""
-symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
-
-const CholeskyCompatible = Union{Diagonal,UniformScaling}
+const FactorizationCompatible{T,V} =
+    Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}},UniformScaling{T}}
 
 """
     stein(Σ, Φ, Q)
@@ -49,7 +35,7 @@ stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)
 
 stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
 stein(Σ::Cholesky, Φ::AbstractMatrix, Q) = _stein_chol(Σ, Φ, Q)
-stein(Σ::CholeskyCompatible, Φ::AbstractMatrix, Q::Cholesky) = _stein_chol(Σ, Φ, Q)
+stein(Σ::FactorizationCompatible, Φ::AbstractMatrix, Q::Cholesky) = _stein_chol(Σ, Φ, Q)
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
@@ -77,7 +63,7 @@ schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
 
 schur_reduce(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
 schur_reduce(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
-schur_reduce(Π::CholeskyCompatible, C::AbstractMatrix, R::Cholesky) =
+schur_reduce(Π::FactorizationCompatible, C::AbstractMatrix, R::Cholesky) =
     _schur_red_chol(Π, C, R)
 
 schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
@@ -87,11 +73,8 @@ function _schur_red(Π, C)
     K = Π * C'
     S = symmetrise(C * K)
     K = K / S
-
-    # Joseph form
     L = (I - K * C)
     Σ = symmetrise(L * Π * L')
-
     return S, K, Σ
 end
 
@@ -99,13 +82,11 @@ function _schur_red(Π, C, R)
     K = Π * C'
     S = symmetrise(C * K + R)
     K = K / S
-
-    # Joseph form
     L = (I - K * C)
     Σ = symmetrise(L * Π * L' + K * R * K')
-
     return S, K, Σ
 end
+
 _schur_red(Π, C, R::Cholesky) = _schur_red(Π, C, symmetrise(AbstractMatrix(R)))
 
 function _schur_red_chol(Π, C)
