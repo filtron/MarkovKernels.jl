@@ -1,10 +1,9 @@
-
-# fix logdet for Hermitian matrices
 function LinearAlgebra.logdet(H::Hermitian)
     mag, sign = logabsdet(H)
     resign = real(sign)
     return mag + log(resign)
 end
+LinearAlgebra.logdet(H::HermOrSym{T,<:Diagonal}) where {T} = real(logdet(parent(H)))
 
 """
     rsqrt2cholU(pre_array::AbstractMatrix)
@@ -19,18 +18,19 @@ end
 
 """
     lsqrt(A) 
-returns a 'matrix' L such that A = L*L'. 
+returns a square 'matrix' L such that A = L*L'. 
 L need not be a Cholesky factor.   
 """
 lsqrt(A::AbstractMatrix) = cholesky(A).L
 lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
-# project matrix onto symmetric matrix
+"""
+    symmetrise(Σ::AbstractMatrix{T}) 
+
+Wraps Σ in a Symmetric or Hermitian matrix for T<:Real and T<:Complex, respectively. 
+"""
 symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
-symmetrise(Σ::Diagonal) = Σ
-symmetrise(Σ::UniformScaling) = Σ
-symmetrise(C::Cholesky) = C
 
 const CholeskyCompatible = Union{Diagonal,UniformScaling}
 
@@ -42,7 +42,7 @@ Computes the output of the stein  operator
 
     stein(Σ, Φ)
 
-Same as stein(Σ, Φ, 0.0I)
+Mathematically, the same as stein(Σ, Φ, R) for R = 0.
 """
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
 stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)
@@ -59,30 +59,29 @@ _stein(Σ, Φ, Q::Cholesky) = _stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
 _stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 """
-    schur_red(Π, C, R)
+    schur_reduce(Π, C, R)
 
 Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
 
-[S C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*S*[I K']
-
-where S = C*Π*C' + R.
+[C*Π*C' + R C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C' + R)*[I; K]'
 
 In terms of Kalman filtering, if Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 
-    schur_red(Π, C)
+    schur_reduce(Π, C)
 
 Mathematically, the same as schur_red(Π, C, R) for R = 0
 """
-schur_red(Π, C::AbstractMatrix) = _schur_red(Π, C)
-schur_red(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
+schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
+schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
 
-schur_red(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
-schur_red(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
-schur_red(Π::CholeskyCompatible, C::AbstractMatrix, R::Cholesky) = _schur_red_chol(Π, C, R)
+schur_reduce(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
+schur_reduce(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
+schur_reduce(Π::CholeskyCompatible, C::AbstractMatrix, R::Cholesky) =
+    _schur_red_chol(Π, C, R)
 
-schur_red(Π, C::AbstractAffineMap) = schur_red(Π, slope(C))
-schur_red(Π, C::AbstractAffineMap, R) = schur_red(Π, slope(C), R)
+schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
+schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
 function _schur_red(Π, C)
     K = Π * C'

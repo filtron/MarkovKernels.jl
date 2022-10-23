@@ -25,35 +25,42 @@ NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
     NormalKernel(AffineCorrector(Φ, b, c), Σ)
 
-const AffineNormalKernel{T} =
-    NormalKernel{T,<:AbstractAffineMap,<:Union{UniformScaling,Factorization,AbstractMatrix}}
+const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
 
-for c in (:AbstractMatrix, :Factorization)
-    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
-        T = promote_type(eltype(F), eltype(Σ))
-        return NormalKernel{T}(
-            convert(AbstractAffineMap{T}, F),
-            symmetrise(convert($c{T}, Σ)),
-        )
-    end
-    @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
-        T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{T}, K.Σ)) :
-        error("T and U must both be complex or both be real")
+function NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
+    T = promote_type(eltype(F), eltype(Σ))
+    return NormalKernel{T}(
+        convert(AbstractAffineMap{T}, F),
+        convert(CovarianceParameter{T}, Σ),
+    )
 end
 
-for c in (:Diagonal, :UniformScaling)
-    @eval function NormalKernel(F::AbstractAffineMap, Σ::$c)
-        T = promote_type(eltype(F), eltype(Σ))
-        return NormalKernel{T}(
-            convert(AbstractAffineMap{T}, F),
-            symmetrise(convert($c{real(T)}, Σ)),
-        )
+function NormalKernel(F::AbstractAffineMap, Σ::Symmetric)
+    T = promote_type(eltype(F), eltype(Σ))
+    T <: Complex && throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
+    return NormalKernel{T}(
+        convert(AbstractAffineMap{T}, F),
+        convert(CovarianceParameter{T}, Σ),
+    )
+end
+
+function NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
+    T = promote_type(eltype(F), eltype(Σ))
+    if T <: Real
+        issymmetric(Σ) && return NormalKernel(F, Symmetric(Σ))
+        throw(DomainError(Σ, "Real valued covariance must be symmetric"))
+    elseif T <: Complex
+        ishermitian(Σ) && return NormalKernel(F, Hermitian(Σ))
+        throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
     end
-    @eval NormalKernel{T}(K::NormalKernel{U,V,W}) where {T,U,V<:AbstractAffineMap,W<:$c} =
-        T <: Real && U <: Real || T <: Complex && U <: Complex ?
-        NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert($c{real(T)}, K.Σ)) :
-        error("T and U must both be complex or both be real")
+end
+
+function NormalKernel{T}(K::AffineNormalKernel{U}) where {T,U}
+    T <: Real && U <: Real || T <: Complex && U <: Complex ?
+    NormalKernel(convert(AbstractAffineMap{T}, K.μ), convert(CovarianceParameter{T}, K.Σ)) :
+    error(
+        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
+    )
 end
 
 AbstractMarkovKernel{T}(K::AbstractNormalKernel) where {T} = AbstractNormalKernel{T}(K)

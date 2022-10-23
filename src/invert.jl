@@ -7,7 +7,7 @@ P(y,x) = Nout(y)*Kout(x,y)
 """
 function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(covp(N), mean(K), covp(K))
+    S, G, Σ = schur_reduce(covp(N), mean(K), covp(K))
 
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
@@ -17,7 +17,7 @@ end
 
 function invert(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T}
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_red(covp(N), mean(K))
+    S, G, Σ = schur_reduce(covp(N), mean(K))
 
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)

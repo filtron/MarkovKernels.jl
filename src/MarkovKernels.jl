@@ -4,9 +4,25 @@ using LinearAlgebra, Statistics, Random, RecipesBase
 
 import Base: *, +, eltype, length, size, log, ==, similar, convert
 
-import LinearAlgebra: logdet, norm_sqr
+import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
+
+const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+
+# maybe not needed
+#const DiagonalCovarianceParameter{T,V} =
+#    Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}}}
+
+for P in (:UniformScaling, :Factorization)
+    @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)
+end
+CovarianceParameter{T}(Σ::HermOrSym) where {T} = convert(AbstractMatrix{T}, Σ)
+
+convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
+    CovarianceParameter{T}(Σ)
+
+export CovarianceParameter, DiagonalCovarianceParameter
 
 abstract type AbstractDistribution{T<:Number} end
 
@@ -70,4 +86,6 @@ include("sampling.jl")
 
 # helper functions
 include("matrix_utilities.jl")
+export lsqrt, stein, schur_reduce
+
 end
