@@ -3,20 +3,7 @@ function LinearAlgebra.logdet(H::Hermitian)
     resign = real(sign)
     return mag + log(resign)
 end
-
-"""
-rlogdet(A)  
-
-Equivalent to logdet(A) if A is Hermitian. 
-Throws InexactError if the sign of the determinant can not be converted to a real type. 
-Throws DomainError if the real value of the sign is non-positive. 
-"""
-rlogdet(A) = logdet(A)
-rlogdet(H::Hermitian) = logdet(H)
-function rlogdet(A::AbstractMatrix{T}) where {T}
-    mag, sign = logabsdet(A)
-    return mag + log(convert(real(T), sign))
-end
+LinearAlgebra.logdet(H::HermOrSym{T,<:Diagonal}) where {T} = real(logdet(parent(H)))
 
 """
     rsqrt2cholU(pre_array::AbstractMatrix)

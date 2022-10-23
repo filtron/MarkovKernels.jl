@@ -24,6 +24,18 @@ function Normal(μ::AbstractVector, Σ::CovarianceParameter)
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
+function Normal(μ::AbstractVector, Σ::AbstractMatrix)
+    T = promote_type(eltype(μ), eltype(Σ)) 
+    if T<:Real  
+        issymmetric(Σ) &&  return Normal(μ, Symmetric(Σ))
+        error("Normal of eltype $(T) must have symmetric covariance $(Σ)")
+    elseif T<:Complex  
+        ishermitian(Σ) && return Normal(μ, Hermitian(Σ)) 
+        error("Normal of eltype $(T) must have Hermitian covariance $(Σ)")
+    end
+end
+
+
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
     T <: Real && U <: Real || T <: Complex && U <: Complex ?
     Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) :
@@ -85,7 +97,7 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 Returns the logarithm of the probability density function of N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * log(_piconst(T)) + rlogdet(covp(N)) + norm_sqr(residual(N, x)))
+    -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
 logpdf(N::IsoNormal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(abs(N.Σ.λ))) + norm_sqr(residual(N, x)))
 
@@ -95,7 +107,7 @@ logpdf(N::IsoNormal{T}, x) where {T} =
 Returns the entropy of N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + rlogdet(covp(N)))
+    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
 entropy(N::IsoNormal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(abs(covp(N).λ)))
 
@@ -108,7 +120,7 @@ function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Nu
     root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
     _nscale(T) * (
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
-        real(T)(2) * rlogdet(root_ratio)
+        real(T)(2) * real(logdet(root_ratio))
     )
 end
 function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
