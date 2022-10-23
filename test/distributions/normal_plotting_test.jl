@@ -9,5 +9,6 @@ function normal_plotting_test()
 
     @testset "Normal plotting" begin
         @test_nowarn plot(ks, Ns)
+        @test_throws ErrorException plot([Normal(zeros(k), 1.0I(k)) for k in 1:3])
     end
 end
