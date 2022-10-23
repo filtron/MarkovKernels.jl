@@ -35,6 +35,15 @@ function NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
     )
 end
 
+function NormalKernel(F::AbstractAffineMap, Σ::Symmetric)
+    T = promote_type(eltype(F), eltype(Σ))
+    T <: Complex && throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
+    return NormalKernel{T}(
+        convert(AbstractAffineMap{T}, F),
+        convert(CovarianceParameter{T}, Σ),
+    )
+end
+
 function NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
     T = promote_type(eltype(F), eltype(Σ))
     if T <: Real

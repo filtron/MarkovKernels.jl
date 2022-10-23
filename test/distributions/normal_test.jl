@@ -11,6 +11,7 @@ function normal_test(T, n, cov_types)
     @testset "Normal | AbstractMatrix constructor" begin
         @test_throws DomainError Normal(ones(2), tril(ones(2, 2)))
         @test_throws DomainError Normal(ones(ComplexF64, 2), tril(ones(2, 2)))
+        @test_throws DomainError Normal(ones(ComplexF64, 2), Symmetric(diagm(ones(2))))
     end
 
     @testset "Normal | Unary | $(T)" begin

@@ -19,9 +19,14 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Normal{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
-# can currently create Complex valued Normal with symmetric covariance, this is bad
 function Normal(μ::AbstractVector, Σ::CovarianceParameter)
     T = promote_type(eltype(μ), eltype(Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
+end
+
+function Normal(μ::AbstractVector, Σ::Symmetric)
+    T = promote_type(eltype(μ), eltype(Σ))
+    T <: Complex && throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
