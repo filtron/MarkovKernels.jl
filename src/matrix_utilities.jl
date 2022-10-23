@@ -18,15 +18,18 @@ end
 
 """
     lsqrt(A) 
-returns a 'matrix' L such that A = L*L'. 
+returns a square 'matrix' L such that A = L*L'. 
 L need not be a Cholesky factor.   
 """
 lsqrt(A::AbstractMatrix) = cholesky(A).L
 lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
-# project matrix onto symmetric matrix
-symmetrise(Σ) = Σ
+"""
+    symmetrise(Σ::AbstractMatrix{T}) 
+
+Wraps Σ in a Symmetric or Hermitian matrix for T<:Real and T<:Complex, respectively. 
+"""
 symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
 
 const CholeskyCompatible = Union{Diagonal,UniformScaling}
@@ -60,9 +63,7 @@ _stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
 
-[S C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*S*[I K']
-
-where S = C*Π*C' + R.
+[C*Π*C' + R C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C' + R)*[I; K]'
 
 In terms of Kalman filtering, if Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.

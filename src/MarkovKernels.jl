@@ -8,8 +8,11 @@ import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
-const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}} 
-const DiagonalCovarianceParameter{T, V} = Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}}}
+const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+
+# maybe not needed
+#const DiagonalCovarianceParameter{T,V} =
+#    Union{Symmetric{T,Diagonal{T,V}},Hermitian{T,Diagonal{T,V}}}
 
 for P in (:UniformScaling, :Factorization)
     @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)

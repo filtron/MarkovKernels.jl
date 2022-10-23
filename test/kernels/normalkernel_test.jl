@@ -15,6 +15,11 @@ function normalkernel_test(T, affine_types)
 end
 
 function affine_normalkernel_test(T, n, affine_types, cov_types)
+    @testset "NormalKernel | AbstractMatrix constructor" begin
+        @test_throws DomainError NormalKernel(ones(2, 2), tril(ones(2, 2)))
+        @test_throws DomainError NormalKernel(ones(ComplexF64, 2, 2), tril(ones(2, 2)))
+    end
+
     kernel_type_parameters = Iterators.product(affine_types, cov_types)
 
     for ts in kernel_type_parameters
