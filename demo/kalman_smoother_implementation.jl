@@ -23,26 +23,22 @@ function kalman_smoother(
     fw_kernel::AbstractNormalKernel,
     m_kernel::AbstractNormalKernel,
 )
+    filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
 
-filter_distributions, loglike = 
-    kalman_filter(ys, init, fw_kernel, m_kernel)
+    bw_kernels = NormalKernel[]
 
-bw_kernels = NormalKernel[]
+    for m in 1:length(filter_distributions)-1
+        pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
+        push!(bw_kernels, bw_kernel)
+    end
 
-for m in 1:length(filter_distributions)-1 
-    pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
-    push!(bw_kernels, bw_kernel)
-end
+    smoother_distributions = Normal[]
+    pushfirst!(smoother_distributions, filter_distributions[end])
 
-smoother_distributions = Normal[]
-pushfirst!(smoother_distributions, filter_distributions[end])
+    for m in length(filter_distributions)-1:-1:1
+        smoother_distribution = marginalise(filter_distributions[m+1], bw_kernels[m])
+        pushfirst!(smoother_distributions, smoother_distribution)
+    end
 
-for m in length(filter_distributions)-1:-1:1
-    smoother_distribution  = marginalise(filter_distributions[m+1], 
-    bw_kernels[m])
-    pushfirst!(smoother_distributions, smoother_distribution)
-end
-
-    return smoother_distributions, filter_distributions, loglike 
-
+    return smoother_distributions, filter_distributions, loglike
 end

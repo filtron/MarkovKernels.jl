@@ -33,8 +33,7 @@ function kalman_filter(
     likelihood = LogLike(m_kernel, y)
 
     # measurement update
-    filter_distribution, loglike_increment =
-        bayes_rule(filter_distribution, likelihood)
+    filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
     loglike = loglike_increment
 
@@ -48,8 +47,7 @@ function kalman_filter(
         likelihood = LogLike(m_kernel, y)
 
         # measurement update
-        filter_distribution, loglike_increment =
-            bayes_rule(filter_distribution, likelihood)
+        filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
 
         push!(filter_distributions, filter_distribution)
         loglike = loglike + loglike_increment
