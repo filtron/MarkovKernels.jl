@@ -2,7 +2,7 @@ module MarkovKernels
 
 using LinearAlgebra, Statistics, Random, RecipesBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, convert
+import Base: *, +, eltype, length, size, log, ==, similar, convert, show
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
