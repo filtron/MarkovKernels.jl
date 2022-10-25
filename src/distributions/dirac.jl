@@ -29,3 +29,9 @@ std(D::Dirac) = zeros(real(eltype(D)), dim(D))
 
 rand(::AbstractRNG, D::Dirac) = mean(D)
 rand(D::Dirac) = rand(GLOBAL_RNG, D)
+
+function Base.show(io::IO, N::Dirac{T,U}) where {T,U}
+    print(io, "Dirac{$T,$U}(μ)")
+    print(io, "\n μ = ")
+    show(io, N.μ)
+end

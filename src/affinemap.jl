@@ -84,3 +84,27 @@ AffineCorrector{T}(F::AffineCorrector) where {T} = AffineCorrector(
     convert(AbstractVector{T}, F.c),
 )
 AbstractAffineMap{T}(F::AffineCorrector) where {T} = AffineCorrector{T}(F)
+
+function Base.show(io::IO, F::AffineMap{T,U,V}) where {T,U,V}
+    print(io, "AffineMap{$T,$U,$V}(A, b)")
+    print(io, "\n A = ")
+    show(io, (F.A))
+    print(io, "\n b = ")
+    show(io, F.b)
+end
+
+function Base.show(io::IO, F::LinearMap{T,U}) where {T,U}
+    print(io, "LinearMap{$T,$U}(A)")
+    print(io, "\n A = ")
+    show(io, (F.A))
+end
+
+function Base.show(io::IO, F::AffineCorrector{T,U,V,S}) where {T,U,V,S}
+    print(io, "AffineCorrector{$T,$U,$V,$S}(A, b, c)")
+    print(io, "\n A = ")
+    show(io, (F.A))
+    print(io, "\n b = ")
+    show(io, F.b)
+    print(io, "\n c = ")
+    show(io, F.c)
+end

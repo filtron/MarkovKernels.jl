@@ -38,3 +38,9 @@ condition(K::DiracKernel, x) = Dirac(mean(K)(x))
 
 rand(RNG::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector) = mean(condition(K, x))
 rand(K::AbstractDiracKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
+
+function Base.show(io::IO, N::DiracKernel{T,U}) where {T,U}
+    print(io, "DiracKernel{$T,$U}(μ)")
+    print(io, "\n μ = ")
+    show(io, N.μ)
+end
