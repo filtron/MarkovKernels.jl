@@ -91,10 +91,10 @@ rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
     rand(RNG, condition(K, x))
 rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
 
-function Base.show(io::IO, N::NormalKernel{T,U,V}) where {T,U,V} 
+function Base.show(io::IO, N::NormalKernel{T,U,V}) where {T,U,V}
     print(io, "NormalKernel{$T,$U,$V}(μ, Σ)")
-    print(io, "\n μ = ") 
+    print(io, "\n μ = ")
     show(io, N.μ)
     print(io, "\n Σ = ")
-    show(io,  N.Σ)
+    show(io, N.Σ)
 end

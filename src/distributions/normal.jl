@@ -138,10 +138,10 @@ rand(RNG::AbstractRNG, N::AbstractNormal) =
     mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
 rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
 
-function Base.show(io::IO, N::Normal{T,U,V}) where {T,U,V} 
+function Base.show(io::IO, N::Normal{T,U,V}) where {T,U,V}
     print(io, "Normal{$T,$U,$V}(μ, Σ)")
-    print(io, "\n μ = ") 
+    print(io, "\n μ = ")
     show(io, (N.μ))
     print(io, "\n Σ = ")
-    show(io,  N.Σ)
+    show(io, N.Σ)
 end
