@@ -1,7 +1,7 @@
 """
     AbstractNormal{T<:Number}
 
-Abstract type for representing normal distributed random vectors taking values in T.
+Abstract type for representing Normal distributed random vectors taking values in T.
 """
 abstract type AbstractNormal{T} <: AbstractDistribution{T} end
 
@@ -11,7 +11,7 @@ abstract type AbstractNormal{T} <: AbstractDistribution{T} end
 """
     Normal{T,U,V}
 
-Standard parametrisation of the normal distribution with element type T.
+Standard mean vector / covariance matrix parametrisation of the normal distribution with element type T.
 """
 struct Normal{T,U,V} <: AbstractNormal{T}
     μ::U
@@ -19,6 +19,11 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Normal{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
+"""
+    Normal(μ::AbstractVector, Σ::CovarianceParameter)
+
+Creates a Normal distribution with mean vector μ and covariance matrix parametrised by Σ.
+"""
 function Normal(μ::AbstractVector, Σ::CovarianceParameter)
     T = promote_type(eltype(μ), eltype(Σ))
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
@@ -30,6 +35,12 @@ function Normal(μ::AbstractVector, Σ::Symmetric)
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
+"""
+    Normal(μ::AbstractVector, Σ::AbstractMatrix)
+
+Creates a Normal distribution with mean vector μ and covariance matrix Σ
+if Σ is Symmetric / Hermitian. Throws domain error otherwise.
+"""
 function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     T = promote_type(eltype(μ), eltype(Σ))
     if T <: Real
@@ -41,6 +52,21 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     end
 end
 
+const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
+
+"""
+    IsoNormal(μ::AbstractVector, λ::Real)
+
+Short-hand for Normal(μ, λ * I).
+"""
+IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
+
+"""
+    Normal{T}(N::Normal{U,V,W})
+
+Computes a Normal distribution of eltype T from the Normal distribution N if T and U are compatible.
+That is T and U must both be Real or both be Complex.
+"""
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
     T <: Real && U <: Real || T <: Complex && U <: Complex ?
     Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) :
@@ -49,9 +75,6 @@ function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceP
     )
 end
 
-const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
-IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
-
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
@@ -59,36 +82,54 @@ AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
 """
     dim(N::AbstractNormal)
 
-Returns the dimension of the normal distribution N.
+Returns the dimension of the Normal distribution N.
 """
 dim(N::Normal) = length(N.μ)
 
 """
-    covp(N::Normal)
+    mean(N::AbstractNormal)
+
+Computes the mean vector of the Normal distribution N.
+"""
+mean(N::Normal) = N.μ
+
+"""
+    cov(N::AbstractNormal)
+
+Computes the covariance matrix of the Normal distribution N.
+"""
+cov(N::Normal) = AbstractMatrix(N.Σ)
+cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
+cov(N::IsoNormal) = covp(N)(dim(N))
+
+"""
+    covp(N::AbstractNormal)
 
 Returns the internal representation of the covariance matrix of the Normal distribution N.
 For computing the actual covariance matrix, use cov.
 """
 covp(N::Normal) = N.Σ
 
-mean(N::Normal) = N.μ
-
-cov(N::Normal) = AbstractMatrix(N.Σ)
-cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
-cov(N::IsoNormal) = covp(N)(dim(N))
-
+"""
+    var(N::AbstractNormal)
+Computes the vector of marginal variances of the Normal distribution N.
+"""
 var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::IsoNormal) = real(diag(N.Σ(dim(N))))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2))
 
+"""
+    std(N::AbstractNormal)
+Computes the vector of marginal standard deviations of the Normal distribution N.
+"""
 std(N::AbstractNormal) = sqrt.(var(N))
 
 """
-    residual(N::AbstractNormal,x)
+    residual(N::AbstractNormal, x::AbstractVector)
 
-Returns the whitened residual associated with N and observed vector x.
+Computes the whitened residual associated with the Normal distribution N and observed vector x.
 """
-residual(N::AbstractNormal, x) = lsqrt(covp(N)) \ (x - mean(N))
+residual(N::AbstractNormal, x::AbstractVector) = lsqrt(covp(N)) \ (x - mean(N))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
@@ -99,7 +140,7 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 """
     logpdf(N::AbstractNormal,x)
 
-Returns the logarithm of the probability density function of N evaluated at x.
+Computes the logarithm of the probability density function of the Normal distribution N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
@@ -109,7 +150,7 @@ logpdf(N::IsoNormal{T}, x) where {T} =
 """
     entropy(N::AbstractNormal)
 
-Returns the entropy of N.
+Computes the entropy of the Normal distribution N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
@@ -117,9 +158,9 @@ entropy(N::IsoNormal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(abs(covp(N).λ)))
 
 """
-    kldivergence(N1::AbstractNormal,N2::AbstractNormal)
+    kldivergence(N1::AbstractNormal, N2::AbstractNormal)
 
-Returns the Kullback-Leibler divergence between N1 and N2.
+Computes the Kullback-Leibler divergence between the Normal distributions N1 and N2.
 """
 function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
     root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
@@ -134,8 +175,21 @@ function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
     (dim(N1) * ratio + norm_sqr(residual(N2, mean(N1))) - dim(N1) - dim(N1) * log(ratio))
 end
 
+"""
+    rand(RNG::AbstractRNG, N::AbstractNormal)
+
+Computes a random vector distributed according to the Normal distribution N
+using the random number generator RNG.
+"""
 rand(RNG::AbstractRNG, N::AbstractNormal) =
     mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
+
+"""
+    rand(N::AbstractNormal)
+
+Computes a random vector distributed according to the Normal distribution N
+using the random number generator Random.GLOBAL_RNG.
+"""
 rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
 
 function Base.show(io::IO, N::Normal{T,U,V}) where {T,U,V}

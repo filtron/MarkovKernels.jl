@@ -1,7 +1,7 @@
 """
     marginalise(D::AbstractDistribution, K::AbstractMarkovKernel)
 
-Returns M, K marginalised with respect to N i.e,
+Computes M, the marginalisation of K with respect to D, i.e.,
 
 M(y) = ∫ K(y,x)D(x) dx
 """

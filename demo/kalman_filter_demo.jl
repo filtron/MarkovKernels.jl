@@ -4,10 +4,10 @@ using Plots, Random
 rng = MersenneTwister(1991)
 
 include("sampling_implementation.jl")
-include("kalman_filter_implementation.jl")
 include("sample_trajectory.jl")
+include("kalman_filter_implementation.jl")
 
-# kalman filter 
+# kalman filter
 filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
 
 # plotting the filter state estimates

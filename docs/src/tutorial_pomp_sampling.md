@@ -17,63 +17,81 @@ Additionally, noisy measurements of the output process will be generated accordi
 z_n \mid x_n \sim \mathcal{N}(Cx_n,R).
 ```
 
-### Sampling from the latent Gauss-Markov process
+### Sampling a Gauss-Markov process
 ```@example 1
-using MarkovKernels, LinearAlgebra, Plots
+using MarkovKernels
+using Random, LinearAlgebra, Plots
 
-N = 2^9
-ns = 0:N
+function sample(
+    RNG::AbstractRNG,
+    init::AbstractDistribution,
+    K::AbstractMarkovKernel,
+    nstep::Integer,
+)
+    x = rand(RNG, init)
+    xs = zeros(nstep + 1, length(x))
+    xs[1, :] = x
 
-# define a Markov kernel for a homogeneous Markov proces
-λ = 0.9
-σ = 1.0
-dimx = 2
-Φ = [λ 0.0; 1 - λ^2 λ]
-Q = (1-λ^2)*(1+λ^2) * 1.0*I(dimx)
-forward_kernel = NormalKernel(Φ, Q)
+    for n in 1:nstep
+        x = rand(RNG, K, x)
+        xs[n+1, :] = x
+    end
 
-# define initial distribution
-init = Normal(zeros(dimx), 1.0*I(dimx))
+    return xs
+end
 
-# sample Gauss-Markov process and plot
-xs = rand(init, forward_kernel, N)
-plot(
-    ns,
+function sample(init::AbstractDistribution, K::AbstractMarkovKernel, nstep::Integer)
+    return sample(GLOBAL_RNG, init, K, nstep)
+end
+```
+
+### Sampling latent states
+```@example 1
+# set an rng
+rng = MersenneTwister(1991)
+
+# time grid
+m = 100
+T = 5
+ts = collect(LinRange(0, T, m))
+dt = T / (m - 1)
+
+# define transtion kernel
+λ = 2.0
+Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
+Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
+fw_kernel = NormalKernel(Φ, Q)
+
+# initial distribution
+init = Normal(zeros(2), 1.0I)
+
+# sample state
+xs = sample(rng, init, fw_kernel, m - 1)
+
+state_plt = plot(
+    ts,
     xs,
-    layout=(dimx,1),
-    xlabel = ["" "t"],
-    label = ["x0" "x1"],
-    title = ["Latent Gauss-Markov process" ""]
+    layout = (2, 1),
+    xlabel = "t",
+    labels = ["x1" "x2"],
+    title = ["Latent Gauss-Markov process" ""],
 )
 ```
 
-### Sampling output and measurements
+### Sampling and plotting the output
+
 ```@example 1
-# define output process
-C = σ*[1.0 -1.0]
+# output kernel and measurement kernel
+C = 1.0 / sqrt(2) * [1.0 -1.0]
 output_kernel = DiracKernel(C)
+R = fill(0.1, 1, 1)
+m_kernel = compose(NormalKernel(1.0I(1), R), output_kernel)
 
-# define measurements of output process
-R = fill(0.1,1,1)
-measurement_kernel = NormalKernel(C,R)
+# sample output and its measurements
+outs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
+ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 
-# sample outputs, measurements and plot
-output = rand(output_kernel,xs)
-zs = rand(measurement_kernel,xs)
-
-plot(
-    ns,
-    output,
-    xlabel = "t",
-    ylabel = "y",
-    label = "output process",
-    title = "Output process and measurements"
-)
-
-scatter!(
-    ns,
-    zs,
-    label = "measurements",
-    color="black"
-)
+output_plot = plot(ts, outs, label = "output", xlabel = "t")
+scatter!(ts, ys, label = "measurement", color = "black")
+output_plot
 ```

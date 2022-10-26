@@ -16,11 +16,16 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Distributions" => ["Normal distributions" => "normal.md"],
-        "Kernels" => ["normalkernel.md"],
+        "Affine maps" => "affinemap.md",
+        "Covariance parametrisations" => "covariance_parameter.md",
+        "Distributions" => ["Normal" => "normal.md", "Dirac" => "dirac.md"],
+        "Kernels" => ["normalkernel.md", "dirackernel.md"],
+        "LogLikelihoods" => "likelihoods.md",
+        "Binary operators" => "binary_operators.md",
         "Tutorials" => [
-            "Sampling from Probabilistic state-space models" => "tutorial_pomp_sampling.md"
-            "Implementing a Kalman filter and a Rauch-Tung-Striebel smoother" => "tutorial_kalman_filter.md"
+            "Sampling from probabilistic state-space models" => "tutorial_pomp_sampling.md"
+            "Implementing a Kalman filter" => "tutorial_kalman_filter.md"
+            "Implementing a Rauch-Tung-Striebel smoother" => "tutorial_rts.md"
         ],
     ],
 )

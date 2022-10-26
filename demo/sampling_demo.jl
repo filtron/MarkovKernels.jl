@@ -1,6 +1,9 @@
 using MarkovKernels
 using Plots, Random
 
+rng = MersenneTwister(1991)
+
+include("sampling_implementation.jl")
 include("sampling_implementation.jl")
 include("sample_trajectory.jl")
 

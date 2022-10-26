@@ -1,224 +1,94 @@
-# Implementing a Kalman filter and a Rauch-Tung-Striebel smoother
+# Implementing a Kalman filter
 
-This tutorial describes how to implement a Kalman filter for the following state-space model
-
-```math
-\begin{aligned}
-x_0 &\sim \mathcal{N}(\mu_0 ,\Sigma_0), \\
-x_n \mid x_{n-1} &\sim \mathcal{N}(\Phi  x_{n-1}, Q),\\
-z_n \mid x_n &\sim \mathcal{N}(Cx_n,R),
-\end{aligned}
+```@meta
+CurrentModule = MarkovKernels
 ```
-given a measurement sequence $z_{0:N}$.
 
+### Setting up the environment and loading some data
 
-
-### Kalman filter implementation
-The classical imlementation of a Kalman filter is decomposed into a prediction step and an update step.
-These can be implemented as follows.
 
 ```@example 2
-using MarkovKernels, LinearAlgebra, Plots
+using MarkovKernels
+using Random, LinearAlgebra, Plots
 
-function predict(N::AbstractNormal, K::NormalKernel{T,U,V}) where {T,U<:AbstractAffineMap,V}
-    N_new, B = invert(N, K)
-    return N_new, B
-end
+rng = MersenneTwister(1991)
 
-function update(
-    N::AbstractNormal,
-    L::Likelihood{NormalKernel{U,V,S},YT},
-) where {U,V<:AbstractAffineMap,S,YT}
-    M, C = invert(N, measurement_model(L))
-    y = measurement(L)
-    N_new = condition(C, y)
-    loglike = logpdf(M, y)
+include("../../demo/sampling_implementation.jl")
+include("../../demo/sample_trajectory.jl")
 
-    return N_new, M, loglike
-end
+output_plot = plot(ts, outs, label = "output", xlabel = "t")
+scatter!(ts, ys, label = "measurement", color = "black")
 ```
 
-Note that the above implementation of the prediction step also computes the backward kernel required for the Rauch-Tung-Striebel smoother recursion.
-If no smoothing is to be performed, an alternative to the prediction step is simply to call marginalise, that is.
+### Implementing a Kalman filter
 
-```@example
-using MarkovKernels # hide
-function predict2(N::AbstractNormal, K::NormalKernel{T,U,V}) where {T,U<:AbstractAffineMap,V}
-    N_new = marginalise(N,K)
-    return N_new
-end
-```
-In any case, this tutorial does indeed demonstrate how to implement the smoother as well.
-The Kalman filter may thus be implemented by the following.
 ```@example 2
-
 function kalman_filter(
     ys::AbstractVecOrMat,
     init::AbstractNormal,
     fw_kernel::AbstractNormalKernel,
     m_kernel::AbstractNormalKernel,
 )
-    N = size(ys, 1)
+    n = size(ys, 1)
 
     # initialise recursion
     filter_distribution = init
-    filter_distributions = AbstractNormal[]      # filtering distributions
-    prediction_distributions = AbstractNormal[]  # one step-ahead measurement predictions
-    backward_kernels = AbstractNormalKernel[]    # backward kernels (used for rts smoothing)
-    loglike = 0.0
+    filter_distributions = Normal[]      # filtering distributions
 
     # create measurement model
     y = ys[1, :]
-    likelihood = Likelihood(m_kernel, y)
+    likelihood = LogLike(m_kernel, y)
 
     # measurement update
-    filter_distribution, pred_distribution, loglike_increment =
-        update(filter_distribution, likelihood)
-
-    push!(prediction_distributions, pred_distribution)
-    loglike = loglike + loglike_increment
+    filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
+    loglike = loglike_increment
 
-    for n in 2:N
+    for m in 2:n
 
         # predict
-        filter_distribution, bw_kernel = predict(filter_distribution, fw_kernel)
-        push!(backward_kernels, bw_kernel)
+        filter_distribution = marginalise(filter_distribution, fw_kernel)
 
         # create measurement model
-        y = ys[n, :]
-        likelihood = Likelihood(m_kernel, y)
+        y = ys[m, :]
+        likelihood = LogLike(m_kernel, y)
 
         # measurement update
-        filter_distribution, pred_distribution, loglike_increment =
-            update(filter_distribution, likelihood)
+        filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
 
         push!(filter_distributions, filter_distribution)
-        push!(prediction_distributions, pred_distribution)
         loglike = loglike + loglike_increment
     end
 
-    return filter_distributions, prediction_distributions, backward_kernels, loglike
+    return filter_distributions, loglike
 end
 ```
 
-It remains to generate some data to try it out.
+### Computing the state estimates
 
 ```@example 2
-N = 2^6
-ns = 0:N
+filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
 
-# define a Markov kernel for a homogeneous Markov proces
-λ = 0.5
-
-dt = 1.0
-dimx = 2
-Φ = [1.0 0; dt 1.0]
-Q = [dt dt^2/2; dt^2/2 dt^3/3]
-forward_kernel = NormalKernel(Φ, Q)
-
-# define initial distribution
-init = Normal(zeros(dimx), 10.0*I(dimx))
-
-# sample Gauss-Markov process
-xs = rand(init, forward_kernel, N)
-
-# define output process
-C = [0.0 1.0]
-output_kernel = DiracKernel(C)
-
-# define measurements of output process
-R = fill(150.0,1,1)
-measurement_kernel = NormalKernel(C,R)
-
-# sample outputs, measurements and plot
-output = rand(output_kernel,xs)
-zs = rand(measurement_kernel,xs)
-
-filter_distributions, prediction_distributions, backward_kernels, loglike =
-        kalman_filter(zs, init, forward_kernel, measurement_kernel)
-
-# plotting the filter state estimates
-plot(
-    ns,
+state_plt = plot(
+    ts,
     xs,
-    layout=(dimx,1),
+    layout = (2, 1),
     xlabel = ["" "t"],
-    label = ["x0" "x1"],
-    title = ["Filter estimates of the state" ""]
+    label = ["x1" "x2"],
+    title = ["Filter estimates of the state" ""],
 )
-plot!(
-    ns,
-    filter_distributions,
-    layout=(dimx,1),
-    label = ["x0filter" "x1filter"]
-)
+plot!(ts, filter_distributions, layout = (2, 1), label = ["x1filter" "x2filter"])
+
+state_plt
 ```
 
+
+### Computing the output estimates
+
 ```@example 2
-plot(
-    ns,
-    prediction_distributions,
-    xlabel = "t",
-    ylabel = "y",
-    label = "one-step ahead prediction",
-    title = "One-step ahead predictions"
-)
+output_filter_estimate = map(z -> marginalise(z, output_kernel), filter_distributions)
 
-scatter!(
-    ns,
-    zs,
-    label = "measurements",
-    color="black"
-)
-```
-
-#### Implementing the Rauch-Tung-Striebel smoother
-
-Given the previous implementation of the Kalman filter, implementing the smoother is straight-forward.
-```@example 2
-function rts_recursion(
-    terminal::AbstractNormal,
-    kernels::AbstractVector{<:AbstractNormalKernel},
-)
-    N = length(kernels)
-    d = terminal
-    distributions = AbstractNormal[]
-
-    pushfirst!(distributions, d)
-
-    for n in 0:N-1
-        k = kernels[N-n]
-        d = marginalise(d, k)
-        pushfirst!(distributions, d)
-    end
-
-    return distributions
-end
-```
-
-The smoother estimates may thus be calculated from the previous output of the Kalman filter as follows.
-```@example 2
-smoother_distributions = rts_recursion(filter_distributions[end],backward_kernels)
-
-plot(
-    ns,
-    xs,
-    layout=(dimx,1),
-    xlabel = ["" "t"],
-    label = ["x0" "x1"],
-    title = ["Filter estimates of the state" ""]
-)
-plot!(
-    ns,
-    filter_distributions,
-    layout=(dimx,1),
-    label = ["x0filter" "x1filter"]
-)
-plot!(
-    ns,
-    smoother_distributions,
-    layout=(dimx,1),
-    label = ["x0smoother" "x1smoother"]
-)
+plt = plot(ts, outs, label = "output", xlabel = "t")
+scatter!(ts, ys, label = "measurement", color = "black")
+plot!(ts, output_filter_estimate, label = "filter estimate")
 ```
