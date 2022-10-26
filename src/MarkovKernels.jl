@@ -1,6 +1,5 @@
 module MarkovKernels
 
-
 using LinearAlgebra, Statistics, Random, RecipesBase
 
 import Base: *, +, eltype, length, size, log, ==, similar, convert, show
