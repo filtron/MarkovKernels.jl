@@ -57,25 +57,6 @@ Computes the mean vector of the Dirac distribution D.
 mean(D::Dirac) = D.μ
 
 """
-    cov(D::AbstractDirac)
-
-Computes the covariance matrix of the Dirac distribution D.
-"""
-cov(D::AbstractDirac) = Diagonal(zeros(eltype(D), dim(D)))
-
-"""
-    var(D::AbstractDirac)
-Computes the vector of marginal variances of the Dirac distribution D.
-"""
-var(D::AbstractDirac) = zeros(real(eltype(D)), dim(D))
-
-"""
-    std(N::AbstractDirac)
-Computes the vector of marginal standard deviations of the Dirac distribution D.
-"""
-std(D::AbstractDirac) = zeros(real(eltype(D)), dim(D))
-
-"""
     rand(RNG::AbstractRNG, D::AbstractDirac)
 
 Computes a random vector distributed according to the Dirac distribution D

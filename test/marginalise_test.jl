@@ -60,7 +60,6 @@ function marginalise_test(T, n, m, affine_types, cov_types)
         F = dirac_amaps[j]
         @testset "marginalise | $(typeof(D)) | $(typeof(K))" begin
             @test mean(marginalise(D, K)) ≈ F(μ)
-            @test cov(marginalise(D, K)) ≈ Diagonal(zeros(T, n))
         end
     end
 end

@@ -13,12 +13,6 @@ function dirac_test(T, n)
             eltype(AbstractDirac{U}(D)) == U
         end
         @test mean(D) == μ
-        @test cov(D) == Diagonal(zeros(T, n))
-        @test var(D) == zeros(T, n)
-        @test std(D) == zeros(T, n)
         @test rand(D) == mean(D)
-
-        @test eltype(var(D)) <: Real
-        @test eltype(std(D)) <: Real
     end
 end
