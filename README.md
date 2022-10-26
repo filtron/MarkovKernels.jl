@@ -25,6 +25,12 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
 
+## Instalation 
+
+```julia 
+] add https://github.com/filtron/MarkovKernels.jl.git
+```
+
 ## Package specific types
 
 * Types for representing marginal distributions, Markov kernels, and likelihoods:
