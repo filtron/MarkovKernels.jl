@@ -53,7 +53,6 @@ DiracKernel  # Vector valued Dirac kernels
 Likelihood   # AbstractMarkovKernel paired with a measurement 
 ```
 
-
 For the purpose of Bayesian state estimation, ideally the following functions are defined:   
 
 ```julia
@@ -69,4 +68,10 @@ Therefore, it is in practice up to the user to define appropriate approximations
 predict(D::AbstractDistribution,K::AbstractMarkovKernel)
 update(D::AbstractDistribution,L::AbstractLikelihood)
 ```
+
+## TODO: 
+
+1. Implement Mixture ditributions / kernels (e.g. for particle filtering). 
+2. Resampling kernels (i.e. resampling step in particle filters is a draw from a Markov kernel).
+3. Normal distributions in information vector / matrix parametrisation.   
 
