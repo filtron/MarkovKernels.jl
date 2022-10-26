@@ -57,16 +57,16 @@ Likelihood   # AbstractMarkovKernel paired with a measurement
 
 The following type union is used to represent the (conditional) covariance:
 
-´´´julia 
+```julia 
 const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
-´´´
+```
 
 Additionally, the following aliases are defined: 
 
-´´´julia 
+```julia 
 const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
 const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
-´´´
+```
 
 ## Functions 
 
