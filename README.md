@@ -36,6 +36,8 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 Types for representing marginal distributions, Markov kernels, and likelihoods:
 
 ```julia
+abtract type AbstractAffineMap end # used to represent affine conditional means
+
 abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
@@ -53,6 +55,21 @@ DiracKernel  # Vector valued Dirac kernels
 Likelihood   # AbstractMarkovKernel paired with a measurement 
 ```
 
+The following type union is used to represent the (conditional) covariance:
+
+´´´julia 
+const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+´´´
+
+Additionally, the following aliases are defined: 
+
+´´´julia 
+const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
+const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
+´´´
+
+## Functions 
+
 For the purpose of Bayesian state estimation, ideally the following functions are defined:   
 
 ```julia
@@ -61,8 +78,10 @@ invert(D::AbstractDistrbution, K::AbstractMarkovKernel)
 bayes_rule(D::AbstractDistrbution, K::AbstractMarkovKernel)
 ```
 
-However, these can rarely be implemented exactly for arbitrary distribution / Markov kernel pars.
-Therefore, it is in practice up to the user to define appropriate approximations, i.e. 
+These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
+
+In practice, these functions can not be implemented exactly for a given distribution, Markov kernel pair.
+Therefore, it is up to the user to define appropriate approximations, i.e.: 
 
 ```julia
 predict(D::AbstractDistribution,K::AbstractMarkovKernel)
