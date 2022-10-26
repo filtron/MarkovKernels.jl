@@ -8,7 +8,7 @@ import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
-include("affinemap.jl") # define affine maps to use as conditional means 
+include("affinemap.jl") # define affine maps to use as conditional means
 export AbstractAffineMap,
     AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
 
@@ -63,9 +63,6 @@ include("kernels/compose.jl")
 include("marginalise.jl")
 include("invert.jl")
 export compose, marginalise, invert
-
-# general sampling functions for kernels and Markov processes
-include("sampling.jl")
 
 include("matrix_utils.jl") # helper functions
 
