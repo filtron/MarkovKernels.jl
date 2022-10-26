@@ -30,6 +30,7 @@ function affinemap_test(T, affine_types, n)
         @testset "AffineMap | Binary | {$(T),$(t1)} | {$(T),$(t2)}" begin
             @test slope(compose(F2, F1)) ≈ slopegt
             @test intercept(compose(F2, F1)) ≈ interceptgt
+            @test compose(F2, F1) == F2 * F1
         end
     end
 end

@@ -29,8 +29,6 @@ Equivalent to compose(F2::AbstractAffineMap, F1::AbstractAffineMap).
 """
 *(F2::AbstractAffineMap, F1::AbstractAffineMap) = compose(F2, F1)
 
-nout(F::AbstractAffineMap) = size(slope(F), 1)
-
 AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
