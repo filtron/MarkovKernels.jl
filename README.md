@@ -25,7 +25,7 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 [![Build Status](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/filtron/MarkovKernels.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/filtron/MarkovKernels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/filtron/MarkovKernels.jl)
 
-## Instalation 
+## Installation 
 
 ```julia 
 ] add https://github.com/filtron/MarkovKernels.jl.git
@@ -40,6 +40,19 @@ abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
+
+Currently, the following concrete types are defined: 
+
+```julia
+Normal # Vector valued Normal distributons 
+Dirac  # Vector valued Dirac distributions 
+
+NormalKernel # Vector valued Normal kernels 
+DiracKernel  # Vector valued Dirac kernels 
+
+Likelihood   # AbstractMarkovKernel paired with a measurement 
+```
+
 
 For the purpose of Bayesian state estimation, ideally the following functions are defined:   
 
