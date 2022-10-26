@@ -62,8 +62,8 @@ invert(D::AbstractDistrbution, K::AbstractMarkovKernel)
 bayes_rule(D::AbstractDistrbution, K::AbstractMarkovKernel)
 ```
 
-
-In practice, to implement Bayesian state estimation algorithms, it is up to the user to define appropriate prediction / update functions: 
+However, these can rarely be implemented exactly for arbitrary distribution / Markov kernel pars.
+Therefore, it is in practice up to the user to define appropriate approximations, i.e. 
 
 ```julia
 predict(D::AbstractDistribution,K::AbstractMarkovKernel)
