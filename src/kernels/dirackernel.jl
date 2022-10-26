@@ -78,15 +78,6 @@ That is, the output is callable.
 """
 mean(K::DiracKernel) = K.μ
 
-# delete cov!
-"""
-    cov(K::AbstractDiracKernel)
-
-Computes the conditonal covariance function of the Dirac kernel K.
-That is, the output is callable.
-"""
-cov(K::AffineDiracKernel{T}) where {T} = x -> Diagonal(zeros(T, nout(mean(K))))
-
 """
     condition(K::AbstractDiracKernel, x)
 
