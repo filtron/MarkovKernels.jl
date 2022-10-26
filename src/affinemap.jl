@@ -46,12 +46,23 @@ Type for representing affine maps in the standard slope / intercept parametrisat
 struct AffineMap{T,U,V} <: AbstractAffineMap{T}
     A::U
     b::V
-    function AffineMap(A::AbstractMatrix, b::AbstractVector)
-        T = promote_type(eltype(A), eltype(b))
-        A = convert(AbstractMatrix{T}, A)
-        b = convert(AbstractVector{T}, b)
-        new{T,typeof(A),typeof(b)}(A, b)
-    end
+    AffineMap{T,U,V}(A, b) where {T,U,V} = new{T,U,V}(A, b)
+end
+
+function AffineMap{T}(A::AbstractMatrix, b::AbstractVector) where {T}
+    A = convert(AbstractMatrix{T}, A)
+    b = convert(AbstractVector{T}, b)
+    AffineMap{T,typeof(A),typeof(b)}(A, b)
+end
+
+"""
+    AffineMap(A::AbstractMatrix, b::AbstractVector)
+
+Creates an AffineMap with slope A and intercept b.
+"""
+function AffineMap(A::AbstractMatrix, b::AbstractVector)
+    T = promote_type(eltype(A), eltype(b))
+    AffineMap{T}(A, b)
 end
 
 Base.iterate(F::AffineMap) = (F.A, Val(:b))
@@ -89,8 +100,20 @@ Type for representing affine maps with zero intercept.
 """
 struct LinearMap{T,U} <: AbstractAffineMap{T}
     A::U
-    LinearMap(A::AbstractMatrix) = new{eltype(A),typeof(A)}(A)
+    LinearMap{T,U}(A) where {T,U} = new{T,U}(A)
 end
+
+function LinearMap{T}(A::AbstractMatrix) where {T}
+    A = convert(AbstractMatrix{T}, A)
+    LinearMap{T,typeof(A)}(A)
+end
+
+"""
+    LinearMap(A::AbstractMatrix)
+
+Creates a LinearMap with slope A.
+"""
+LinearMap(A::AbstractMatrix) = LinearMap{eltype(A),typeof(A)}(A)
 
 Base.iterate(F::LinearMap) = (F.A, Val(:done))
 Base.iterate(F::LinearMap, ::Val{:done}) = nothing
@@ -114,13 +137,28 @@ struct AffineCorrector{T,U,V,S} <: AbstractAffineMap{T}
     A::U
     b::V
     c::S
-    function AffineCorrector(A::AbstractMatrix, b::AbstractVector, c::AbstractVector)
-        T = promote_type(eltype(A), eltype(b), eltype(c))
-        A = convert(AbstractMatrix{T}, A)
-        b = convert(AbstractVector{T}, b)
-        c = convert(AbstractVector{T}, c)
-        new{T,typeof(A),typeof(b),typeof(c)}(A, b, c)
-    end
+    AffineCorrector{T,U,V,S}(A, b, c) where {T,U,V,S} = new{T,U,V,S}(A, b, c)
+end
+
+function AffineCorrector{T}(
+    A::AbstractMatrix,
+    b::AbstractVector,
+    c::AbstractVector,
+) where {T}
+    A = convert(AbstractMatrix{T}, A)
+    b = convert(AbstractVector{T}, b)
+    c = convert(AbstractVector{T}, c)
+    AffineCorrector{T,typeof(A),typeof(b),typeof(c)}(A, b, c)
+end
+
+"""
+    AffineCorrector(A::AbstractMatrix, b::AbstractVector, c::AbstractVector)
+
+Creates an Affine Corrector with slope A and intercept b - A * c.
+"""
+function AffineCorrector(A::AbstractMatrix, b::AbstractVector, c::AbstractVector)
+    T = promote_type(eltype(A), eltype(b), eltype(c))
+    AffineCorrector{T}(A, b, c)
 end
 
 Base.iterate(F::AffineCorrector) = (F.A, Val(:b))
