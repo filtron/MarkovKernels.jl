@@ -33,14 +33,24 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 
 ## Package specific types
 
-* Types for representing marginal distributions, Markov kernels, and likelihoods:
+Types for representing marginal distributions, Markov kernels, and likelihoods:
 
 ```julia
 abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
 abstract type AbstractLikelihood end
 ```
-* In practice, to implement Bayesian state estimation algorithms, it is up to the user to define appropriate prediction / update functions: 
+
+For the purpose of Bayesian state estimation, ideally the following functions are defined:   
+
+```julia
+marginalise(D::AbstractDistrbution, K::AbstractMarkovKernel)
+invert(D::AbstractDistrbution, K::AbstractMarkovKernel)
+bayes_rule(D::AbstractDistrbution, K::AbstractMarkovKernel)
+```
+
+
+In practice, to implement Bayesian state estimation algorithms, it is up to the user to define appropriate prediction / update functions: 
 
 ```julia
 predict(D::AbstractDistribution,K::AbstractMarkovKernel)
