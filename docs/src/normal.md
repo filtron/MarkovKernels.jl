@@ -20,25 +20,55 @@ whereas for complex valued vectors the density function is given by
 \mathcal{N}(x ; \mu  , \Sigma ) = |\pi \Sigma|^{-1} \exp \Big(  -(x-\mu)^* \Sigma^{-1} (x-\mu)  \Big).
 ```
 
-* Types:
-
-```julia
-abstract type AbstractNormal{T<:Number}  <: AbstractDistribution end # normal distributions with realisations in real / complex Euclidean spaces
-Normal{T} <: AbstractNormal{T} # mean vector / covariance matrix parametrisation of normal distributions
+### Types
+```@docs
+AbstractNormal{T}
+Normal{T}
 ```
 
-* Functionality:
+#### Type aliases
+
 ```julia
-dim(N::AbstractNormal)  # dimension  of the normal distribution
+const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
+```
 
-mean(N::AbstractNormal) # mean vector
-cov(N::AbstractNormal)  # covariance matrix
-var(N::AbstractNormal)  # vector of marginal variances
-std(N::AbstractNormal)  # vector of marginal standard deviations
+### Constructors
 
-residual(N::AbstractNormal,x) # whitened residual of realisation x
-logpdf(N::AbstractNormal,x)   # logarithm of the probability density function at x
-entropy(N::AbstractNormal)
-kldivergence(N1::AbstractNormal,N2::AbstractNormal)
-rand(N::AbstractNormal)
+```@docs
+Normal(μ::AbstractVector, Σ::CovarianceParameter)
+Normal(μ::AbstractVector, Σ::AbstractMatrix)
+IsoNormal(μ::AbstractVector, λ::Real)
+Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
+```
+
+### Basics
+
+```@docs
+dim(::Normal)
+mean(::Normal)
+cov(::Normal)
+covp(::Normal)
+var(::AbstractNormal)
+std(::AbstractNormal)
+```
+
+### Probability density function
+
+```@docs
+residual(N::AbstractNormal, x::AbstractVector)
+logpdf(N::AbstractNormal, x)
+```
+
+### Information theory
+
+```@docs
+entropy(::AbstractNormal)
+kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
+```
+
+### Sampling
+
+```@docs
+rand(::AbstractRNG, ::AbstractNormal)
+rand( ::AbstractNormal)
 ```

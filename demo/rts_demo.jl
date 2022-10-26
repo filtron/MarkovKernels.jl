@@ -4,13 +4,12 @@ using Plots, Random
 rng = MersenneTwister(1991)
 
 include("sampling_implementation.jl")
-include("kalman_filter_implementation.jl")
-include("kalman_smoother_implementation.jl")
 include("sample_trajectory.jl")
+include("kalman_filter_implementation.jl")
+include("rts_implementation.jl")
 
-# kalman filter 
-smoother_distributions, filter_distributions, loglike =
-    kalman_smoother(ys, init, fw_kernel, m_kernel)
+# Rauch-Tung-Striebel smoother
+smoother_distributions, filter_distributions, loglike = rts(ys, init, fw_kernel, m_kernel)
 
 # plotting the filter state estimates
 state_plt = plot(
@@ -22,7 +21,6 @@ state_plt = plot(
     title = ["Filter estimates of the state" ""],
 )
 plot!(ts, filter_distributions, layout = (2, 1), label = ["x1filter" "x2filter"])
-
 plot!(ts, smoother_distributions, layout = (2, 1), label = ["x1smoother" "x2smoother"])
 
 display(state_plt)

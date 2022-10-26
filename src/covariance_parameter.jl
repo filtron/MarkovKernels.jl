@@ -9,27 +9,46 @@ convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
     CovarianceParameter{T}(Σ)
 
 """
-    lsqrt(A) 
-returns a square 'matrix' L such that A = L*L'. 
-L need not be a Cholesky factor.   
+    lsqrt(A::CovarianceParameter)
+Computes a square 'matrix' L such that A = L*L'.
+L need not be a Cholesky factor.
 """
-lsqrt(A::AbstractMatrix) = cholesky(A).L
 lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
+
+"""
+    lsqrt(A::AbstractMatrix)
+
+Equivalent to cholesky(A).L
+"""
+lsqrt(A::AbstractMatrix) = cholesky(A).L
 
 const FactorizationCompatible{T,V} = Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}
 
 """
-    stein(Σ, Φ, Q)
+    stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
 
 Computes the output of the stein  operator
-Σ ↦ Φ * Σ * Φ' + Q
 
-    stein(Σ, Φ)
+    Σ ↦ Φ * Σ * Φ'.
 
-Mathematically, the same as stein(Σ, Φ, R) for R = 0.
+Generally, the type of Σ determines the type of the output.
+The exception is the case when Q is a Factorization and Σ is of type
+Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case Q determines the type of the output.
 """
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
+
+"""
+    stein(Σ::CovarianceParameter, Φ::AbstractMatrix, Q::CovarianceParameter)
+
+Computes the output of the stein  operator
+
+    Σ ↦ Φ * Σ * Φ' + Q.
+
+Generally, the type of Σ determines the type of the output.
+The exception is the case when Q is a Factorization and Σ is of type
+Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case Q determines the type of the output.
+"""
 stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)
 
 stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
@@ -44,7 +63,23 @@ _stein(Σ, Φ, Q::Cholesky) = _stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
 _stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 """
-    schur_reduce(Π, C, R)
+    schur_reduce(Π::CovarianceParameter, C::AbstractMatrix)
+
+Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
+
+    [C*Π*C' C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C')*[I; K]'
+
+In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
+then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
+
+Generally, the type of Π determines the type of the output.
+The exception is the case when R is a Factorization and Π is of type
+Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case R determines the type of the output.
+"""
+schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
+
+"""
+    schur_reduce(Π::CovarianceParameter, C::AbstractMatrix, R::CovarianceParameter)
 
 Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
 
@@ -53,11 +88,10 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 
-    schur_reduce(Π, C)
-
-Mathematically, the same as schur_red(Π, C, R) for R = 0
+Generally, the type of Π determines the type of the output.
+The exception is the case when R is a Factorization and Π is of type
+Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case R determines the type of the output.
 """
-schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
 schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
 
 schur_reduce(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)

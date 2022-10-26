@@ -1,9 +1,7 @@
 """
-invert(N::AbstractNorma, K::AffineNormalKernel)
+invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 
-Returns the inverted factorisation of the joint distirbution P(y,x) = N(x)*K(y, x) i.e
-
-P(y,x) = Nout(y)*Kout(x,y)
+Computes D2, K2, such that D(x)K(y, x) = D2(y)K2(x, y), i.e., an inverted factorisation of D, K.
 """
 function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     pred = mean(K)(mean(N))

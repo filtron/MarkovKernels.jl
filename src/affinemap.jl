@@ -1,21 +1,48 @@
+"""
+    AbstractAffineMap{T<:Number}
+
+Abstract type for representing affine maps between vector spaces over the field determined by T.
+"""
 abstract type AbstractAffineMap{T<:Number} end
 
 eltype(::AbstractAffineMap{T}) where {T} = T
 
+"""
+    (F::AbstractAffineMap)(x)
+
+Evaluates the affine map F at x.
+"""
 (F::AbstractAffineMap)(x) = slope(F) * x + intercept(F)
+
+"""
+    compose(F2::AbstractAffineMap, F1::AbstractAffineMap)
+
+Computes the affine map F3 resulting from the composition F2 ∘ F1.
+"""
 compose(F2::AbstractAffineMap, F1::AbstractAffineMap) =
     AffineMap(slope(F2) * slope(F1), slope(F2) * intercept(F1) + intercept(F2))
+
+"""
+    *(F2::AbstractAffineMap, F1::AbstractAffineMap)
+
+Equivalent to compose(F2::AbstractAffineMap, F1::AbstractAffineMap).
+"""
 *(F2::AbstractAffineMap, F1::AbstractAffineMap) = compose(F2, F1)
+
 nout(F::AbstractAffineMap) = size(slope(F), 1)
 
 AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
 
-# this falls back to === in Base if F1 and F2 are not of same eltype?
 ==(F1::T, F2::T) where {T<:AbstractAffineMap} =
     all(f -> getfield(F1, f) == getfield(F2, f), 1:nfields(F1))
 
+"""
+    AffineMap{T,U,V}
+
+Type for representing affine maps in the standard slope / intercept parametrisation.
+"""
 struct AffineMap{T,U,V} <: AbstractAffineMap{T}
     A::U
     b::V
@@ -31,13 +58,35 @@ Base.iterate(F::AffineMap) = (F.A, Val(:b))
 Base.iterate(F::AffineMap, ::Val{:b}) = (F.b, Val(:done))
 Base.iterate(F::AffineMap, ::Val{:done}) = nothing
 
+"""
+    slope(F::AbstractAffineMap)
+
+Computes the slope of F.
+"""
 slope(F::AffineMap) = F.A
+
+"""
+    intercept(F::AffineMap)
+
+Computes the intercept of F.
+"""
 intercept(F::AffineMap) = F.b
 
 AffineMap{T}(F::AffineMap) where {T} =
     AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
+
+"""
+    AbstractAffineMap{T}(F::AbstractAffineMap)
+
+Creates an affine map from F with eltype T.
+"""
 AbstractAffineMap{T}(F::AffineMap) where {T} = AffineMap{T}(F)
 
+"""
+    LinearMap{T,U}
+
+Type for representing affine maps with zero intercept.
+"""
 struct LinearMap{T,U} <: AbstractAffineMap{T}
     A::U
     LinearMap(A::AbstractMatrix) = new{eltype(A),typeof(A)}(A)
@@ -54,6 +103,13 @@ compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
 LinearMap{T}(F::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, F.A))
 AbstractAffineMap{T}(F::LinearMap) where {T} = LinearMap{T}(F)
 
+"""
+    AffineCorrector{T,U,V,S}
+
+Type for representing affine correctors, i.e.,
+
+    x ↦ b + A * (x -c).
+"""
 struct AffineCorrector{T,U,V,S} <: AbstractAffineMap{T}
     A::U
     b::V
