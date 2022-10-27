@@ -81,8 +81,8 @@ bayes_rule(D::AbstractDistrbution, L::AbstractLogLike)
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
 Additionally, marginalise is implemented for Dirac with respect to the aforementioned kernels. 
 
-In practice, these functions can not be implemented exactly for a given distribution, Markov kernel pair.
-Therefore, it is up to the user to define appropriate approximations, i.e.: 
+In practice, these functions can not be implemented exactly for a given distribution / Markov kernel pair.
+Therefore, it is up to the user to define, when required, appropriate approximations, i.e.: 
 
 ```julia
 predict(D::AbstractDistribution, K::AbstractMarkovKernel)
