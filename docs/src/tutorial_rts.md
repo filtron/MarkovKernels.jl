@@ -1,4 +1,4 @@
-# Implementing a Rauch-Tung-Striebeel smoother
+# Implementing a Rauch-Tung-Striebel smoother
 
 ```@meta
 CurrentModule = MarkovKernels
