@@ -86,7 +86,7 @@ Therefore, it is up to the user to define, when required, appropriate approximat
 
 ```julia
 predict(D::AbstractDistribution, K::AbstractMarkovKernel)
-update(D::AbstractDistribution, L::AbstractLikelihood)
+update(D::AbstractDistribution, L::AbstractLogLike)
 ```
 
 ## TODO: 
