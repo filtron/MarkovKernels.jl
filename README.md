@@ -52,7 +52,7 @@ Dirac  # Vector valued Dirac distributions
 NormalKernel # Vector valued Normal kernels 
 DiracKernel  # Vector valued Dirac kernels 
 
-Likelihood   # AbstractMarkovKernel paired with a measurement 
+LogLike   # AbstractMarkovKernel paired with a measurement 
 ```
 
 The following type union is used to represent the (conditional) covariance:
