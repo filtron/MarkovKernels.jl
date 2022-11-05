@@ -36,7 +36,7 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 Types for representing marginal distributions, Markov kernels, and likelihoods:
 
 ```julia
-abtract type AbstractAffineMap end # used to represent affine conditional means
+abstract type AbstractAffineMap end # used to represent affine conditional means
 
 abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
