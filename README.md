@@ -28,7 +28,7 @@ where evaluation of $\pi(x \mid y)$ at $y$ gives Bayes' rule and $k(y)$ is the m
 ## Installation 
 
 ```julia 
-] add https://github.com/filtron/MarkovKernels.jl.git
+] add MarkovKernels
 ```
 
 ## Package specific types
