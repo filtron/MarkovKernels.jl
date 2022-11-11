@@ -27,9 +27,6 @@ Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector}
 ```@docs
 dim(::Dirac)
 mean(::Dirac)
-cov(::AbstractDirac)
-var(::AbstractDirac)
-std(::AbstractDirac)
 ```
 
 ### Sampling
