@@ -1,11 +1,12 @@
-function compose_test(T, n, affine_types, cov_types)
+function compose_test(T, n, affine_types, cov_type)
+
+
     dirac_slopes, dirac_intercepts, dirac_amaps =
         collect(zip(map(x -> _make_affinemap(T, n, n, x), affine_types)...))
     dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
 
-    normal_kernel_types = Iterators.product(affine_types, cov_types)
     normal_amaps, cov_mats, cov_params, normal_kernels =
-        collect(zip(map(x -> _make_normalkernel(T, n, n, x...), normal_kernel_types)...))
+        collect(zip(map(x -> _make_normalkernel(T, n, n, x, cov_type), affine_types)...))
 
     x = randn(T, n)
 

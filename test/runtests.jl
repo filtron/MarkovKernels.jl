@@ -24,6 +24,10 @@ m = 2
 
 etypes = (Float64, Complex{Float64})
 affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
+
+# in preparation for StaticArrays
+cov_container = (:Matrix, :Diagonal)
+
 cov_types = (:Matrix, :Diagonal, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
@@ -50,20 +54,20 @@ cov_types = (:Matrix, :Diagonal, :Cholesky)
     end
 
     @testset "Likelihoods" begin
-        for T in etypes
-            likelihood_test(T, n, m, affine_types, cov_types)
+        for T in etypes, CT in cov_types
+            likelihood_test(T, n, m, affine_types, CT)
         end
     end
 
     @testset "compose" begin
-        for T in etypes
-            compose_test(T, n, affine_types, cov_types)
+        for T in etypes, CT in cov_types
+            compose_test(T, n, affine_types, CT)
         end
     end
 
     @testset "marginalise" begin
-        for T in etypes
-            marginalise_test(T, n, m, affine_types, cov_types)
+        for T in etypes, CT in cov_types
+            marginalise_test(T, n, m, affine_types, CT)
         end
     end
 

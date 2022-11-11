@@ -13,7 +13,7 @@ export AbstractAffineMap,
     AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
 
 include("covariance_parameter.jl")
-export CovarianceParameter, FactorizationCompatible, lsqrt, stein, schur_reduce
+export CovarianceParameter, lsqrt, stein, schur_reduce
 
 abstract type AbstractDistribution{T<:Number} end
 

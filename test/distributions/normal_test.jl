@@ -1,6 +1,7 @@
 function normal_test(T, n, cov_types)
-    ncovps = length(cov_types)
 
+
+    ncovps = length(cov_types)
     means, ncov_mats, ncov_params, normals =
         collect(zip(map(x -> _make_normal(T, n, x), cov_types)...))
 
