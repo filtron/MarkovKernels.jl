@@ -58,7 +58,7 @@ LogLike   # AbstractMarkovKernel paired with a measurement
 The following type union is used to represent the (conditional) covariance:
 
 ```julia 
-const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T}}
 ```
 
 Additionally, the following aliases are defined: 
