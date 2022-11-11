@@ -15,8 +15,6 @@ function normal_test(T, n, cov_types)
     end
 
     @testset "Normal | Unary | $(T)" begin
-        @test IsoNormal(x, one(real(T))) == Normal(x, one(T) * I)
-
         for i in 1:ncovps
             N = normals[i]
             μ = means[i]

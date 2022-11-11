@@ -24,7 +24,7 @@ m = 2
 
 etypes = (Float64, Complex{Float64})
 affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
-cov_types = (:Matrix, :Diagonal, :UniformScaling, :Cholesky)
+cov_types = (:Matrix, :Diagonal, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
     @testset "Distributions" begin
