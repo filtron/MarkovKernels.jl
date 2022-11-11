@@ -10,8 +10,5 @@
     stds = mapreduce(permutedims, vcat, std.(ns))
 
     ribbon --> ribbon_width * stds
-    xguide --> "t"
-    yguide --> "y"
-
     return values
 end
