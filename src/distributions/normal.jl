@@ -52,15 +52,6 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     end
 end
 
-const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
-
-"""
-    IsoNormal(μ::AbstractVector, λ::Real)
-
-Short-hand for Normal(μ, λ * I).
-"""
-IsoNormal(μ::AbstractVector, λ::Real) = Normal(μ, λ * I)
-
 """
     Normal{T}(N::Normal{U,V,W})
 
@@ -100,7 +91,6 @@ Computes the covariance matrix of the Normal distribution N.
 """
 cov(N::Normal) = AbstractMatrix(N.Σ)
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
-cov(N::IsoNormal) = covp(N)(dim(N))
 
 """
     covp(N::AbstractNormal)
@@ -115,7 +105,6 @@ covp(N::Normal) = N.Σ
 Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
-var(N::IsoNormal) = real(diag(N.Σ(dim(N))))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2))
 
 """
@@ -144,8 +133,6 @@ Computes the logarithm of the probability density function of the Normal distrib
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
     -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
-logpdf(N::IsoNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * (log(_piconst(T)) + log(abs(N.Σ.λ))) + norm_sqr(residual(N, x)))
 
 """
     entropy(N::AbstractNormal)
@@ -154,8 +141,6 @@ Computes the entropy of the Normal distribution N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
     _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
-entropy(N::IsoNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + dim(N) * log(abs(covp(N).λ)))
 
 """
     kldivergence(N1::AbstractNormal, N2::AbstractNormal)
@@ -168,11 +153,6 @@ function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Nu
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
         real(T)(2) * real(logdet(root_ratio))
     )
-end
-function kldivergence(N1::IsoNormal{T}, N2::IsoNormal{T}) where {T<:Number}
-    ratio = abs(covp(N2).λ \ covp(N1).λ)
-    _nscale(T) *
-    (dim(N1) * ratio + norm_sqr(residual(N2, mean(N1))) - dim(N1) - dim(N1) * log(ratio))
 end
 
 """

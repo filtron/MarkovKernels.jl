@@ -1,8 +1,6 @@
-const CovarianceParameter{T} = Union{HermOrSym{T},UniformScaling{T},Factorization{T}}
+const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T}}
 
-for P in (:UniformScaling, :Factorization)
-    @eval CovarianceParameter{T}(Σ::$P) where {T} = convert($P{T}, Σ)
-end
+CovarianceParameter{T}(Σ::Factorization) where {T} = convert(Factorization{T}, Σ)
 CovarianceParameter{T}(Σ::HermOrSym) where {T} = convert(AbstractMatrix{T}, Σ)
 
 convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
@@ -13,7 +11,6 @@ convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
 Computes a square 'matrix' L such that A = L*L'.
 L need not be a Cholesky factor.
 """
-lsqrt(J::UniformScaling) = sqrt(J)
 lsqrt(C::Cholesky) = C.L
 
 """
@@ -23,7 +20,7 @@ Equivalent to cholesky(A).L
 """
 lsqrt(A::AbstractMatrix) = cholesky(A).L
 
-const FactorizationCompatible{T,V} = Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}
+const FactorizationCompatible{T,V} = Union{HermOrSym{T,Diagonal{T,V}}}
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
@@ -34,7 +31,7 @@ Computes the output of the stein  operator
 
 Generally, the type of Σ determines the type of the output.
 The exception is the case when Q is a Factorization and Σ is of type
-Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case Q determines the type of the output.
+HermOrSym{T,Diagonal{T,V}}, in which case Q determines the type of the output.
 """
 stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
 
@@ -47,7 +44,7 @@ Computes the output of the stein  operator
 
 Generally, the type of Σ determines the type of the output.
 The exception is the case when Q is a Factorization and Σ is of type
-Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case Q determines the type of the output.
+HermOrSym{T,Diagonal{T,V}}, in which case Q determines the type of the output.
 """
 stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)
 
@@ -74,7 +71,7 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 
 Generally, the type of Π determines the type of the output.
 The exception is the case when R is a Factorization and Π is of type
-Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case R determines the type of the output.
+HermOrSym{T,Diagonal{T,V}}, in which case R determines the type of the output.
 """
 schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
 
@@ -90,7 +87,7 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 
 Generally, the type of Π determines the type of the output.
 The exception is the case when R is a Factorization and Π is of type
-Union{HermOrSym{T,Diagonal{T,V}},UniformScaling{T}}, in which case R determines the type of the output.
+HermOrSym{T,Diagonal{T,V}}, in which case R determines the type of the output.
 """
 schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
 

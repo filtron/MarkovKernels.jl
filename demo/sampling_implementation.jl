@@ -6,9 +6,9 @@
         nstep::Integer,
     )
 
-samples a trajectory of length nstep + 1 from the Markov model 
+samples a trajectory of length nstep + 1 from the Markov model
 
-x_1 ∼ init 
+x_1 ∼ init
 x_m | x_{m-1} ∼ fw_kernel(·, x_{m-1})
 """
 
@@ -28,8 +28,4 @@ function sample(
     end
 
     return xs
-end
-
-function sample(init::AbstractDistribution, K::AbstractMarkovKernel, nstep::Integer)
-    return sample(GLOBAL_RNG, init, K, nstep)
 end

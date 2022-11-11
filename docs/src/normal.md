@@ -26,18 +26,11 @@ AbstractNormal{T}
 Normal{T}
 ```
 
-#### Type aliases
-
-```julia
-const IsoNormal{T,U} = Normal{T,U,<:UniformScaling}
-```
-
 ### Constructors
 
 ```@docs
 Normal(μ::AbstractVector, Σ::CovarianceParameter)
 Normal(μ::AbstractVector, Σ::AbstractMatrix)
-IsoNormal(μ::AbstractVector, λ::Real)
 Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
 ```
 
