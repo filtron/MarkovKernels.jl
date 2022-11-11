@@ -72,8 +72,8 @@ cov_types = (:Matrix, :Diagonal, :Cholesky)
     end
 
     @testset "invert" begin
-        for T in etypes
-            invert_test(T, n, m, affine_types, cov_types)
+        for T in etypes, CT in cov_types
+            invert_test(T, n, m, affine_types, CT)
         end
     end
 end

@@ -1,19 +1,16 @@
-function invert_test(T, n, m, affine_types, cov_types)
+function invert_test(T, n, m, affine_types, cov_type)
+
     dirac_slopes, dirac_intercepts, dirac_amaps =
         collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
     dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
 
-    normal_kernel_types = Iterators.product(affine_types, cov_types)
     normal_amaps, kcov_mats, kcov_params, normal_kernels =
-        collect(zip(map(x -> _make_normalkernel(T, n, m, x...), normal_kernel_types)...))
+        collect(zip(map(x -> _make_normalkernel(T, n, m, x, cov_type), affine_types)...))
 
-    means, ncov_mats, ncov_params, normals =
-        collect(zip(map(x -> _make_normal(T, m, x), cov_types)...))
+    μ, ncovm, ncov_params, D = _make_normal(T, m, cov_type)
 
-    for i in 1:length(normals), j in 1:length(normal_kernels)
-        D = normals[i]
-        μ = means[i]
-        ncovm = ncov_mats[i]
+    for j in 1:length(normal_kernels)
+        ncovm
 
         K = normal_kernels[j]
         kcovm = kcov_mats[j]
@@ -38,18 +35,14 @@ function invert_test(T, n, m, affine_types, cov_types)
         end
     end
 
-    for i in 1:length(normals), j in 1:length(dirac_kernels)
-        D = normals[i]
-        μ = means[i]
-        ncovm = ncov_mats[i]
-
+    for j in 1:length(dirac_kernels)
         K = dirac_kernels[j]
         F = dirac_amaps[j]
 
         NC, KC = invert(D, K)
         y = randn(T, n)
 
-        S, G, Π = _schur(ncovm, slope(F)) # _schur should not return pred
+        S, G, Π = _schur(ncovm, slope(F)) 
         pred = F(μ)
         Ngt = Normal(pred, S)
         Kgt = NormalKernel(G, μ, pred, Π)
