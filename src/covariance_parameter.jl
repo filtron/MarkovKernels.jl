@@ -112,14 +112,18 @@ function _make_post_array(pre_array)
 end
 _upper_cholesky(U) = U |> UpperTriangular |> Cholesky
 
-# convert here is a bit hacky but only way I could figure out 
-# that makes output matrices match  input matrices for eg StaticArrays.  
 function _make_schur_output_cholesky(post_array, Πfac, C, Rfac)
     ny, nx = size(C)
-    S = @inbounds convert(typeof(Rfac), post_array[1:ny, 1:ny]) |> _upper_cholesky
-    Σ = @inbounds convert(typeof(Πfac), post_array[ny+1:ny+nx, ny+1:ny+nx]) |>
+    S = @inbounds _convert2similar(Rfac, post_array[1:ny, 1:ny]) |> _upper_cholesky
+    Σ = @inbounds _convert2similar(Πfac, post_array[ny+1:ny+nx, ny+1:ny+nx]) |>
               _upper_cholesky
-    Kt = @inbounds convert(typeof(C), post_array[1:ny, ny+1:ny+nx])
+    Kt = @inbounds _convert2similar(C, post_array[1:ny, ny+1:ny+nx])
     K = Kt' / lsqrt(S)
     return S, K, Σ
 end
+
+# convert here is a bit hacky but only way I could figure out 
+# that makes output matrices match  input matrices for eg StaticArrays.  
+_convert2similar(Ain::AbstractMatrix, Aout::AbstractMatrix) = convert(typeof(Ain), Aout)
+_convert2similar(::Diagonal{T}, Aout::AbstractMatrix) where {T} =
+    convert(AbstractMatrix{T}, Aout)
