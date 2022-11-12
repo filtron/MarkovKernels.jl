@@ -104,6 +104,8 @@ end
 schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
 schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
+symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+
 function _make_post_array(pre_array)
     U = qr(pre_array).R
     return conj.(sign.(Diagonal(U))) * U
