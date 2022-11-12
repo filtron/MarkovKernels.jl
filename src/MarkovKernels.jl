@@ -9,8 +9,7 @@ import Statistics: mean, cov, var, std
 import Random: rand, GLOBAL_RNG
 
 include("affinemap.jl") # define affine maps to use as conditional means
-export AbstractAffineMap,
-    AffineMap, LinearMap, AffineCorrector, slope, intercept, compose, nout
+export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
 
 include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
@@ -32,7 +31,6 @@ include("distributions/normal_plotting.jl") # plotting vectors of normal distrib
 include("distributions/dirac.jl") # dirac distributions
 export AbstractNormal,
     Normal,
-    IsoNormal,
     dim,
     mean,
     cov,

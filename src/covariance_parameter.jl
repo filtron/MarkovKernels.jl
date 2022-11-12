@@ -52,6 +52,7 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 
 In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
+The type of the CovarianceParameter is preserved at the output.
 """
 function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
     K = Π * C'
@@ -79,6 +80,8 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 
 In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
+Both Π and R need to be of the same CovarianceParameter type, e.g. both SymOrHerm or both Cholesky.
+The type of the CovarianceParameter is preserved at the output.
 """
 function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
     K = Π * C'
