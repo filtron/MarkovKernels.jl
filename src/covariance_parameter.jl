@@ -12,15 +12,7 @@ Computes a square 'matrix' L such that A = L*L'.
 L need not be a Cholesky factor.
 """
 lsqrt(C::Cholesky) = C.L
-
-"""
-    lsqrt(A::AbstractMatrix)
-
-Equivalent to cholesky(A).L
-"""
-lsqrt(A::AbstractMatrix) = cholesky(A).L
-
-const FactorizationCompatible{T,V} = Union{HermOrSym{T,Diagonal{T,V}}}
+lsqrt(A::HermOrSym) = cholesky(A).L
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
@@ -29,11 +21,10 @@ Computes the output of the stein  operator
 
     Σ ↦ Φ * Σ * Φ'.
 
-Generally, the type of Σ determines the type of the output.
-The exception is the case when Q is a Factorization and Σ is of type
-HermOrSym{T,Diagonal{T,V}}, in which case Q determines the type of the output.
+The type of CovarianceParameter is preserved at the output.
 """
-stein(Σ, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
+stein(Σ::HermOrSym, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
+stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix, Q::CovarianceParameter)
@@ -42,22 +33,15 @@ Computes the output of the stein  operator
 
     Σ ↦ Φ * Σ * Φ' + Q.
 
-Generally, the type of Σ determines the type of the output.
-The exception is the case when Q is a Factorization and Σ is of type
-HermOrSym{T,Diagonal{T,V}}, in which case Q determines the type of the output.
+Both Σ and Q need to be of the same CovarianceParameter type, e.g. both SymOrHerm or both Cholesky.
+The type of the CovarianceParameter is preserved at the output.
 """
-stein(Σ, Φ::AbstractMatrix, Q) = _stein(Σ, Φ, Q)
-
-stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
-stein(Σ::Cholesky, Φ::AbstractMatrix, Q) = _stein_chol(Σ, Φ, Q)
-stein(Σ::FactorizationCompatible, Φ::AbstractMatrix, Q::Cholesky) = _stein_chol(Σ, Φ, Q)
+stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym) = symmetrise(Φ * Σ * Φ' + Q)
+stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) =
+    Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
-
-_stein(Σ, Φ, Q) = symmetrise(Φ * Σ * Φ' + Q)
-_stein(Σ, Φ, Q::Cholesky) = _stein(Σ, Φ, symmetrise(AbstractMatrix(Q)))
-_stein_chol(Σ, Φ, Q) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 """
     schur_reduce(Π::CovarianceParameter, C::AbstractMatrix)
@@ -68,12 +52,23 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 
 In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-
-Generally, the type of Π determines the type of the output.
-The exception is the case when R is a Factorization and Π is of type
-HermOrSym{T,Diagonal{T,V}}, in which case R determines the type of the output.
 """
-schur_reduce(Π, C::AbstractMatrix) = _schur_red(Π, C)
+function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
+    K = Π * C'
+    S = symmetrise(C * K)
+    K = K / S
+    L = (I - K * C)
+    Σ = symmetrise(L * Π * L')
+    return S, K, Σ
+end
+
+function schur_reduce(Π::Cholesky, C::AbstractMatrix)
+    ny, nx = size(C)
+    pre_array = [zeros(ny, nx + ny); lsqrt(Π)'*C' lsqrt(Π)']
+    post_array = rsqrt2cholU(pre_array)
+    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
+    return S, K, Σ
+end
 
 """
     schur_reduce(Π::CovarianceParameter, C::AbstractMatrix, R::CovarianceParameter)
@@ -84,31 +79,8 @@ Returns the tuple (S, K, Σ) associated with the following (block) Schur reducti
 
 In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-
-Generally, the type of Π determines the type of the output.
-The exception is the case when R is a Factorization and Π is of type
-HermOrSym{T,Diagonal{T,V}}, in which case R determines the type of the output.
 """
-schur_reduce(Π, C::AbstractMatrix, R) = _schur_red(Π, C, R)
-
-schur_reduce(Π::Cholesky, C::AbstractMatrix) = _schur_red_chol(Π, C)
-schur_reduce(Π::Cholesky, C::AbstractMatrix, R) = _schur_red_chol(Π, C, R)
-schur_reduce(Π::FactorizationCompatible, C::AbstractMatrix, R::Cholesky) =
-    _schur_red_chol(Π, C, R)
-
-schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
-schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
-
-function _schur_red(Π, C)
-    K = Π * C'
-    S = symmetrise(C * K)
-    K = K / S
-    L = (I - K * C)
-    Σ = symmetrise(L * Π * L')
-    return S, K, Σ
-end
-
-function _schur_red(Π, C, R)
+function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
     K = Π * C'
     S = symmetrise(C * K + R)
     K = K / S
@@ -117,23 +89,16 @@ function _schur_red(Π, C, R)
     return S, K, Σ
 end
 
-_schur_red(Π, C, R::Cholesky) = _schur_red(Π, C, symmetrise(AbstractMatrix(R)))
-
-function _schur_red_chol(Π, C)
-    ny, nx = size(C)
-    pre_array = [zeros(ny, nx + ny); lsqrt(Π)'*C' lsqrt(Π)']
-    post_array = rsqrt2cholU(pre_array)
-    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
-    return S, K, Σ
-end
-
-function _schur_red_chol(Π, C, R)
+function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
     ny, nx = size(C)
     pre_array = [lsqrt(R)' zeros(ny, nx); lsqrt(Π)'*C' lsqrt(Π)']
     post_array = rsqrt2cholU(pre_array)
     S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
     return S, K, Σ
 end
+
+schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
+schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
 function _schur_red_chol_make_output(ny, nx, post_array)
     S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))

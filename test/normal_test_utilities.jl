@@ -10,10 +10,6 @@ function _make_cov(T, n, s::Symbol)
         d = randn(T, n, n)
         covariance_matrix = Diagonal(abs2.(d))
         covariance_parameter = covariance_matrix
-    elseif s === :UniformScaling
-        λ = abs2.(randn(T))
-        covariance_parameter = UniformScaling(λ)
-        covariance_matrix = covariance_parameter(n)
     elseif s === :Cholesky
         R = randn(T, n, n)
         covariance_matrix = R' * R

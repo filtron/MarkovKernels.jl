@@ -7,7 +7,7 @@ function normalkernel_test(T, affine_types)
         x = randn(T, 1)
 
         @testset "NormalKernel | Unary | $(T) | $(t)" begin
-            @test_nowarn show(K)
+            #@test_nowarn show(K)
             @test mean(K)(x) == F(x)
             @test cov(K)(x) == Σ(x)
             @test condition(K, x) == Normal(F(x), Σ(x))
@@ -36,7 +36,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
         @testset "AffineNormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
-            @test_nowarn show(K)
+            @test_nowarn repr(K)
             @test eltype(K) == T
             @test typeof(K) <: AffineNormalKernel
             @test K == NormalKernel(mean(K)..., cov_param)
