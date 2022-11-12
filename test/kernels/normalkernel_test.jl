@@ -37,6 +37,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
 
         @testset "AffineNormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
             #@test_nowarn show(K)
+            @test_nowarn repr(K)
             @test eltype(K) == T
             @test typeof(K) <: AffineNormalKernel
             @test K == NormalKernel(mean(K)..., cov_param)

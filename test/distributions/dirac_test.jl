@@ -7,6 +7,7 @@ function dirac_test(T, n)
 
     @testset "Dirac | $(T) " begin
         #@test_nowarn show(D)
+        @test_nowarn repr(D)
         @test eltype(D) == T
         for U in eltypes
             AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)

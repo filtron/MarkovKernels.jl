@@ -21,6 +21,7 @@ function normal_test(T, n, cov_types)
             covpar = ncov_params[i]
 
             #@test_nowarn show(N)
+            @test_nowarn repr(N)
             @test eltype(N) == T
             for U in eltypes
                 @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)

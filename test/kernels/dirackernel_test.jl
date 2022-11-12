@@ -8,6 +8,7 @@ function dirackernel_test(T, n, affine_types, cov_types)
 
         @testset "AffineDiracKernel | Unary | $(T) | $(at)" begin
             #@test_nowarn show(K)
+            @test_nowarn repr(K)
             @test eltype(K) == T
             @test typeof(K) <: AffineDiracKernel
             @test K == DiracKernel(mean(K)...)

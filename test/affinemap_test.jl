@@ -7,6 +7,7 @@ function affinemap_test(T, affine_types, n)
 
         @testset "AffineMap | Unary | $(T) | $(t)" begin
             #@test_nowarn show(F)
+            @test_nowarn repr(F)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
             for U in eltypes
