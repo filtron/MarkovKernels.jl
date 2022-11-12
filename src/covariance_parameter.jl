@@ -12,13 +12,7 @@ Computes a square 'matrix' L such that A = L*L'.
 L need not be a Cholesky factor.
 """
 lsqrt(C::Cholesky) = C.L
-
-"""
-    lsqrt(A::AbstractMatrix)
-
-Equivalent to cholesky(A).L
-"""
-lsqrt(A::AbstractMatrix) = cholesky(A).L
+lsqrt(A::HermOrSym) = cholesky(A).L
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
@@ -43,7 +37,8 @@ Both Σ and Q need to be of the same CovarianceParameter type, e.g. both SymOrHe
 The type of the CovarianceParameter is preserved at the output.
 """
 stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym) = symmetrise(Φ * Σ * Φ' + Q)
-stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) = Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
+stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) =
+    Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
@@ -67,6 +62,13 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
     return S, K, Σ
 end
 
+function schur_reduce(Π::Cholesky, C::AbstractMatrix)
+    ny, nx = size(C)
+    pre_array = [zeros(ny, nx + ny); lsqrt(Π)'*C' lsqrt(Π)']
+    post_array = rsqrt2cholU(pre_array)
+    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
+    return S, K, Σ
+end
 
 """
     schur_reduce(Π::CovarianceParameter, C::AbstractMatrix, R::CovarianceParameter)
@@ -84,14 +86,6 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
     K = K / S
     L = (I - K * C)
     Σ = symmetrise(L * Π * L' + K * R * K')
-    return S, K, Σ
-end
-
-function schur_reduce(Π::Cholesky, C::AbstractMatrix)
-    ny, nx = size(C)
-    pre_array = [zeros(ny, nx + ny); lsqrt(Π)'*C' lsqrt(Π)']
-    post_array = rsqrt2cholU(pre_array)
-    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
     return S, K, Σ
 end
 

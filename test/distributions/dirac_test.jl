@@ -6,7 +6,7 @@ function dirac_test(T, n)
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
     @testset "Dirac | $(T) " begin
-        @test_nowarn show(D)
+        #@test_nowarn show(D)
         @test eltype(D) == T
         for U in eltypes
             AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)

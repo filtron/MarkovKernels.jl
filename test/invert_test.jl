@@ -1,5 +1,4 @@
 function invert_test(T, n, m, affine_types, cov_type)
-
     dirac_slopes, dirac_intercepts, dirac_amaps =
         collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
     dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
@@ -42,7 +41,7 @@ function invert_test(T, n, m, affine_types, cov_type)
         NC, KC = invert(D, K)
         y = randn(T, n)
 
-        S, G, Π = _schur(ncovm, slope(F)) 
+        S, G, Π = _schur(ncovm, slope(F))
         pred = F(μ)
         Ngt = Normal(pred, S)
         Kgt = NormalKernel(G, μ, pred, Π)

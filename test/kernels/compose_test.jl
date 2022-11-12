@@ -1,6 +1,4 @@
 function compose_test(T, n, affine_types, cov_type)
-
-
     dirac_slopes, dirac_intercepts, dirac_amaps =
         collect(zip(map(x -> _make_affinemap(T, n, n, x), affine_types)...))
     dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))

@@ -1,12 +1,10 @@
 function marginalise_test(T, n, m, affine_types, cov_type)
-
     dirac_slopes, dirac_intercepts, dirac_amaps =
         collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
     dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
 
     normal_amaps, kcov_mats, kcov_params, normal_kernels =
         collect(zip(map(x -> _make_normalkernel(T, n, m, x, cov_type), affine_types)...))
-
 
     dirac = Dirac(randn(T, m))
 
