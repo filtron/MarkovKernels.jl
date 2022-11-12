@@ -6,7 +6,6 @@ function affinemap_test(T, affine_types, n)
         eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
         @testset "AffineMap | Unary | $(T) | $(t)" begin
-            #@test_nowarn show(F)
             @test_nowarn repr(F)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F

@@ -36,7 +36,6 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
         @testset "AffineNormalKernel | Unary | $(T) | $(atype) | $(ctype)" begin
-            #@test_nowarn show(K)
             @test_nowarn repr(K)
             @test eltype(K) == T
             @test typeof(K) <: AffineNormalKernel
