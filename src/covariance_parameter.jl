@@ -112,15 +112,14 @@ function _make_post_array(pre_array)
 end
 _upper_cholesky(U) = U |> UpperTriangular |> Cholesky
 
-
 function _make_schur_output_cholesky(post_array, Πfac, C, Rfac)
     ny, nx = size(C)
     yidx = similar(axes(C, 1)) # maybe even similar(diag(Rfac)) (MVector vs SVector??)
-    @inbounds yidx[1:ny] = 1:ny 
+    @inbounds yidx[1:ny] = 1:ny
     xidx = similar(axes(C, 2)) # maybe even similar(diag(Πfac)) (MVector vs SVector??)
-    @inbounds xidx[1:nx] = ny+1:ny+nx 
+    @inbounds xidx[1:nx] = ny+1:ny+nx
 
-    S = @inbounds post_array[yidx, yidx] |> _upper_cholesky 
+    S = @inbounds post_array[yidx, yidx] |> _upper_cholesky
     Σ = @inbounds post_array[xidx, xidx] |> _upper_cholesky
     Kadj = @inbounds post_array[yidx, xidx]
     K = Kadj' / lsqrt(S)

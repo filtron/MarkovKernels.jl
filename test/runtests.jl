@@ -35,9 +35,8 @@ cov_container = (:Matrix, :Diagonal)
 cov_types = (:Matrix, :Diagonal, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
-
     @testset "CovarianceParameter" begin
-        for T in etypes 
+        for T in etypes
             covariance_parameter_test(T)
         end
     end
