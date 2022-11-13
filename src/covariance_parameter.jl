@@ -114,8 +114,8 @@ _upper_cholesky(U) = U |> UpperTriangular |> Cholesky
 
 function _make_schur_output_cholesky(post_array, C)
     ny, nx = size(C)
-    yidx = similar(axes(C, 1)) 
-    xidx = similar(axes(C, 2)) 
+    yidx = similar(axes(C, 1))
+    xidx = similar(axes(C, 2))
     @inbounds yidx[1:ny] = 1:ny
     @inbounds xidx[1:nx] = ny+1:ny+nx
 
