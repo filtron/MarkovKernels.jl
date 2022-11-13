@@ -117,7 +117,8 @@ Base.iterate(F::LinearMap) = (F.A, Val(:done))
 Base.iterate(F::LinearMap, ::Val{:done}) = nothing
 
 slope(F::LinearMap) = F.A
-intercept(F::LinearMap) = zeros(eltype(F), size(slope(F), 1))
+intercept(F::LinearMap) = zero(diag(slope(F)))
+
 (F::LinearMap)(x) = slope(F) * x
 compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
 

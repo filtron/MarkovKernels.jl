@@ -95,7 +95,7 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
 end
 
 function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
-    pre_array = vcat(hcat(lsqrt(R)', zero(C)), hcat(lsqrt(Π)' * C', lsqrt(Π)'))
+    pre_array = vcat(hcat(lsqrt(R)', zero(C)), hcat(lsqrt(Π)' * C', lsqrt(Π)')) #hvcat breaks for StaticArrays
     post_array = _make_post_array(pre_array)
     S, K, Σ = _make_schur_output_cholesky(post_array, Π.factors, C, R.factors)
     return S, K, Σ
@@ -112,18 +112,17 @@ function _make_post_array(pre_array)
 end
 _upper_cholesky(U) = U |> UpperTriangular |> Cholesky
 
+
 function _make_schur_output_cholesky(post_array, Πfac, C, Rfac)
     ny, nx = size(C)
-    S = @inbounds _convert2similar(Rfac, post_array[1:ny, 1:ny]) |> _upper_cholesky
-    Σ = @inbounds _convert2similar(Πfac, post_array[ny+1:ny+nx, ny+1:ny+nx]) |>
-              _upper_cholesky
-    Kt = @inbounds _convert2similar(C, post_array[1:ny, ny+1:ny+nx])
-    K = Kt' / lsqrt(S)
+    yidx = similar(axes(C, 1)) # maybe even similar(diag(Rfac)) (MVector vs SVector??)
+    @inbounds yidx[1:ny] = 1:ny 
+    xidx = similar(axes(C, 2)) # maybe even similar(diag(Πfac)) (MVector vs SVector??)
+    @inbounds xidx[1:nx] = ny+1:ny+nx 
+
+    S = @inbounds post_array[yidx, yidx] |> _upper_cholesky 
+    Σ = @inbounds post_array[xidx, xidx] |> _upper_cholesky
+    Kadj = @inbounds post_array[yidx, xidx]
+    K = Kadj' / lsqrt(S)
     return S, K, Σ
 end
-
-# convert here is a bit hacky but only way I could figure out 
-# that makes output matrices match  input matrices for eg StaticArrays.  
-_convert2similar(Ain::AbstractMatrix, Aout::AbstractMatrix) = convert(typeof(Ain), Aout)
-_convert2similar(::Diagonal{T}, Aout::AbstractMatrix) where {T} =
-    convert(AbstractMatrix{T}, Aout)
