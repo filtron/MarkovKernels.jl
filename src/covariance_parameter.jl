@@ -68,7 +68,7 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix)
     Rfac = ArrayInterfaceCore.zeromatrix(diag(C))
     zero_array = hcat(Rfac, zero(C))
     post_array = vcat(_make_post_array(hcat(lsqrt(Π)' * C', lsqrt(Π)')), zero_array)
-    S, K, Σ = _make_schur_output_cholesky(post_array, Π.factors, C, Rfac)
+    S, K, Σ = _make_schur_output_cholesky(post_array, C)
 
     return S, K, Σ
 end
@@ -97,7 +97,7 @@ end
 function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
     pre_array = vcat(hcat(lsqrt(R)', zero(C)), hcat(lsqrt(Π)' * C', lsqrt(Π)')) #hvcat breaks for StaticArrays
     post_array = _make_post_array(pre_array)
-    S, K, Σ = _make_schur_output_cholesky(post_array, Π.factors, C, R.factors)
+    S, K, Σ = _make_schur_output_cholesky(post_array, C)
     return S, K, Σ
 end
 
@@ -112,11 +112,11 @@ function _make_post_array(pre_array)
 end
 _upper_cholesky(U) = U |> UpperTriangular |> Cholesky
 
-function _make_schur_output_cholesky(post_array, Πfac, C, Rfac)
+function _make_schur_output_cholesky(post_array, C)
     ny, nx = size(C)
-    yidx = similar(axes(C, 1)) # maybe even similar(diag(Rfac)) (MVector vs SVector??)
+    yidx = similar(axes(C, 1)) 
+    xidx = similar(axes(C, 2)) 
     @inbounds yidx[1:ny] = 1:ny
-    xidx = similar(axes(C, 2)) # maybe even similar(diag(Πfac)) (MVector vs SVector??)
     @inbounds xidx[1:nx] = ny+1:ny+nx
 
     S = @inbounds post_array[yidx, yidx] |> _upper_cholesky
