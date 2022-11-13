@@ -105,13 +105,13 @@ covp(N::Normal) = N.Σ
 Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
-var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2))
+var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2)) # this is broken for StaticArrays
 
 """
     std(N::AbstractNormal)
 Computes the vector of marginal standard deviations of the Normal distribution N.
 """
-std(N::AbstractNormal) = sqrt.(var(N))
+std(N::AbstractNormal) = sqrt.(var(N)) # this is broken for StaticArrays
 
 """
     residual(N::AbstractNormal, x::AbstractVector)

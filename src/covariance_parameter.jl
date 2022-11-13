@@ -8,7 +8,8 @@ convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
 
 """
     lsqrt(A::CovarianceParameter)
-Computes a square 'matrix' L such that A = L*L'.
+
+Computes a square matrix L such that A = L*L'.
 L need not be a Cholesky factor.
 """
 lsqrt(C::Cholesky) = C.L
@@ -24,7 +25,7 @@ Computes the output of the stein  operator
 The type of CovarianceParameter is preserved at the output.
 """
 stein(Σ::HermOrSym, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
-stein(Σ::Cholesky, Φ::AbstractMatrix) = Cholesky(rsqrt2cholU(lsqrt(Σ)' * Φ'))
+stein(Σ::Cholesky, Φ::AbstractMatrix) = _make_post_array(lsqrt(Σ)' * Φ') |> _upper_cholesky
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix, Q::CovarianceParameter)
@@ -38,7 +39,7 @@ The type of the CovarianceParameter is preserved at the output.
 """
 stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym) = symmetrise(Φ * Σ * Φ' + Q)
 stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) =
-    Cholesky(rsqrt2cholU([lsqrt(Σ)' * Φ'; lsqrt(Q)']))
+    _make_post_array(vcat(lsqrt(Σ)' * Φ', lsqrt(Q)')) |> _upper_cholesky
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
@@ -64,10 +65,11 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
 end
 
 function schur_reduce(Π::Cholesky, C::AbstractMatrix)
-    ny, nx = size(C)
-    pre_array = [zeros(ny, nx + ny); lsqrt(Π)'*C' lsqrt(Π)']
-    post_array = rsqrt2cholU(pre_array)
-    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
+    Rfac = ArrayInterfaceCore.zeromatrix(diag(C))
+    zero_array = hcat(Rfac, zero(C))
+    post_array = vcat(_make_post_array(hcat(lsqrt(Π)' * C', lsqrt(Π)')), zero_array)
+    S, K, Σ = _make_schur_output_cholesky(post_array, C)
+
     return S, K, Σ
 end
 
@@ -93,20 +95,33 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
 end
 
 function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
-    ny, nx = size(C)
-    pre_array = [lsqrt(R)' zeros(ny, nx); lsqrt(Π)'*C' lsqrt(Π)']
-    post_array = rsqrt2cholU(pre_array)
-    S, K, Σ = _schur_red_chol_make_output(ny, nx, post_array)
+    pre_array = vcat(hcat(lsqrt(R)', zero(C)), hcat(lsqrt(Π)' * C', lsqrt(Π)')) #hvcat breaks for StaticArrays
+    post_array = _make_post_array(pre_array)
+    S, K, Σ = _make_schur_output_cholesky(post_array, C)
     return S, K, Σ
 end
 
 schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
 schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
-function _schur_red_chol_make_output(ny, nx, post_array)
-    S = Cholesky(UpperTriangular(post_array[1:ny, 1:ny]))
-    Σ = Cholesky(UpperTriangular(post_array[ny+1:ny+nx, ny+1:ny+nx]))
-    Kt = post_array[1:ny, ny+1:ny+nx]
-    K = Kt' / lsqrt(S)
+symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+
+function _make_post_array(pre_array)
+    U = qr(pre_array).R
+    return conj.(sign.(Diagonal(U))) * U
+end
+_upper_cholesky(U) = U |> UpperTriangular |> Cholesky
+
+function _make_schur_output_cholesky(post_array, C)
+    ny, nx = size(C)
+    yidx = similar(axes(C, 1))
+    xidx = similar(axes(C, 2))
+    @inbounds yidx[1:ny] = 1:ny
+    @inbounds xidx[1:nx] = ny+1:ny+nx
+
+    S = @inbounds post_array[yidx, yidx] |> _upper_cholesky
+    Σ = @inbounds post_array[xidx, xidx] |> _upper_cholesky
+    Kadj = @inbounds post_array[yidx, xidx]
+    K = Kadj' / lsqrt(S)
     return S, K, Σ
 end

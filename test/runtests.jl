@@ -1,9 +1,13 @@
 using MarkovKernels
 using Test
-using LinearAlgebra
+using LinearAlgebra, StaticArrays
 using Plots
 
+import LinearAlgebra: HermOrSym
+
 include("normal_test_utilities.jl")
+
+include("covariance_parameter_test.jl")
 
 include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
@@ -31,6 +35,12 @@ cov_container = (:Matrix, :Diagonal)
 cov_types = (:Matrix, :Diagonal, :Cholesky)
 
 @testset "MarkovKernels.jl" begin
+    @testset "CovarianceParameter" begin
+        for T in etypes
+            covariance_parameter_test(T)
+        end
+    end
+
     @testset "Distributions" begin
         for T in etypes
             normal_test(T, n, cov_types)
