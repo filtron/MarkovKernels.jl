@@ -38,19 +38,3 @@ function covariance_parameter_test(T)
         end
     end
 end
-
-function _ofsametype(Ain::AbstractMatrix, Aout::AbstractMatrix)
-    typeof(Aout) <: typeof(Ain)
-end
-
-function _ofsametype(Ain::AbstractMatrix, Aout::HermOrSym)
-    typeof(parent(Aout)) <: typeof(Ain)
-end
-
-function _ofsametype(Ain::Diagonal, Aout::HermOrSym)
-    typeof(parent(Aout)) <: typeof(diagm(parent(Ain)))
-end
-
-function _ofsametype(Ain::AbstractMatrix, Aout::Cholesky)
-    typeof(Aout.factors) <: typeof(Ain)
-end

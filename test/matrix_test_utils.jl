@@ -32,3 +32,23 @@ function _make_covp(A::AbstractMatrix{T}, s) where {T}
         return cholesky(A)
     end
 end
+
+function _ofsametype(Ain::AbstractVector, Aout::AbstractVector)
+    typeof(Aout) <: typeof(Ain)
+end
+
+function _ofsametype(Ain::AbstractMatrix, Aout::AbstractMatrix)
+    typeof(Aout) <: typeof(Ain)
+end
+
+function _ofsametype(Ain::AbstractMatrix, Aout::HermOrSym)
+    typeof(parent(Aout)) <: typeof(Ain)
+end
+
+function _ofsametype(Ain::Diagonal, Aout::HermOrSym)
+    typeof(parent(Aout)) <: typeof(diagm(parent(Ain)))
+end
+
+function _ofsametype(Ain::AbstractMatrix, Aout::Cholesky)
+    typeof(Aout.factors) <: typeof(Ain)
+end
