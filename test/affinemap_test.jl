@@ -36,8 +36,6 @@ function affinemap_test(T, affine_types, n)
 end
 
 function _make_affinemap(T, n::Int, m::Int, t::Symbol)
-    (:LinearMap, :AffineMap, :AffineCorrector)
-
     if t === :LinearMap
         A = randn(T, n, m)
         slope = A

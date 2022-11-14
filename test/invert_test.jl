@@ -18,7 +18,7 @@ function invert_test(T, n, m, affine_types, cov_type)
         NC, KC = invert(D, K)
         y = randn(T, n)
 
-        S, G, Π = _schur(ncovm, slope(F), kcovm) # _schur should not return pred
+        S, G, Π = _schur(ncovm, slope(F), kcovm)
         pred = F(μ)
         Ngt = Normal(pred, S)
         Kgt = NormalKernel(G, μ, pred, Π)

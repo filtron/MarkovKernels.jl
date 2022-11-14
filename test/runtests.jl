@@ -30,7 +30,6 @@ m = 2
 etypes = (Float64, Complex{Float64})
 affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
 
-# in preparation for StaticArrays
 cov_container = (:Matrix, :Diagonal)
 
 cov_types = (:Matrix, :Diagonal, :Cholesky)
