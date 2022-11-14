@@ -1,4 +1,13 @@
 
+function _make_vector(v::AbstractVector, s)
+    n = length(v)
+    if s === :Matrix
+        return Vector(v)
+    elseif s === :SMatrix
+        return SVector{n}(v)
+    end
+end
+
 function _make_matrix(A::AbstractMatrix, s)
     n, m = size(A)
     if s === :Matrix

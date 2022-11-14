@@ -7,6 +7,5 @@ function LinearAlgebra.logdet(H::Hermitian)
 end
 LinearAlgebra.logdet(H::HermOrSym{T,<:Diagonal}) where {T} = real(logdet(parent(H)))
 
-LinearAlgebra.inv(H::HermOrSym{T,<:Diagonal}) where {T} = 
+LinearAlgebra.inv(H::HermOrSym{T,<:Diagonal}) where {T} =
     T <: Complex ? Hermitian(inv(parent(H))) : Symmetric(inv(parent(H)))
-

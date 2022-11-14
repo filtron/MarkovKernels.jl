@@ -41,7 +41,7 @@ function _schur(Σ, C)
     S = C * Σ * C'
     S = _symmetrise(eltype(S), S)
     G = Σ * C' / S
-    Π = Σ - G * S * G' 
+    Π = Σ - G * S * G'
     Π = _symmetrise(eltype(Π), Π)
     return S, G, Π
 end
@@ -50,7 +50,7 @@ function _schur(Σ, C, R)
     S = C * Σ * C' + R
     S = _symmetrise(eltype(S), S)
     G = Σ * C' / S
-    Π = Σ - G * S * G' 
+    Π = Σ - G * S * G'
     Π = _symmetrise(eltype(Π), Π)
     return S, G, Π
 end
