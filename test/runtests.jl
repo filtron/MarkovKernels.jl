@@ -5,6 +5,7 @@ using Plots
 
 import LinearAlgebra: HermOrSym
 
+include("matrix_test_utils.jl")
 include("normal_test_utilities.jl")
 
 include("covariance_parameter_test.jl")

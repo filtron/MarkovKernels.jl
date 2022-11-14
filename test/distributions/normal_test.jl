@@ -55,12 +55,10 @@ function normal_test(T, n, cov_types)
             N1 = normals[i]
             μ1 = means[i]
             covmat1 = ncov_mats[i]
-            covpar1 = ncov_params[i]
 
             N2 = normals2[j]
             μ2 = means2[j]
             covmat2 = ncov_mats2[j]
-            covpar2 = ncov_params2[j]
 
             @test kldivergence(N1, N2) ≈ _kld(T, μ1, covmat1, μ2, covmat2)
             @test kldivergence(N2, N1) ≈ _kld(T, μ2, covmat2, μ1, covmat1)
@@ -68,4 +66,45 @@ function normal_test(T, n, cov_types)
             @test eltype(kldivergence(N2, N1)) <: Real
         end
     end
+end
+
+
+function _logpdf(T, μ1, Σ1, x1)
+    n = length(μ1)
+    Σ1 = _symmetrise(T, Σ1)
+    if T <: Real
+        logpdf = -T(0.5) * logdet( T(2π) * Σ1) - T(0.5) * dot(x1 - μ1, inv(Σ1), x1 - μ1)
+    elseif T <: Complex
+        logpdf = -real(T)(n) * log(real(T)(π)) - logdet(Σ1) - dot(x1 - μ1, inv(Σ1), x1 - μ1)
+    end
+
+    return logpdf
+end
+
+function _entropy(T, μ1, Σ1)
+    n = length(μ1)
+    Σ1 = _symmetrise(T, Σ1)
+    if T <: Real
+        entropy = T(0.5) * logdet( T(2π) * exp(T(1)) * Σ1)
+    elseif T <: Complex
+        entropy = real(T)(n) * log(real(T)(π)) + logdet(Σ1) + real(T)(n)
+    end
+end
+
+function _kld(T, μ1, Σ1, μ2, Σ2)
+    n = length(μ1)
+    Σ1 = _symmetrise(T, Σ1)
+    Σ2 = _symmetrise(T, Σ2)
+
+    if T <: Real
+        kld =
+            T(0.5) *
+            (tr(Σ2 \ Σ1) - T(n) + dot(μ2 - μ1, inv(Σ2), μ2 - μ1) + logdet(Σ2) - logdet(Σ1))
+    elseif T <: Complex
+        kld =
+            real(tr(Σ2 \ Σ1)) - real(T)(n) + real(dot(μ2 - μ1, inv(Σ2), μ2 - μ1)) + logdet(Σ2) -
+            logdet(Σ1)
+    end
+
+    return kld
 end

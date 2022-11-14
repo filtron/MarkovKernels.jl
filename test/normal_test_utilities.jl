@@ -34,64 +34,23 @@ function _make_normalkernel(T, n, m, atype::Symbol, ctype::Symbol)
     return M, cov_mat, cov_param, K
 end
 
-_symmetrise(T, Σ, n) = Σ
-_symmetrise(T, Σ::Diagonal, n) = Σ
-_symmetrise(T, Σ::UniformScaling, n) = Σ(n)
+_symmetrise(T, Σ) = Σ
 _symmetrise(T, Σ::AbstractMatrix) = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
 
-function _logpdf(T, μ1, Σ1, x1)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1, n)
-    if T <: Real
-        logpdf = -0.5 * logdet(2 * π * Σ1) - 0.5 * dot(x1 - μ1, inv(Σ1), x1 - μ1)
-    elseif T <: Complex
-        logpdf = -n * log(π) - logdet(Σ1) - dot(x1 - μ1, inv(Σ1), x1 - μ1)
-    end
-
-    return logpdf
-end
-
-function _entropy(T, μ1, Σ1)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1, n)
-    if T <: Real
-        entropy = 1.0 / 2.0 * logdet(2 * π * exp(1) * Σ1)
-    elseif T <: Complex
-        entropy = n * log(π) + logdet(Σ1) + n
-    end
-end
-
-function _kld(T, μ1, Σ1, μ2, Σ2)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1, n)
-    Σ2 = _symmetrise(T, Σ2, n)
-
-    if T <: Real
-        kld =
-            1 / 2 *
-            (tr(Σ2 \ Σ1) - n + dot(μ2 - μ1, inv(Σ2), μ2 - μ1) + logdet(Σ2) - logdet(Σ1))
-    elseif T <: Complex
-        kld =
-            real(tr(Σ2 \ Σ1)) - n + real(dot(μ2 - μ1, inv(Σ2), μ2 - μ1)) + logdet(Σ2) -
-            logdet(Σ1)
-    end
-
-    return kld
-end
-
-# this should call symmetrise
-function _schur(Σ, C, R)
-    S = Hermitian(C * Σ * C' + R)
+function _schur(Σ, C)
+    S = C * Σ * C'
+    S = _symmetrise(eltype(S), S)
     G = Σ * C' / S
-    Π = Hermitian(Σ - G * S * G')
-
+    Π = Σ - G * S * G' 
+    Π = _symmetrise(eltype(Π), Π)
     return S, G, Π
 end
 
-function _schur(Σ, C)
-    S = Hermitian(C * Σ * C')
+function _schur(Σ, C, R)
+    S = C * Σ * C' + R
+    S = _symmetrise(eltype(S), S)
     G = Σ * C' / S
-    Π = Hermitian(Σ - G * S * G')
-
+    Π = Σ - G * S * G' 
+    Π = _symmetrise(eltype(Π), Π)
     return S, G, Π
 end
