@@ -40,7 +40,7 @@ abstract type AbstractAffineMap end # used to represent affine conditional means
 
 abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
-abstract type AbstractLikelihood end
+abstract type AbstractLogLike end
 ```
 
 Currently, the following concrete types are defined: 
