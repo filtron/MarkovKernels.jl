@@ -1,6 +1,4 @@
-function affinemap_test(T, affine_types, n)
-    matrix_types = (:Matrix, :SMatrix)
-
+function affinemap_test(T, n, affine_types, matrix_types)
     A1p = randn(T, n, n)
     b1p = randn(T, n)
     c1p = randn(T, n)
@@ -52,49 +50,48 @@ function to_affine_parameters(
     A::AbstractMatrix,
     b::AbstractVector,
     c::AbstractVector,
-    affine_t,
+    ::Type{LinearMap},
     matrix_t,
 )
     A = _make_matrix(A, matrix_t)
-    b =
-        affine_t === :LinearMap ? _make_vector(zero(b), matrix_t) :
-        _make_vector(b, matrix_t)
-    c =
-        affine_t === :AffineCorrector ? _make_vector(c, matrix_t) :
-        _make_vector(zero(c), matrix_t)
+    b = _make_vector(zero(b), matrix_t)
+    c = _make_vector(zero(c), matrix_t)
     return A, b, c
 end
 
-function to_affine_map(A::AbstractMatrix, b::AbstractVector, c::AbstractVector, affine_t)
-    if affine_t === :LinearMap
-        return LinearMap(A)
-    elseif affine_t === :AffineMap
-        return AffineMap(A, b)
-    elseif affine_t === :AffineCorrector
-        return AffineCorrector(A, b, c)
-    end
+function to_affine_parameters(
+    A::AbstractMatrix,
+    b::AbstractVector,
+    c::AbstractVector,
+    ::Type{AffineMap},
+    matrix_t,
+)
+    A = _make_matrix(A, matrix_t)
+    b = _make_vector(b, matrix_t)
+    c = _make_vector(zero(c), matrix_t)
+    return A, b, c
 end
 
-function _make_affinemap(T, n::Int, m::Int, t::Symbol)
-    if t === :LinearMap
-        A = randn(T, n, m)
-        slope = A
-        intercept = zeros(T, n)
-        F = LinearMap(A)
-    elseif t === :AffineMap
-        A = randn(T, n, m)
-        b = randn(T, n)
-        slope = A
-        intercept = b
-        F = AffineMap(A, b)
-    elseif t == :AffineCorrector
-        A = randn(T, n, m)
-        b = randn(T, n)
-        c = randn(T, m)
-        slope = A
-        intercept = b - A * c
-        F = AffineCorrector(A, b, c)
-    end
-
-    return slope, intercept, F
+function to_affine_parameters(
+    A::AbstractMatrix,
+    b::AbstractVector,
+    c::AbstractVector,
+    ::Type{AffineCorrector},
+    matrix_t,
+)
+    A = _make_matrix(A, matrix_t)
+    b = _make_vector(b, matrix_t)
+    c = _make_vector(c, matrix_t)
+    return A, b, c
 end
+
+to_affine_map(A::AbstractMatrix, b::AbstractVector, c::AbstractVector, ::Type{LinearMap}) =
+    LinearMap(A)
+to_affine_map(A::AbstractMatrix, b::AbstractVector, c::AbstractVector, ::Type{AffineMap}) =
+    AffineMap(A, b)
+to_affine_map(
+    A::AbstractMatrix,
+    b::AbstractVector,
+    c::AbstractVector,
+    ::Type{AffineCorrector},
+) = AffineCorrector(A, b, c)

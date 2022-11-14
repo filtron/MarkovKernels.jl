@@ -1,37 +1,13 @@
 
-function _make_vector(v::AbstractVector, s)
-    n = length(v)
-    if s === :Matrix
-        return Vector(v)
-    elseif s === :SMatrix
-        return SVector{n}(v)
-    end
-end
+_make_vector(v::AbstractVector, ::Type{Matrix}) = Vector(v)
+_make_vector(v::AbstractVector, ::Type{SMatrix}) = SVector{length(v)}(v)
 
-function _make_matrix(A::AbstractMatrix, s)
-    n, m = size(A)
-    if s === :Matrix
-        return Matrix(A)
-    elseif s === :SMatrix
-        return SMatrix{n,m}(A)
-    end
-end
+_make_matrix(A::AbstractMatrix, ::Type{Matrix}) = Matrix(A)
+_make_matrix(A::AbstractMatrix, ::Type{SMatrix}) = SMatrix{size(A)...}(A)
 
-function _wrap_matrix(A::AbstractMatrix, s)
-    if s === :AbstractMatrix
-        return A
-    elseif s === :Diagonal
-        return Diagonal(A)
-    end
-end
-
-function _make_covp(A::AbstractMatrix{T}, s) where {T}
-    if s === :HermOrSym
-        return T <: Complex ? Hermitian(A) : Symmetric(A)
-    elseif s === :Cholesky
-        return cholesky(A)
-    end
-end
+_make_covp(A::AbstractMatrix{T}, ::Type{HermOrSym}) where {T} =
+    T <: Complex ? Hermitian(A) : Symmetric(A)
+_make_covp(A::AbstractMatrix, ::Type{Cholesky}) = cholesky(A)
 
 function _ofsametype(Ain::AbstractVector, Aout::AbstractVector)
     typeof(Aout) <: typeof(Ain)
@@ -51,4 +27,25 @@ end
 
 function _ofsametype(Ain::AbstractMatrix, Aout::Cholesky)
     typeof(Aout.factors) <: typeof(Ain)
+end
+
+_symmetrise(T, Σ) = Σ
+_symmetrise(T, Σ::AbstractMatrix) = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+
+function _schur(Σ, C)
+    S = C * Σ * C'
+    S = _symmetrise(eltype(S), S)
+    G = Σ * C' / S
+    Π = Σ - G * S * G'
+    Π = _symmetrise(eltype(Π), Π)
+    return S, G, Π
+end
+
+function _schur(Σ, C, R)
+    S = C * Σ * C' + R
+    S = _symmetrise(eltype(S), S)
+    G = Σ * C' / S
+    Π = Σ - G * S * G'
+    Π = _symmetrise(eltype(Π), Π)
+    return S, G, Π
 end

@@ -1,4 +1,4 @@
-function normal_test(T, n, cov_types)
+function normal_test(T, n, cov_types, matrix_types)
     @testset "Normal | AbstractMatrix constructor" begin
         @test_throws DomainError Normal(ones(2), tril(ones(2, 2)))
         @test_throws DomainError Normal(ones(ComplexF64, 2), tril(ones(2, 2)))
@@ -6,8 +6,6 @@ function normal_test(T, n, cov_types)
     end
 
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
-    cov_types = (:HermOrSym, :Cholesky)
-    matrix_types = (:Matrix, :SMatrix)
 
     xp = randn(T, n)
     μ1p = randn(T, n)

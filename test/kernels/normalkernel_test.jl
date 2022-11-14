@@ -1,4 +1,4 @@
-function normalkernel_test(T, affine_types)
+function normalkernel_test(T)
     A = ones(T, 1, 1)
     Σ = x -> diagm(exp.(abs.(x)))
     K = NormalKernel(A, Σ)
@@ -12,7 +12,7 @@ function normalkernel_test(T, affine_types)
     end
 end
 
-function affine_normalkernel_test(T, n, affine_types, cov_types)
+function affine_normalkernel_test(T, n, cov_types, matrix_types)
     @testset "NormalKernel | AbstractMatrix constructor" begin
         @test_throws DomainError NormalKernel(ones(2, 2), tril(ones(2, 2)))
         @test_throws DomainError NormalKernel(ones(ComplexF64, 2, 2), tril(ones(2, 2)))
@@ -22,8 +22,6 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
         )
     end
 
-    covar_types = (:HermOrSym, :Cholesky)
-    matrix_types = (:Matrix, :SMatrix)
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
     Ap = randn(T, n, n)
@@ -32,7 +30,7 @@ function affine_normalkernel_test(T, n, affine_types, cov_types)
     μp = randn(T, n)
     xp = randn(T, n)
 
-    for cov_t in covar_types, matrix_t in matrix_types
+    for cov_t in cov_types, matrix_t in matrix_types
         A = _make_matrix(Ap, matrix_t)
         μ = _make_vector(μp, matrix_t)
         Σ = _make_covp(_make_matrix(Vp, matrix_t), cov_t)

@@ -6,7 +6,7 @@ using Plots
 import LinearAlgebra: HermOrSym
 
 include("matrix_test_utils.jl")
-include("normal_test_utilities.jl")
+#include("normal_test_utilities.jl")
 
 include("covariance_parameter_test.jl")
 
@@ -19,7 +19,7 @@ include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
 include("kernels/compose_test.jl")
 
-include("likelihood_test.jl")
+include("loglike_test.jl")
 
 include("marginalise_test.jl")
 include("invert_test.jl")
@@ -28,22 +28,21 @@ n = 1
 m = 2
 
 etypes = (Float64, Complex{Float64})
-affine_types = (:LinearMap, :AffineMap, :AffineCorrector)
 
-cov_container = (:Matrix, :Diagonal)
-
-cov_types = (:Matrix, :Diagonal, :Cholesky)
+matrix_types = (Matrix, SMatrix)
+affine_types = (LinearMap, AffineMap, AffineCorrector)
+cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
     @testset "CovarianceParameter" begin
         for T in etypes
-            covariance_parameter_test(T)
+            covariance_parameter_test(T, cov_types, matrix_types)
         end
     end
 
     @testset "Distributions" begin
         for T in etypes
-            normal_test(T, n, cov_types)
+            normal_test(T, n, cov_types, matrix_types)
             dirac_test(T, n)
         end
         normal_plotting_test()
@@ -51,39 +50,39 @@ cov_types = (:Matrix, :Diagonal, :Cholesky)
 
     @testset "AffineMaps" begin
         for T in etypes
-            affinemap_test(T, affine_types, n)
+            affinemap_test(T, n, affine_types, matrix_types)
         end
     end
 
     @testset "Kernels" begin
         for T in etypes
-            normalkernel_test(T, affine_types)
-            affine_normalkernel_test(T, n, affine_types, cov_types)
-            dirackernel_test(T, n, affine_types, cov_types)
+            normalkernel_test(T)
+            affine_normalkernel_test(T, n, cov_types, matrix_types)
+            dirackernel_test(T, n, matrix_types)
         end
     end
 
-    @testset "Likelihoods" begin
-        for T in etypes, CT in cov_types
-            likelihood_test(T, n, m, affine_types, CT)
+    @testset "LogLike" begin
+        for T in etypes
+            loglike_test(T, n, m, cov_types, matrix_types)
         end
     end
 
     @testset "compose" begin
-        for T in etypes, CT in cov_types
-            compose_test(T, n, affine_types, CT)
+        for T in etypes
+            compose_test(T, n, cov_types, matrix_types)
         end
     end
 
     @testset "marginalise" begin
-        for T in etypes, CT in cov_types
-            marginalise_test(T, n, m, affine_types, CT)
+        for T in etypes
+            marginalise_test(T, n, m, cov_types, matrix_types)
         end
     end
 
     @testset "invert" begin
-        for T in etypes, CT in cov_types
-            invert_test(T, n, m, affine_types, CT)
+        for T in etypes
+            invert_test(T, n, m, cov_types, matrix_types)
         end
     end
 end
