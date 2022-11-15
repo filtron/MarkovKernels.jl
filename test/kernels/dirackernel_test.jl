@@ -1,4 +1,10 @@
 function dirackernel_test(T, n, matrix_types)
+    @testset "NormalKernel | AbstractMatrix constructor" begin
+        @test mean(DiracKernel(1.0I(2), ones(2))) == AffineMap(1.0I(2), ones(2))
+        @test mean(DiracKernel(1.0I(2), ones(2), zeros(2))) ==
+              AffineCorrector(1.0I(2), ones(2), zeros(2))
+    end
+
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
     Ap = randn(T, n, n)

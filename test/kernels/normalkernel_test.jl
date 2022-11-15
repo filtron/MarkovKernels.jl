@@ -20,6 +20,7 @@ function affine_normalkernel_test(T, n, cov_types, matrix_types)
             ones(ComplexF64, 2, 2),
             Symmetric(diagm(ones(2))),
         )
+        @test mean(NormalKernel(1.0I(2), ones(2), 1.0I(2))) == AffineMap(1.0I(2), ones(2))
     end
 
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)

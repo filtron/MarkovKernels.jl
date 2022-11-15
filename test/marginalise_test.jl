@@ -13,18 +13,47 @@ function marginalise_test(T, n, m, cov_types, matrix_types)
         Q = _make_matrix(Qp, matrix_t)
 
         N = Normal(μ, _make_covp(Σ, cov_t))
+        D = Dirac(μ)
         NK = NormalKernel(A, _make_covp(Q, cov_t))
         DK = DiracKernel(A)
 
-        for kernel in (NK, DK)
-            @testset "marginalise | $(nameof(typeof(N))) | $(nameof(typeof(kernel)))" begin
-                @test mean(marginalise(N, kernel)) ≈ A * μ
-                if typeof(kernel) <: NormalKernel
-                    @test cov(marginalise(N, kernel)) ≈ A * Σ * A' + Q
-                elseif typeof(kernel) <: DiracKernel
-                    @test cov(marginalise(N, kernel)) ≈ A * Σ * A'
-                end
-            end
+        for distribution in (N, D), kernel in (NK, DK)
+            _test_pair_marginalise(distribution, kernel, (μ, Σ), (A, Q))
         end
+    end
+end
+
+function _test_pair_marginalise(D::Normal, K::AffineNormalKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ A * Σ * A' + Q
+    end
+end
+
+function _test_pair_marginalise(D::Normal, K::AffineDiracKernel, P1, P2)
+    μ, Σ = P1
+    A = P2[1]
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ A * Σ * A'
+    end
+end
+
+function _test_pair_marginalise(D::Dirac, K::AffineNormalKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ Q
+    end
+end
+
+function _test_pair_marginalise(D::Dirac, K::AffineDiracKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
     end
 end
