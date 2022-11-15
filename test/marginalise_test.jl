@@ -1,55 +1,59 @@
-function marginalise_test(T, n, m, affine_types, cov_type)
-    dirac_slopes, dirac_intercepts, dirac_amaps =
-        collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
-    dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
+function marginalise_test(T, n, m, cov_types, matrix_types)
+    μp = randn(T, n)
+    Σp = randn(T, n, n)
+    Σp = Σp * Σp'
+    Ap = randn(T, n, n)
+    Qp = randn(T, n, n)
+    Qp = Qp * Qp'
 
-    normal_amaps, kcov_mats, kcov_params, normal_kernels =
-        collect(zip(map(x -> _make_normalkernel(T, n, m, x, cov_type), affine_types)...))
+    for cov_t in cov_types, matrix_t in matrix_types
+        μ = _make_vector(μp, matrix_t)
+        Σ = _make_matrix(Σp, matrix_t)
+        A = _make_matrix(Ap, matrix_t)
+        Q = _make_matrix(Qp, matrix_t)
 
-    dirac = Dirac(randn(T, m))
+        N = Normal(μ, _make_covp(Σ, cov_t))
+        D = Dirac(μ)
+        NK = NormalKernel(A, _make_covp(Q, cov_t))
+        DK = DiracKernel(A)
 
-    μ, ncovm, ncov_params, D = _make_normal(T, m, cov_type)
-
-    for j in 1:length(normal_kernels)
-        K = normal_kernels[j]
-        kcovm = kcov_mats[j]
-        F = normal_amaps[j]
-        @testset "marginalise | $(typeof(D)) | $(typeof(K))" begin
-            @test mean(marginalise(D, K)) ≈ F(μ)
-            @test cov(marginalise(D, K)) ≈ slope(F) * ncovm * slope(F)' + kcovm
+        for distribution in (N, D), kernel in (NK, DK)
+            _test_pair_marginalise(distribution, kernel, (μ, Σ), (A, Q))
         end
     end
+end
 
-    for j in 1:length(dirac_kernels)
-        K = dirac_kernels[j]
-        F = dirac_amaps[j]
-        @testset "marginalise | $(typeof(D)) | $(typeof(K))" begin
-            @test mean(marginalise(D, K)) ≈ F(μ)
-            @test cov(marginalise(D, K)) ≈ slope(F) * ncovm * slope(F)'
-        end
+function _test_pair_marginalise(D::Normal, K::AffineNormalKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ A * Σ * A' + Q
     end
+end
 
-    for j in 1:length(normal_kernels)
-        D = dirac
-        μ = mean(D)
-
-        K = normal_kernels[j]
-        kcovm = kcov_mats[j]
-        F = normal_amaps[j]
-        @testset "marginalise | $(typeof(D)) | $(typeof(K))" begin
-            @test mean(marginalise(D, K)) ≈ F(μ)
-            @test cov(marginalise(D, K)) ≈ kcovm
-        end
+function _test_pair_marginalise(D::Normal, K::AffineDiracKernel, P1, P2)
+    μ, Σ = P1
+    A = P2[1]
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ A * Σ * A'
     end
+end
 
-    for j in 1:length(dirac_kernels)
-        D = dirac
-        μ = mean(D)
+function _test_pair_marginalise(D::Dirac, K::AffineNormalKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
+        @test cov(marginalise(D, K)) ≈ Q
+    end
+end
 
-        K = dirac_kernels[j]
-        F = dirac_amaps[j]
-        @testset "marginalise | $(typeof(D)) | $(typeof(K))" begin
-            @test mean(marginalise(D, K)) ≈ F(μ)
-        end
+function _test_pair_marginalise(D::Dirac, K::AffineDiracKernel, P1, P2)
+    μ, Σ = P1
+    A, Q = P2
+    @testset "marginalise | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test mean(marginalise(D, K)) ≈ A * μ
     end
 end

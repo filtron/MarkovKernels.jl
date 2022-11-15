@@ -1,61 +1,39 @@
-function compose_test(T, n, affine_types, cov_type)
-    dirac_slopes, dirac_intercepts, dirac_amaps =
-        collect(zip(map(x -> _make_affinemap(T, n, n, x), affine_types)...))
-    dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
+function compose_test(T, n, cov_types, matrix_types)
+    A1p = randn(T, n, n)
+    A2p = randn(T, n, n)
+    V1p = randn(T, n, n)
+    V1p = V1p * V1p'
+    V2p = randn(T, n, n)
+    V2p = V2p * V2p'
+    xp = randn(T, n)
 
-    normal_amaps, cov_mats, cov_params, normal_kernels =
-        collect(zip(map(x -> _make_normalkernel(T, n, n, x, cov_type), affine_types)...))
+    for cov_t in cov_types, matrix_t in matrix_types
+        A1 = _make_matrix(A1p, matrix_t)
+        A2 = _make_matrix(A2p, matrix_t)
+        Σ1 = _make_matrix(V1p, matrix_t)
+        Σ2 = _make_matrix(V2p, matrix_t)
+        x = _make_vector(xp, matrix_t)
 
-    x = randn(T, n)
+        NK1 = NormalKernel(A1, _make_covp(Σ1, cov_t))
+        NK2 = NormalKernel(A2, _make_covp(Σ2, cov_t))
 
-    for i in 1:length(dirac_kernels), j in 1:length(dirac_kernels)
-        K2 = dirac_kernels[j]
-        F2 = dirac_amaps[j]
-        K1 = dirac_kernels[i]
-        F1 = dirac_amaps[i]
+        DK1 = DiracKernel(A1)
+        DK2 = DiracKernel(A2)
 
-        @testset "compose | $(typeof(K2)) | $(typeof(K1))" begin
-            @test mean(compose(K2, K1)) == compose(F2, F1)
-            @test mean(compose(K1, K2)) == compose(F1, F2)
-        end
-    end
+        kernel_pairs = ((NK1, NK2), (NK1, DK2), (DK1, NK2), (DK1, DK2))
 
-    for i in 1:length(normal_kernels), j in 1:length(dirac_kernels)
-        K2 = dirac_kernels[j]
-        F2 = dirac_amaps[j]
-        K1 = normal_kernels[i]
-        F1 = normal_amaps[i]
-        cov_mat1 = cov_mats[i]
-        @testset "compose | $(typeof(K2)) | $(typeof(K1))" begin
-            @test mean(compose(K2, K1)) == compose(F2, F1)
-            @test cov(condition(compose(K2, K1), x)) ≈
-                  slope(mean(K2)) * cov_mat1 * slope(mean(K2))'
-        end
-    end
+        for kernels in kernel_pairs
+            K1, K2 = kernels
+            @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
+                @test mean(compose(K2, K1)) == compose(LinearMap(A2), LinearMap(A1))
 
-    for i in 1:length(dirac_kernels), j in 1:length(normal_kernels)
-        K1 = dirac_kernels[i]
-        F1 = dirac_amaps[i]
-        K2 = normal_kernels[j]
-        F2 = normal_amaps[j]
-        cov_mat2 = cov_mats[j]
-        @testset "compose | $(typeof(K2)) | $(typeof(K1))" begin
-            @test mean(compose(K2, K1)) == compose(F2, F1)
-            @test cov(condition(compose(K2, K1), x)) ≈ cov_mat2
-        end
-    end
-
-    for i in 1:length(normal_kernels), j in 1:length(normal_kernels)
-        K1 = normal_kernels[i]
-        F1 = normal_amaps[i]
-        cov_mat1 = cov_mats[i]
-        K2 = normal_kernels[j]
-        F2 = normal_amaps[j]
-        cov_mat2 = cov_mats[j]
-        @testset "compose | $(typeof(K2)) | $(typeof(K1))" begin
-            @test mean(compose(K2, K1)) == compose(F2, F1)
-            @test cov(condition(compose(K2, K1), x)) ≈
-                  slope(mean(K2)) * cov_mat1 * slope(mean(K2))' + cov_mat2
+                if all(typeof.(kernels) .<: NormalKernel)
+                    @test cov(condition(compose(K2, K1), x)) ≈
+                          slope(mean(K2)) * Σ1 * slope(mean(K2))' + Σ2
+                elseif typeof(K1) <: DiracKernel && typeof(K2) <: NormalKernel
+                    @test cov(condition(compose(K2, K1), x)) ≈ Σ2
+                end
+            end
         end
     end
 end

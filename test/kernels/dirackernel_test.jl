@@ -1,12 +1,20 @@
-function dirackernel_test(T, n, affine_types, cov_types)
-    for at in affine_types
-        slope, intercept, F = _make_affinemap(T, n, n, at)
-        K = DiracKernel(F)
-        x = randn(T, n)
+function dirackernel_test(T, n, matrix_types)
+    @testset "NormalKernel | AbstractMatrix constructor" begin
+        @test mean(DiracKernel(1.0I(2), ones(2))) == AffineMap(1.0I(2), ones(2))
+        @test mean(DiracKernel(1.0I(2), ones(2), zeros(2))) ==
+              AffineCorrector(1.0I(2), ones(2), zeros(2))
+    end
 
-        eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
+    eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
-        @testset "AffineDiracKernel | Unary | $(T) | $(at)" begin
+    Ap = randn(T, n, n)
+    xp = randn(T, n)
+
+    for matrix_t in matrix_types
+        A = _make_matrix(Ap, matrix_t)
+        x = _make_vector(xp, matrix_t)
+        K = DiracKernel(A)
+        @testset "AffineDiracKernel | Unary | $(T)" begin
             @test_nowarn repr(K)
             @test eltype(K) == T
             @test typeof(K) <: AffineDiracKernel
@@ -18,8 +26,8 @@ function dirackernel_test(T, n, affine_types, cov_types)
                       DiracKernel{U}(K)
                 @test eltype(AbstractDiracKernel{U}(K)) == U
             end
-            @test mean(K)(x) == F(x)
-            @test condition(K, x) == Dirac(F(x))
+            @test mean(K)(x) == A * x
+            @test condition(K, x) == Dirac(A * x)
             @test eltype(rand(K, x)) == T
         end
     end

@@ -1,29 +1,31 @@
-function invert_test(T, n, m, affine_types, cov_type)
-    dirac_slopes, dirac_intercepts, dirac_amaps =
-        collect(zip(map(x -> _make_affinemap(T, n, m, x), affine_types)...))
-    dirac_kernels = collect(map(x -> DiracKernel(x), dirac_amaps))
+function invert_test(T, n, m, cov_types, matrix_types)
+    μp = randn(T, m)
+    Σp = randn(T, m, m)
+    Σp = Σp * Σp'
+    Ap = randn(T, n, m)
+    Rp = randn(T, n, n)
+    Rp = Rp * Rp'
 
-    normal_amaps, kcov_mats, kcov_params, normal_kernels =
-        collect(zip(map(x -> _make_normalkernel(T, n, m, x, cov_type), affine_types)...))
+    yp = randn(T, n)
 
-    μ, ncovm, ncov_params, D = _make_normal(T, m, cov_type)
+    for cov_t in cov_types, matrix_t in matrix_types
+        μ = _make_vector(μp, matrix_t)
+        Σ = _make_matrix(Σp, matrix_t)
+        A = _make_matrix(Ap, matrix_t)
+        R = _make_matrix(Rp, matrix_t)
+        y = _make_vector(yp, matrix_t)
 
-    for j in 1:length(normal_kernels)
-        ncovm
+        N = Normal(μ, _make_covp(Σ, cov_t))
+        NK = NormalKernel(A, _make_covp(R, cov_t))
+        DK = DiracKernel(A)
 
-        K = normal_kernels[j]
-        kcovm = kcov_mats[j]
-        F = normal_amaps[j]
+        S, G, Π = _schur(Σ, A, R)
+        Ngt = Normal(A * μ, S)
+        Kgt = NormalKernel(G, μ, A * μ, Π)
 
-        NC, KC = invert(D, K)
-        y = randn(T, n)
+        NC, KC = invert(N, NK)
 
-        S, G, Π = _schur(ncovm, slope(F), kcovm) # _schur should not return pred
-        pred = F(μ)
-        Ngt = Normal(pred, S)
-        Kgt = NormalKernel(G, μ, pred, Π)
-
-        @testset "invert | $(typeof(D)) | $(typeof(K))" begin
+        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(NK)))" begin
             @test mean(NC) ≈ mean(Ngt)
             @test cov(NC) ≈ cov(Ngt)
 
@@ -32,21 +34,14 @@ function invert_test(T, n, m, affine_types, cov_type)
             @test cov(condition(KC, y)) ≈ cov(condition(Kgt, y))
             @test mean(condition(KC, y)) ≈ mean(condition(Kgt, y))
         end
-    end
 
-    for j in 1:length(dirac_kernels)
-        K = dirac_kernels[j]
-        F = dirac_amaps[j]
+        S, G, Π = _schur(Σ, A)
+        Ngt = Normal(A * μ, S)
+        Kgt = NormalKernel(G, μ, A * μ, Π)
 
-        NC, KC = invert(D, K)
-        y = randn(T, n)
+        NC, KC = invert(N, DK)
 
-        S, G, Π = _schur(ncovm, slope(F))
-        pred = F(μ)
-        Ngt = Normal(pred, S)
-        Kgt = NormalKernel(G, μ, pred, Π)
-
-        @testset "invert | $(typeof(D)) | $(typeof(K))" begin
+        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(DK)))" begin
             @test mean(NC) ≈ mean(Ngt)
             @test cov(NC) ≈ cov(Ngt)
 
