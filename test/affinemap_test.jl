@@ -25,10 +25,10 @@ function affinemap_test(T, n, affine_types, matrix_types)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
 
-                for U in Us
-                    eltype(AbstractAffineMap{U}(F)) == U
-                    convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)
-                end
+            for U in Us
+                eltype(AbstractAffineMap{U}(F)) == U
+                convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)
+            end
             @test AbstractAffineMap{T}(F) == F
             @test convert(AbstractAffineMap{T}, F) == F
             @test slope(F) == A
