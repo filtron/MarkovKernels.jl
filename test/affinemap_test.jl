@@ -9,16 +9,26 @@ function affinemap_test(T, n, affine_types, matrix_types)
     for affine_t in affine_types, matrix_t in matrix_types
         A, b, c = to_affine_parameters(A1p, b1p, c1p, affine_t, matrix_t)
         F = to_affine_map(A, b, c, affine_t)
+
+        if affine_t == LinearMap
+            @test_nowarn (At,) = F
+        elseif affine_t == AffineMap
+            @test_nowarn (At, bt) = F
+        elseif affine_t == AffineCorrector
+            @test_nowarn (At, bt, ct) = F
+        end
+
         x = _make_vector(xp, matrix_t)
 
         @testset "AffineMap | Unary | $(T) | $(affine_t) | $(matrix_t)" begin
             @test_nowarn repr(F)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
-            for U in Us
-                eltype(AbstractAffineMap{U}(F)) == U
-                convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)
-            end
+
+                for U in Us
+                    eltype(AbstractAffineMap{U}(F)) == U
+                    convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)
+                end
             @test AbstractAffineMap{T}(F) == F
             @test convert(AbstractAffineMap{T}, F) == F
             @test slope(F) == A
