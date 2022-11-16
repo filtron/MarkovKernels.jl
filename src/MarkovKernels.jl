@@ -29,6 +29,7 @@ export AbstractDistribution, AbstractMarkovKernel, AbstractLogLike
 include("distributions/normal.jl")  # normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
 include("distributions/dirac.jl") # dirac distributions
+include("distributions/mixture.jl")
 export AbstractNormal,
     Normal,
     dim,
@@ -42,7 +43,11 @@ export AbstractNormal,
     entropy,
     kldivergence,
     AbstractDirac,
-    Dirac
+    Dirac,
+    AbstractMixture,
+    Mixture,
+    weights,
+    components
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels

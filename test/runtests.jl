@@ -6,13 +6,13 @@ using Plots
 import LinearAlgebra: HermOrSym
 
 include("matrix_test_utils.jl")
-#include("normal_test_utilities.jl")
 
 include("covariance_parameter_test.jl")
 
 include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
 include("distributions/normal_plotting_test.jl")
+include("distributions/mixture_test.jl")
 
 include("affinemap_test.jl")
 include("kernels/normalkernel_test.jl")
@@ -44,6 +44,7 @@ cov_types = (HermOrSym, Cholesky)
         for T in etypes
             normal_test(T, n, cov_types, matrix_types)
             dirac_test(T, n)
+            mixture_test()
         end
         normal_plotting_test()
     end
