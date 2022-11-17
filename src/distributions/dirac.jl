@@ -12,15 +12,21 @@ Type for representing Dirac random vectors taking values in T.
 """
 struct Dirac{T,U} <: AbstractDirac{T}
     μ::U
-    Dirac{T}(μ) where {T} = new{T,typeof(μ)}(μ)
 end
 
 """
-    Dirac(μ::AbstractVector)
+    Dirac(μ::AbstractVector{<:Number})
 
-Creates a Dirac distribution with mean vector μ.
+Creates a vector-valued Dirac distribution with mean vector μ.
 """
-Dirac(μ::AbstractVector) = Dirac{eltype(μ)}(μ)
+Dirac(μ::AbstractVector{T}) where {T<:Number} = Dirac{T,typeof(μ)}(μ)
+
+"""
+    Dirac(μ::AbstractVector{<:AbstractVector{T}}) where {T<:Number}
+
+Creates a trajectory-valued Dirac distribution with mean trajectory μ
+"""
+Dirac(μ::AbstractVector{<:AbstractVector{T}}) where {T<:Number} = Dirac{T,typeof(μ)}(μ)
 
 """
     Dirac{T}(D::Dirac{U,V})
@@ -28,12 +34,25 @@ Dirac(μ::AbstractVector) = Dirac{eltype(μ)}(μ)
 Computes a Dirac distribution of eltype T from the Dirac distribution D if T and U are compatible.
 That is T and U must both be Real or both be Complex.
 """
-Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector} =
-    T <: Real && U <: Real || T <: Complex && U <: Complex ?
-    Dirac(convert(AbstractVector{T}, D.μ)) :
-    error(
-        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
-    )
+function Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector}
+    if T <: Real && U <: Real || T <: Complex && U <: Complex
+        Dirac(convert(AbstractVector{T}, D.μ))
+    else
+        error(
+            "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
+        )
+    end
+end
+
+function Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector{<:AbstractVector}}
+    if T <: Real && U <: Real || T <: Complex && U <: Complex
+        Dirac(convert.(AbstractVector{T}, D.μ))
+    else
+        error(
+            "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
+        )
+    end
+end
 
 AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
