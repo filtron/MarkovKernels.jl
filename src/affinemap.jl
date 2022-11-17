@@ -98,12 +98,6 @@ Type for representing affine maps with zero intercept.
 """
 struct LinearMap{T,U} <: AbstractAffineMap{T}
     A::U
-    LinearMap{T,U}(A) where {T,U} = new{T,U}(A)
-end
-
-function LinearMap{T}(A::AbstractMatrix) where {T}
-    A = convert(AbstractMatrix{T}, A)
-    LinearMap{T,typeof(A)}(A)
 end
 
 """
