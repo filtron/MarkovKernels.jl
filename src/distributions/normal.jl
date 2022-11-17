@@ -5,9 +5,6 @@ Abstract type for representing Normal distributed random vectors taking values i
 """
 abstract type AbstractNormal{T} <: AbstractDistribution{T} end
 
-==(N1::T, N2::T) where {T<:AbstractNormal} =
-    all(f -> getfield(N1, f) == getfield(N2, f), 1:nfields(N1))
-
 """
     Normal{T,U,V}
 

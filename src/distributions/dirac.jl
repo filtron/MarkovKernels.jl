@@ -5,9 +5,6 @@ Abstract type for representing Dirac random vectors taking values in T.
 """
 abstract type AbstractDirac{T} <: AbstractDistribution{T} end
 
-==(D1::T, D2::T) where {T<:AbstractDirac} =
-    all(f -> getfield(D1, f) == getfield(D2, f), 1:nfields(D1))
-
 """
     Dirac{T<:Number}
 

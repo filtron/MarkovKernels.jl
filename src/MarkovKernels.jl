@@ -14,16 +14,7 @@ export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercep
 include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
 
-abstract type AbstractDistribution{T<:Number} end
-
-eltype(::AbstractDistribution{T}) where {T} = T
-
-abstract type AbstractMarkovKernel{T<:Number} end
-
-eltype(::AbstractMarkovKernel{T}) where {T} = T
-
-abstract type AbstractLogLike end
-
+include("general.jl")
 export AbstractDistribution, AbstractMarkovKernel, AbstractLogLike
 
 include("distributions/normal.jl")  # normal distributions
@@ -62,9 +53,9 @@ export AbstractNormalKernel,
 include("likelihoods.jl") # defines observation likelihoods
 export LogLike, measurement_model, measurement, bayes_rule
 
-include("kernels/compose.jl")
-include("marginalise.jl")
-include("invert.jl")
+include("binary_operations/compose.jl")
+include("binary_operations/marginalise.jl")
+include("binary_operations/invert.jl")
 export compose, marginalise, invert
 
 include("matrix_utils.jl") # helper functions
