@@ -11,8 +11,5 @@ marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} =
 marginalise(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
     Normal(mean(K)(mean(N)), stein(covp(N), mean(K)))
 
-marginalise(D::AbstractDirac{T}, K::AffineNormalKernel{T}) where {T} =
-    Normal(mean(K)(mean(D)), covp(K))
-
-marginalise(D::AbstractDirac{T}, K::AbstractDiracKernel{T}) where {T} =
-    Dirac(mean(K)(mean(D)))
+marginalise(D::AbstractDirac{T}, K::AbstractMarkovKernel{T}) where {T} =
+    condition(K, mean(D))

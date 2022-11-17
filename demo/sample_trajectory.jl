@@ -1,8 +1,6 @@
 using MarkovKernels
 using Plots, Random
 
-rng = MersenneTwister(1991)
-
 # time grid
 m = 200
 T = 5
