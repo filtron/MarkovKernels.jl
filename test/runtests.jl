@@ -17,12 +17,11 @@ include("distributions/mixture_test.jl")
 include("affinemap_test.jl")
 include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
-include("kernels/compose_test.jl")
 
 include("loglike_test.jl")
-
-include("marginalise_test.jl")
-include("invert_test.jl")
+include("binary_operations/compose_test.jl")
+include("binary_operations/marginalise_test.jl")
+include("binary_operations/invert_test.jl")
 
 n = 1
 m = 2

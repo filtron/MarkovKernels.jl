@@ -5,9 +5,6 @@ Abstract type for representing Dirac kernels taking values in T.
 """
 abstract type AbstractDiracKernel{T} <: AbstractMarkovKernel{T} end
 
-==(K1::T, K2::T) where {T<:AbstractDiracKernel} =
-    all(f -> getfield(K1, f) == getfield(K2, f), 1:nfields(K1))
-
 """
     DiracKernel
 
