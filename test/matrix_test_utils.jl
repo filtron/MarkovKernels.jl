@@ -33,12 +33,6 @@ function _ofsametype(Ain::AbstractMatrix, Aout::SubArray)
     _subarray_type(Aout) <: typeof(Ain)
 end
 
-#=
-function _ofsametype(Ain::AbstractMatrix, Aout::Cholesky)
-    typeof(Aout.factors) <: typeof(Ain)
-end
-=#
-
 _symmetrise(T, Σ) = Σ
 _symmetrise(T, Σ::AbstractMatrix) = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
 
