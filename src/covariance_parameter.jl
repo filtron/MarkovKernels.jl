@@ -12,8 +12,8 @@ convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
 Computes a square matrix L such that A = L*L'.
 L need not be a Cholesky factor.
 """
-lsqrt(C::Cholesky) = C.L
-lsqrt(A::HermOrSym) = cholesky(A).L
+lsqrt(C::Cholesky) = C.uplo == "L" ? C.L : C.U'
+lsqrt(A::HermOrSym) = lsqrt(cholesky(A))
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
