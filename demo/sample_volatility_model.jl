@@ -11,7 +11,7 @@ ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
 # define transtion kernel
-λ = 1.0
+λ = 2.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
@@ -23,13 +23,17 @@ init = Normal(zeros(2), 1.0I(2))
 xs = sample(rng, init, fw_kernel, m - 1)
 
 # output kernel
-σ = 0.1
+σ = 1.0
 C = σ / sqrt(2) * [1.0 -1.0]
-variance(x) = fill(exp.(C * x)[1], 1, 1)
-output_kernel = NormalKernel(zeros(1, 2), variance)
+
+output_kernel = DiracKernel(C)
+
+variance(x) = fill(exp.(x)[1], 1, 1)
+m_kernel = compose(NormalKernel(zeros(1, 1), variance), output_kernel)
 
 # sample output
 outs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
+ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 
 state_plt = plot(
     ts,
@@ -43,3 +47,8 @@ display(state_plt)
 
 output_plot = plot(ts, outs, label = "output", xlabel = "t")
 display(output_plot)
+
+mplot = scatter(ts, ys, label = "measurement", color = "black")
+display(mplot)
+
+stdplot = plot(ts, exp.(outs / 2.0))
