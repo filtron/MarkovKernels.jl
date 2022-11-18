@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterfaceCore, Statistics, Random, RecipesBase
+using LinearAlgebra, ArrayInterfaceCore, Statistics, Random, RecipesBase, StatsBase
 
 import Base: *, +, eltype, length, size, log, ==, similar, convert, show
 
@@ -38,17 +38,22 @@ export AbstractNormal,
     AbstractMixture,
     Mixture,
     weights,
+    ncomponents,
     components
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
+include("kernels/resampling.jl")
 export AbstractNormalKernel,
     NormalKernel,
     AffineNormalKernel,
     condition,
     AbstractDiracKernel,
     DiracKernel,
-    AffineDiracKernel
+    AffineDiracKernel,
+    ResamplingMethod,
+    MultinomialResampler
+
 
 include("likelihoods.jl") # defines observation likelihoods
 export LogLike, measurement_model, measurement, bayes_rule

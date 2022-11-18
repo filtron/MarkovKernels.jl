@@ -52,3 +52,27 @@ mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
 stdplot = plot(ts, exp.(outs / 2.0))
+
+
+P = 5
+
+function initialize_particle_filter(rng::AbstractRNG, y::AbstractVector, init::AbstractDistribution, m_kernel::AbstractMarkovKernel, P::Int)
+
+    L = LogLike(m_kernel, y)
+    xs = [[rand(rng, init)] for p in P]
+    ws = L.(last.(xs))
+    ws = ws - max(ws)
+
+    return  Mixture(exp(ws), Dirac.(xs))
+
+end
+
+function particle_filter(rng::AbstractRNG, ys::AbstractVecOrMat, init::AbstractDistribution, fw_kernel::AbstractMarkovKernel, m_kernel::AbstractMarkovKernel)
+
+    n = size(ys, 1)
+
+
+
+end
+
+

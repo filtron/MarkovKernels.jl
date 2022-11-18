@@ -2,7 +2,7 @@
 """
     AbstractMixture <: AbstractDistribution
 
-Abstract type for representing mixture distributions 
+Abstract type for representing mixture distributions
 """
 
 abstract type AbstractMixture{T,U<:AbstractDistribution} <: AbstractDistribution{T} end
@@ -20,9 +20,12 @@ function Mixture(
 end
 
 weights(M::Mixture) = M.weights
+ncomponents(M::Mixture) = length(weights(M))
 components(M::Mixture) = M.dists
 
 mean(M::Mixture) = reduce(hcat, mean.(components(M))) * weights(M)
+
+cov(M::Mixture{T,<:Dirac}) where {T} = _covmean(M)
 
 function cov(M::Mixture)
     W = diagm(weights(M))
@@ -30,4 +33,10 @@ function cov(M::Mixture)
     covmean = ΔX * W * ΔX'
     meancov = sum(cov.(components(M)) .* weights(M))
     return covmean + meancov
+end
+
+function _covmean(M::Mixture)
+    W = diagm(weights(M))
+    ΔX = reduce(hcat, mean.(components(M))) .- mean(M)
+    return ΔX * W * ΔX'
 end
