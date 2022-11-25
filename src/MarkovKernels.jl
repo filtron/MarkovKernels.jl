@@ -2,7 +2,7 @@ module MarkovKernels
 
 using LinearAlgebra, ArrayInterfaceCore, Statistics, Random, RecipesBase, StatsBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, convert, show
+import Base: *, +, eltype, length, size, log, ==, similar, convert, show, copy
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
@@ -53,7 +53,6 @@ export AbstractNormalKernel,
     AffineDiracKernel,
     ResamplingMethod,
     MultinomialResampler
-
 
 include("likelihoods.jl") # defines observation likelihoods
 export LogLike, measurement_model, measurement, bayes_rule
