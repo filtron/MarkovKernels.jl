@@ -13,7 +13,8 @@ function initialize_particle_filter(
     ws = exp.(logws)
     ws = ws / sum(ws)
 
-    return Mixture(ws, Dirac.(xs))
+    #return Mixture(ws, Dirac.(xs))
+    return rand(rng, MultinomialResampler(), Mixture(ws, Dirac.(xs)))
 end
 
 function particle_filter(
@@ -28,7 +29,6 @@ function particle_filter(
 
     particles = initialize_particle_filter(rng, ys[1, :], init, m_kernel, P)
 
-    dists = typeof(components(particles))
     logws = similar(weights(particles))
 
     for m in 2:n
