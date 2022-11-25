@@ -6,7 +6,7 @@ import Base: *, +, eltype, length, size, log, ==, similar, convert, show
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
-import Random: rand, GLOBAL_RNG
+import Random: rand, rand!, GLOBAL_RNG
 
 include("affinemap.jl") # define affine maps to use as conditional means
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
