@@ -1,5 +1,5 @@
 using MarkovKernels
-using Plots, Random
+using Plots, Random, LinearAlgebra, IterTools
 
 # time grid
 m = 200
