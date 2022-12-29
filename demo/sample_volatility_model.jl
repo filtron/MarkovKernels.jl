@@ -1,5 +1,6 @@
 using MarkovKernels
 using Plots, Random
+using IterTools
 
 rng = MersenneTwister(1991)
 
@@ -7,12 +8,12 @@ include("sampling_implementation.jl")
 include("pf_implementation.jl")
 # time grid
 m = 50
-T = 1
+T = 10
 ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
 # define transtion kernel
-λ = 5.0
+λ = 1.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
@@ -24,7 +25,7 @@ init = Normal(zeros(2), 1.0I(2))
 xs = sample(rng, init, fw_kernel, m - 1)
 
 # output kernel
-σ = 1.0
+σ = 5.0
 C = σ / sqrt(2) * [1.0 -1.0]
 
 output_kernel = DiracKernel(C)
@@ -40,12 +41,13 @@ mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
 stdplot = plot(ts, exp.(outs / 2.0))
+display(stdplot)
 
-P = 1000
+P = 2000
 
 particles = particle_filter(rng, ys, init, fw_kernel, m_kernel, P)
 
-state_plt2 = plot(
+state_plt = plot(
     ts,
     xs,
     layout = (2, 1),
@@ -53,20 +55,12 @@ state_plt2 = plot(
     labels = ["x1" "x2"],
     title = ["Latent Gauss-Markov process" ""],
 )
-plot!(ts, mapreduce(permutedims, vcat, mean(particles)), color = "black")
 for p in 1:P
-    plot!(
-        ts,
-        mapreduce(permutedims, vcat, mean(components(particles)[p])),
-        color = "black",
-        alpha = 0.05,
-        label = "",
-    )
+    plot!(ts, components(particles)[p], color = "black", alpha = 0.025, label = "")
 end
-display(state_plt2)
+display(state_plt)
 
 output_plot2 = plot(ts, outs, label = "output", xlabel = "t")
-plot!(ts, mapreduce(permutedims, vcat, mean(particles)) * C', color = "black")
 for p in 1:P
     plot!(
         ts,
@@ -76,5 +70,4 @@ for p in 1:P
         label = "",
     )
 end
-
 display(output_plot2)

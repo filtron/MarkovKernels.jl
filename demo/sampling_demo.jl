@@ -16,7 +16,7 @@ T = 5
 ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
-# define transtion kernel
+# transtion kernel
 λ = 2.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]

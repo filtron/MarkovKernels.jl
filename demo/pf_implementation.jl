@@ -45,16 +45,6 @@ function particle_filter(
             push!(components(particles)[p].μ, xnew)
 
             logws[p] = weights(particles)[p] + L(xnew)
-
-            #=
-            logws[:] = log.(weights(particles))
-            mcurr = copy(mean(components(particles)[p]))
-            mcont = rand(rng, fw_kernel, last(mcurr))
-
-            m = push!(mcurr, mcont)
-            dists[p] = Dirac(m)
-            =#
-
         end
         logws = logws .- maximum(logws)
         ws = exp.(logws)
