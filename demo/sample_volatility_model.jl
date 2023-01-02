@@ -43,9 +43,11 @@ display(mplot)
 stdplot = plot(ts, exp.(outs / 2.0))
 display(stdplot)
 
-P = 2000
+P = 5000
 
 particles = particle_filter(rng, ys, init, fw_kernel, m_kernel, P)
+
+aval = 0.0075
 
 state_plt = plot(
     ts,
@@ -56,18 +58,18 @@ state_plt = plot(
     title = ["Latent Gauss-Markov process" ""],
 )
 for p in 1:P
-    plot!(ts, components(particles)[p], color = "black", alpha = 0.025, label = "")
+    plot!(ts, components(particles)[p], color = "black", alpha = aval, label = "")
 end
 display(state_plt)
 
-output_plot2 = plot(ts, outs, label = "output", xlabel = "t")
+output_plot = plot(ts, outs, label = "output", xlabel = "t", title = "log-variance")
 for p in 1:P
     plot!(
         ts,
         mapreduce(permutedims, vcat, mean(components(particles)[p])) * C',
         color = "black",
-        alpha = 0.05,
+        alpha = aval,
         label = "",
     )
 end
-display(output_plot2)
+display(output_plot)

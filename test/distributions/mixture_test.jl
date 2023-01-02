@@ -14,7 +14,9 @@ function mixture_test()
     meancov = ws[1] * Σ1 + ws[2] * Σ2
 
     @testset "Mixture" begin
+        @test ncomponents(M1) == 2
         @test mean(M1) ≈ mean(M2) ≈ m
         @test cov(M1) ≈ meancov + covmean
+        @test cov(M2) ≈ covmean
     end
 end
