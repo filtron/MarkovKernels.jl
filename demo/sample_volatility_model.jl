@@ -43,7 +43,7 @@ display(mplot)
 stdplot = plot(ts, exp.(outs / 2.0))
 display(stdplot)
 
-P = 5000
+P = 1000
 
 particles = particle_filter(rng, ys, init, fw_kernel, m_kernel, P)
 
