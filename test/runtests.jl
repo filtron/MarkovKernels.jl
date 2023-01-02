@@ -69,6 +69,19 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "compose" begin
+        C = [1.0 -1.0]
+        K1 = DiracKernel(C)
+        variance(x) = fill(exp.(x)[1], 1, 1)
+        K2 = NormalKernel(zeros(1, 1), variance)
+
+        @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
+            m_kernel = compose(K2, K1)
+            x = randn(2)
+
+            @test mean(m_kernel)(x) ≈ zeros(1)
+            @test cov(m_kernel)(x) ≈ variance(C * x)
+        end
+
         for T in etypes
             compose_test(T, n, cov_types, matrix_types)
         end
