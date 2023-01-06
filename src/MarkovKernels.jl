@@ -40,7 +40,9 @@ export AbstractNormal,
     Mixture,
     weights,
     ncomponents,
-    components
+    components, 
+    AbstractParticleSystem,
+    ParticleSystem
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels

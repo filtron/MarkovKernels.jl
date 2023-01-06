@@ -7,7 +7,7 @@ rng = MersenneTwister(1991)
 include("sampling_implementation.jl")
 include("pf_implementation.jl")
 # time grid
-m = 50
+m = 100
 T = 10
 ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
@@ -40,10 +40,7 @@ ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
-stdplot = plot(ts, exp.(outs / 2.0))
-display(stdplot)
-
-P = 1000
+P = 5000
 
 particles = particle_filter(rng, ys, init, fw_kernel, m_kernel, P)
 
