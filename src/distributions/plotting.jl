@@ -6,3 +6,14 @@
 
     return values
 end
+
+
+@recipe function f(
+    ::Type{T},
+    ns::T,
+) where {T<:ParticleSystem{<:Number,<:AbstractVector}}
+
+    values = mapreduce(permutedims, vcat, particles.(ns))
+
+    return values
+end

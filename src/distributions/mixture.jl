@@ -44,36 +44,37 @@ end
 """
     AbstractParticleSystem{T} <: AbstractDistribution{T}
 
-Abstract type for representing systems of particles. 
+Abstract type for representing systems of particles.
 """
-abstract type AbstractParticleSystem{T} <: AbstractDistribution{T} end 
+abstract type AbstractParticleSystem{T} <: AbstractDistribution{T} end
 
 """
     ParticleSystem{T,A,B} <: AbstractParticleSystem{T}
 
-Type for representing a standard particle system. 
+Type for representing a standard particle system.
 """
 struct ParticleSystem{T,A,B} <: AbstractParticleSystem{T}
-    weights::A 
+    logws::A
     X::B
 end
 
-# constructor for time marginals 
-# X::AbstractMatrix -> trajectories 
+# constructor for time marginals
+# X::AbstractMatrix -> trajectories
 # X::AbstractVector -> time marginals
 function ParticleSystem(
-    weights::AbstractVector{<:Real},
+    logws::AbstractVector{<:Real},
     X::AbstractArray{<:AbstractVector{T}}
     ) where {T}
     # check dimension match
-    return ParticleSystem{T,typeof(weights),typeof(X)}(weights, X)
+    return ParticleSystem{T,typeof(logws),typeof(X)}(logws, X)
 end
 
-weights(P::ParticleSystem) = P.weights
-nparticles(P::ParticleSystem) = length(weights(P))
-particles(P::ParticleSystem) = P.X 
+logweights(P::ParticleSystem) = P.logws
+weights(P::ParticleSystem) = exp.(logweights(P))
+nparticles(P::ParticleSystem) = length(logweights(P))
+particles(P::ParticleSystem) = P.X
 
-mean(P::ParticleSystem) = reduce(hcat, P.X) * weights(P)
+mean(P::ParticleSystem) = reduce(hcat, P.X) * exp.(logweights(P))
 
 #update_weights!(P::ParticleSystem, )
 #rand!(P::ParticleSystem, K::MarkovKernel)

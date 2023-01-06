@@ -3,6 +3,7 @@ module MarkovKernels
 using LinearAlgebra, ArrayInterfaceCore, Statistics, Random, RecipesBase, StatsBase
 
 import Base: *, +, eltype, length, size, log, ==, similar, convert, show, copy
+import StatsBase: weights
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
@@ -38,9 +39,12 @@ export AbstractNormal,
     Dirac,
     AbstractMixture,
     Mixture,
+    logweights,
     weights,
+    particles,
+    nparticles,
     ncomponents,
-    components, 
+    components,
     AbstractParticleSystem,
     ParticleSystem
 

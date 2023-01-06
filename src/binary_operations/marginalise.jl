@@ -13,3 +13,8 @@ marginalise(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
 
 marginalise(D::AbstractDirac{T}, K::AbstractMarkovKernel{T}) where {T} =
     condition(K, mean(D))
+
+
+function marginalise(P::ParticleSystem{T,U,<:AbstractVector}, K::AffineDiracKernel{T}) where {T,U}
+    return ParticleSystem(logweights(P), mean(K).(particles(P)))
+end

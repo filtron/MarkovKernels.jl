@@ -6,6 +6,8 @@ rng = MersenneTwister(1991)
 
 include("sampling_implementation.jl")
 include("pf_implementation.jl")
+
+include("bootstrap_filter.jl")
 # time grid
 m = 100
 T = 10
@@ -40,9 +42,17 @@ ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
-P = 5000
+K = 1000
 
-particles = particle_filter(rng, ys, init, fw_kernel, m_kernel, P)
+Ps = particle_filter(rng, ys, init, fw_kernel, m_kernel, K)
+
+Ps2 = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
+
+XX = mapreduce(permutedims, vcat, particles.(Ps2))
+
+bf_output = [marginalise(Ps2[i], output_kernel) for i in eachindex(Ps2)]
+yy =  getindex.(mapreduce(permutedims, vcat, particles.(bf_output)), 1)
+
 
 aval = 0.0075
 
@@ -54,19 +64,20 @@ state_plt = plot(
     labels = ["x1" "x2"],
     title = ["Latent Gauss-Markov process" ""],
 )
-for p in 1:P
-    plot!(ts, components(particles)[p], color = "black", alpha = aval, label = "")
+for k in 1:K
+    plot!(ts, components(Ps)[k], color = "black", alpha = aval, label = "")
 end
 display(state_plt)
 
 output_plot = plot(ts, outs, label = "output", xlabel = "t", title = "log-variance")
-for p in 1:P
+for k in 1:K
     plot!(
         ts,
-        mapreduce(permutedims, vcat, mean(components(particles)[p])) * C',
+        mapreduce(permutedims, vcat, mean(components(Ps)[k])) * C',
         color = "black",
         alpha = aval,
         label = "",
     )
 end
+scatter!(ts, yy, label = "", color = "red", alpha = 0.0025)
 display(output_plot)
