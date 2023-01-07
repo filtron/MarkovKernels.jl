@@ -12,7 +12,7 @@ compose(K2::AffineNormalKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), covp(K2))
 
 compose(K2::NormalKernel{T,<:AbstractAffineMap}, K1::AffineDiracKernel{T}) where {T} =
-    NormalKernel(compose(mean(K2), mean(K1)), cov(K2)∘mean(K1))
+    NormalKernel(compose(mean(K2), mean(K1)), cov(K2) ∘ mean(K1))
 
 compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     DiracKernel(compose(mean(K2), mean(K1)))

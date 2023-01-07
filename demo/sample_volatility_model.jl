@@ -42,7 +42,7 @@ ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
-K = 1000
+K = 500
 
 Ps = particle_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
@@ -51,8 +51,7 @@ Ps2 = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 XX = mapreduce(permutedims, vcat, particles.(Ps2))
 
 bf_output = [marginalise(Ps2[i], output_kernel) for i in eachindex(Ps2)]
-yy =  getindex.(mapreduce(permutedims, vcat, particles.(bf_output)), 1)
-
+yy = getindex.(mapreduce(permutedims, vcat, particles.(bf_output)), 1)
 
 aval = 0.0075
 
@@ -79,5 +78,6 @@ for k in 1:K
         label = "",
     )
 end
-scatter!(ts, yy, label = "", color = "red", alpha = 0.0025)
+#scatter!(ts, yy, label = "", color = "red", alpha = 0.0025)
+scatter!(ts, bf_output, label = "a", color = "red", alpha = 0.0025)
 display(output_plot)

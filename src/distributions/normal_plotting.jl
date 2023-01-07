@@ -1,8 +1,7 @@
 @recipe function f(::Type{T}, ns::T) where {T<:AbstractVector{<:AbstractNormal}}
     ribbon_width = 1.96
-    dimensions = dim(ns[1])
 
-    if !all(dim.(ns) .== dimensions)
+    if !allequal(dim.(ns))
         error("all elements of ns must be of the same dimension")
     end
 

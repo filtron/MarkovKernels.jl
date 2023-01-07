@@ -63,11 +63,14 @@ end
 # X::AbstractVector -> time marginals
 function ParticleSystem(
     logws::AbstractVector{<:Real},
-    X::AbstractArray{<:AbstractVector{T}}
-    ) where {T}
+    X::AbstractArray{<:AbstractVector{T}},
+) where {T}
     # check dimension match
     return ParticleSystem{T,typeof(logws),typeof(X)}(logws, X)
 end
+
+# this is kind of sketchy 
+dim(P::ParticleSystem) = unique(length.(particles(P)))[1]
 
 logweights(P::ParticleSystem) = P.logws
 weights(P::ParticleSystem) = exp.(logweights(P))
