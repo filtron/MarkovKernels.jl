@@ -19,7 +19,7 @@ end
     X = mapreduce(permutedims, vcat, particles.(ps))
 
     #seriestype := :scatter
-    layout --> (dimension, 1)
+    layout --> dimension
     linestyle --> :dot
     alpha --> 0.1
     color --> "black"
@@ -29,7 +29,6 @@ end
     for (i, x) in enumerate(xs)
         @series begin
             subplot := i
-            label --> string(i)
             x
         end
     end

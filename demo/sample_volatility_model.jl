@@ -6,8 +6,8 @@ rng = MersenneTwister(1991)
 
 include("sampling_implementation.jl")
 include("pf_implementation.jl")
-
 include("bootstrap_filter.jl")
+
 # time grid
 m = 100
 T = 10
@@ -15,7 +15,7 @@ ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
 # define transtion kernel
-λ = 1.0
+λ = 2.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
@@ -79,5 +79,5 @@ for k in 1:K
     )
 end
 #scatter!(ts, yy, label = "", color = "red", alpha = 0.0025)
-scatter!(ts, bf_output, label = "a", color = "red", alpha = 0.0025)
+scatter!(ts, bf_output, color = "red", alpha = 0.0025)
 display(output_plot)

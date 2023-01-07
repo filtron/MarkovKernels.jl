@@ -22,6 +22,7 @@ include("distributions/normal.jl")  # normal distributions
 include("distributions/normal_plotting.jl") # plotting vectors of normal distributions
 include("distributions/dirac.jl") # dirac distributions
 include("distributions/mixture.jl")
+include("distributions/particle_system.jl")
 include("distributions/plotting.jl")
 export AbstractNormal,
     Normal,
