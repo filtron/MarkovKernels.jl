@@ -29,6 +29,7 @@ function bootstrap_filter(
     return Ps
 end
 
+# this should just be a call to bayes_rule! 
 function update_weights!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,
