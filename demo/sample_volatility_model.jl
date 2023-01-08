@@ -50,8 +50,6 @@ X = mapreduce(permutedims, vcat, particles.(Ps))
 bf_output = [marginalise(Ps[i], output_kernel) for i in eachindex(Ps)]
 Y = getindex.(mapreduce(permutedims, vcat, particles.(bf_output)), 1)
 
-aval = 0.0075
-
 state_plt = plot(
     ts,
     xs,
