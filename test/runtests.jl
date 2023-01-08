@@ -92,6 +92,7 @@ cov_types = (HermOrSym, Cholesky)
     @testset "marginalise" begin
         for T in etypes
             marginalise_test(T, n, m, cov_types, matrix_types)
+            _test_marginalse_particle_system(T, n, m)
         end
     end
 

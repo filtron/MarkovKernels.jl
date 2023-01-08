@@ -57,3 +57,20 @@ function _test_pair_marginalise(D::Dirac, K::AffineDiracKernel, P1, P2)
         @test mean(marginalise(D, K)) ≈ A * μ
     end
 end
+
+function _test_marginalse_particle_system(T, n, m)
+    k = 10
+
+    X = [randn(T, n) for i in 1:k]
+    logws = randn(real(T), k)
+    P = ParticleSystem(logws, X)
+
+    C = randn(T, m, n)
+    K = DiracKernel(C)
+
+    @testset "marginalise | $(typeof(P)) | $(typeof(K))" begin
+        @test dim(marginalise(P, K)) == m
+        @test logweights(marginalise(P, K)) == logweights(P)
+        @test particles(marginalise(P, K)) ≈ [C * X[i] for i in eachindex(X)]
+    end
+end
