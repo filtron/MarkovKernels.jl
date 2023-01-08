@@ -43,11 +43,11 @@ display(mplot)
 
 K = 50
 
-Ps2 = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
+Ps = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
-X = mapreduce(permutedims, vcat, particles.(Ps2))
+X = mapreduce(permutedims, vcat, particles.(Ps))
 
-bf_output = [marginalise(Ps2[i], output_kernel) for i in eachindex(Ps2)]
+bf_output = [marginalise(Ps[i], output_kernel) for i in eachindex(Ps)]
 Y = getindex.(mapreduce(permutedims, vcat, particles.(bf_output)), 1)
 
 aval = 0.0075
@@ -60,34 +60,21 @@ state_plt = plot(
     labels = ["x1" "x2"],
     title = ["Latent Gauss-Markov process" ""],
 )
-for k in 1:K 
-    scatter!(
-        ts,
-        mapreduce(permutedims, vcat, X[:,k]),
-        marerksize = 2, 
-        color = "red",
-        alpha = 0.0025,
-        label = ""
-)
-end
-display(state_plt)
-
-output_plot = plot(
-    ts,
-    outs,
-    label = "output",
-    xlabel = "t",
-    title = "log-variance"
-)
 for k in 1:K
     scatter!(
         ts,
-        Y, 
-        markersize = 2, 
+        mapreduce(permutedims, vcat, X[:, k]),
+        marerksize = 2,
         color = "red",
         alpha = 0.0025,
         label = "",
     )
+end
+display(state_plt)
+
+output_plot = plot(ts, outs, label = "output", xlabel = "t", title = "log-variance")
+for k in 1:K
+    scatter!(ts, Y, markersize = 2, color = "red", alpha = 0.0025, label = "")
 end
 display(output_plot)
 
