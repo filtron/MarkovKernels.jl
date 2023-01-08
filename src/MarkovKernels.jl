@@ -51,7 +51,6 @@ export AbstractNormal,
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
-include("kernels/resampling.jl")
 export AbstractNormalKernel,
     NormalKernel,
     AffineNormalKernel,
