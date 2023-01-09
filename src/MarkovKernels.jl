@@ -17,9 +17,8 @@ export CovarianceParameter, lsqrt, stein, schur_reduce
 include("general.jl")
 export AbstractDistribution, AbstractMarkovKernel, AbstractLogLike
 
-include("distributions/normal.jl")  # normal distributions
-include("distributions/dirac.jl") # dirac distributions
-include("distributions/mixture.jl")
+include("distributions/normal.jl")
+include("distributions/dirac.jl")
 include("distributions/particle_system.jl")
 include("distributions/plotting.jl")
 export AbstractNormal,
@@ -36,16 +35,12 @@ export AbstractNormal,
     kldivergence,
     AbstractDirac,
     Dirac,
-    AbstractMixture,
-    Mixture,
+    AbstractParticleSystem,
+    ParticleSystem,
     logweights,
     weights,
     particles,
-    nparticles,
-    ncomponents,
-    components,
-    AbstractParticleSystem,
-    ParticleSystem
+    nparticles
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels

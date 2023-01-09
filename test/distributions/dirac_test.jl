@@ -9,7 +9,6 @@ function dirac_test(T, n)
         @test_nowarn repr(D)
         @test eltype(D) == T
         @test dim(D) == n
-        @test copy(D) == D
         for U in compatible_eltypes
             @test AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)
             @test eltype(AbstractDirac{U}(D)) == U

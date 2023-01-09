@@ -65,8 +65,6 @@ Returns the dimension of the Dirac distribution D.
 """
 dim(D::Dirac) = length(D.μ)
 
-copy(D::Dirac) = Dirac(copy(D.μ))
-
 """
     mean(D::AbstractDirac)
 

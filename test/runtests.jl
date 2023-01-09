@@ -12,7 +12,6 @@ include("covariance_parameter_test.jl")
 include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
 include("distributions/normal_plotting_test.jl")
-include("distributions/mixture_test.jl")
 include("distributions/particle_system_test.jl")
 
 include("affinemap_test.jl")
@@ -45,7 +44,6 @@ cov_types = (HermOrSym, Cholesky)
         for T in etypes
             normal_test(T, n, cov_types, matrix_types)
             dirac_test(T, n)
-            mixture_test()
             particle_system_test()
         end
         normal_plotting_test()
