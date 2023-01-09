@@ -35,15 +35,6 @@ function bootstrap_filter(
     return Ps, loglike
 end
 
-# this should just be a call to bayes_rule!
-function update_weights!(
-    P::ParticleSystem{T,U,<:AbstractVector},
-    L::AbstractLogLike,
-) where {T,U}
-    logweights(P)[:] .= logweights(P) + L.(particles(P))
-    logweights(P)[:] .= logweights(P) .- maximum(logweights(P))
-end
-
 function resample!(rng::AbstractRNG, P::ParticleSystem{T,U,<:AbstractVector}) where {T,U}
     idx = StatsBase.wsample(rng, eachindex(logweights(P)), weights(P), nparticles(P))
     logweights(P)[:] .= zero(logweights(P))

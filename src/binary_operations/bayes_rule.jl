@@ -18,7 +18,7 @@ bayes_rule(D::AbstractDistribution, L::AbstractLogLike) =
 
 function bayes_rule(P::ParticleSystem{T,U,<:AbstractVector}, L::AbstractLogLike) where {T,U}
     logws = copy(logweights(P))
-    loglike = _update_weights_and_coompute_loglike!(logws, P, L)
+    loglike = _update_weights_and_compute_loglike!(logws, P, L)
 
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
@@ -27,10 +27,10 @@ function bayes_rule!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,
 ) where {T,U}
-    return _update_weights_and_coompute_loglike!(logweights(P), P, L)
+    return _update_weights_and_compute_loglike!(logweights(P), P, L)
 end
 
-function _update_weights_and_coompute_loglike!(
+function _update_weights_and_compute_loglike!(
     logws::U,
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,
@@ -40,6 +40,7 @@ function _update_weights_and_coompute_loglike!(
 
     logws[:] .= logws + L.(particles(P))
     logc2 = maximum(logws)
+
     logws[:] = logws .- logc2
     logs2 = log(sum(exp, logws))
 

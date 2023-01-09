@@ -27,30 +27,12 @@ function loglike_test(T, n, m, cov_types, matrix_types)
             @test L(x) ≈ logpdf(condition(K, x), y)
         end
 
-        @testset "Loglike | AffineNormal | bayes_rule | {$(T),$(cov_t),$(matrix_t)}" begin
-            M, KC = invert(N, K)
-
-            NC, loglike = bayes_rule(N, L)
-            @test mean(NC) ≈ mean(condition(KC, y))
-            @test cov(NC) ≈ cov(condition(KC, y))
-            @test loglike ≈ logpdf(M, y)
-        end
-
         K = DiracKernel(C)
         L = LogLike(K, y)
         @testset "LogLike | AffineDirac | {$(T),$(cov_t),$(matrix_t)}" begin
             @test L == LogLike(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
-        end
-
-        @testset "Loglike | AffineDirac | bayes_rule | {$(T),$(cov_t),$(matrix_t)}" begin
-            M, KC = invert(N, K)
-
-            NC, loglike = bayes_rule(N, L)
-            @test mean(NC) ≈ mean(condition(KC, y))
-            @test cov(NC) ≈ cov(condition(KC, y))
-            @test loglike ≈ logpdf(M, y)
         end
     end
 end

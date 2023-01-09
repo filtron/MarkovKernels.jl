@@ -28,7 +28,16 @@ end
 
 dim(P::ParticleSystem) = unique(length.(particles(P)))[1]
 logweights(P::ParticleSystem) = P.logws
-weights(P::ParticleSystem) = exp.(logweights(P))
+
+function weights(P::ParticleSystem)
+    logc = maximum(logweights(P))
+    logws = logweights(P) .- logc
+    return exp.(logws) / sum(exp, logws)
+end
+
 nparticles(P::ParticleSystem) = length(logweights(P))
 particles(P::ParticleSystem) = P.X
+
 mean(P::ParticleSystem) = reduce(hcat, P.X) * exp.(logweights(P))
+mean(P::ParticleSystem{U,V}) where {U,V<:AbstractMatrix{<:AbstractVector}} =
+    [reduce(hcat, P.X[i, :]) * weights(P) for i in 1:size(X, 1)]

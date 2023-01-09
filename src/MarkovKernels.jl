@@ -55,9 +55,7 @@ export AbstractNormalKernel,
     condition,
     AbstractDiracKernel,
     DiracKernel,
-    AffineDiracKernel,
-    ResamplingMethod,
-    MultinomialResampler
+    AffineDiracKernel
 
 include("likelihoods.jl") # defines observation likelihoods
 export LogLike, measurement_model, measurement

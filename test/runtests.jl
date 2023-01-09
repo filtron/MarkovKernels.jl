@@ -23,6 +23,7 @@ include("loglike_test.jl")
 include("binary_operations/compose_test.jl")
 include("binary_operations/marginalise_test.jl")
 include("binary_operations/invert_test.jl")
+include("binary_operations/bayes_rule_test.jl")
 
 n = 1
 m = 2
@@ -99,6 +100,12 @@ cov_types = (HermOrSym, Cholesky)
     @testset "invert" begin
         for T in etypes
             invert_test(T, n, m, cov_types, matrix_types)
+        end
+    end
+
+    @testset "bayes_rule" begin
+        for T in etypes
+            bayes_rule_test(T, n, m, cov_types, matrix_types)
         end
     end
 end
