@@ -10,6 +10,7 @@ function particle_system_test()
 
     @testset "ParticleSystem | time marginal " begin
         dim(P) == d
+        nparticles(P) == k
         logweights(P) ≈ logws
         weights(P) ≈ exp.(logws) / sum(exp.(logws))
         nparticles(P) == k

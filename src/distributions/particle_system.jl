@@ -39,5 +39,3 @@ nparticles(P::ParticleSystem) = length(logweights(P))
 particles(P::ParticleSystem) = P.X
 
 mean(P::ParticleSystem) = reduce(hcat, P.X) * exp.(logweights(P))
-mean(P::ParticleSystem{U,V}) where {U,V<:AbstractMatrix{<:AbstractVector}} =
-    [reduce(hcat, P.X[i, :]) * weights(P) for i in 1:size(X, 1)]
