@@ -36,21 +36,3 @@ measurement(L::LogLike) = L.y
 Computes the log-likelihood associated with L evaluated at x.
 """
 (L::LogLike)(x) = logpdf(condition(measurement_model(L), x), measurement(L))
-
-"""
-    bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
-
-Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D, measurement kernel K, and measurement y.
-"""
-function bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
-    M, C = invert(D, K)
-    return condition(C, y), logpdf(M, y)
-end
-
-"""
-    bayes_rule(D::AbstractDistribution, L::AbstractLogLike)
-
-Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
-"""
-bayes_rule(D::AbstractDistribution, L::AbstractLogLike) =
-    bayes_rule(D, measurement_model(L), measurement(L))

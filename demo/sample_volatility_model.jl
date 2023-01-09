@@ -9,12 +9,12 @@ include("bootstrap_filter.jl")
 
 # time grid
 m = 100
-T = 10
+T = 5
 ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
 # define transtion kernel
-λ = 2.0
+λ = 1.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
@@ -41,9 +41,9 @@ ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 mplot = scatter(ts, ys, label = "measurement", color = "black")
 display(mplot)
 
-K = 50
+K = 200
 
-Ps = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
+Ps, loglike = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
 X = mapreduce(permutedims, vcat, particles.(Ps))
 
@@ -62,18 +62,17 @@ for k in 1:K
     scatter!(
         ts,
         mapreduce(permutedims, vcat, X[:, k]),
-        marerksize = 2,
+        markersize = 1,
         color = "red",
-        alpha = 0.0025,
+        alpha = 0.05,
         label = "",
     )
 end
 display(state_plt)
 
 output_plot = plot(ts, outs, label = "output", xlabel = "t", title = "log-variance")
-for k in 1:K
-    scatter!(ts, Y, markersize = 2, color = "red", alpha = 0.0025, label = "")
-end
+scatter!(ts, Y, markersize = 1, color = "red", alpha = 0.05, label = "")
+
 display(output_plot)
 
 #scatter!(ts, bf_output, color = "red", alpha = 0.0025)

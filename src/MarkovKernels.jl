@@ -60,12 +60,13 @@ export AbstractNormalKernel,
     MultinomialResampler
 
 include("likelihoods.jl") # defines observation likelihoods
-export LogLike, measurement_model, measurement, bayes_rule
+export LogLike, measurement_model, measurement
 
 include("binary_operations/compose.jl")
 include("binary_operations/marginalise.jl")
 include("binary_operations/invert.jl")
-export compose, marginalise, invert
+include("binary_operations/bayes_rule.jl")
+export compose, marginalise, invert, bayes_rule, bayes_rule!
 
 include("matrix_utils.jl") # helper functions
 

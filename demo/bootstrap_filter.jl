@@ -1,4 +1,4 @@
-using StatsBase
+import StatsBase
 
 function bootstrap_filter(
     rng::AbstractRNG,
@@ -12,24 +12,30 @@ function bootstrap_filter(
     # initialize
     X = [rand(rng, init) for k in 1:K]
     P = ParticleSystem(zeros(K), X)
+    loglike = 0.0
     L = LogLike(m_kernel, ys[1, :])
-    update_weights!(P, L)
+    #P, loglike_incr = bayes_rule(P, L)
+    loglike_incr = bayes_rule!(P, L)
+    loglike = loglike + loglike_incr
     resample!(rng, P)
 
     Ps = [P]
+    sizehint!(Ps, size(ys, 1))
 
     for m in 2:size(ys, 1)
         L = LogLike(m_kernel, ys[m, :])
         P = predict(rng, P, fw_kernel)
-        update_weights!(P, L)
+        #P, loglike_incr = bayes_rule(P, L)
+        loglike_incr = bayes_rule!(P, L)
+        loglike = loglike + loglike_incr
         resample!(rng, P)
         push!(Ps, P)
     end
 
-    return Ps
+    return Ps, loglike
 end
 
-# this should just be a call to bayes_rule! 
+# this should just be a call to bayes_rule!
 function update_weights!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,
