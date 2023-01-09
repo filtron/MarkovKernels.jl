@@ -1,5 +1,5 @@
 using MarkovKernels
-using Plots, Random
+using Plots, Random, LinearAlgebra, IterTools
 
 # time grid
 m = 200
@@ -14,7 +14,7 @@ Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
 
 # initial distribution
-init = Normal(zeros(2), 1.0I(2))
+init = Normal(zeros(2), diagm(ones(2)))
 
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)

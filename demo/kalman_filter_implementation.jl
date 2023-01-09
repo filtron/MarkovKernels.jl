@@ -22,33 +22,25 @@ function kalman_filter(
     fw_kernel::AbstractNormalKernel,
     m_kernel::AbstractNormalKernel,
 )
-    n = size(ys, 1)
 
     # initialise recursion
     filter_distribution = init
-    filter_distributions = Normal[]      # filtering distributions
+    filter_distributions = typeof(init)[]
 
-    # create measurement model
-    y = ys[1, :]
-    likelihood = LogLike(m_kernel, y)
-
-    # measurement update
+    # initial measurement update
+    likelihood = LogLike(m_kernel, ys[1, :])
     filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
     loglike = loglike_increment
 
-    for m in 2:n
+    for m in 2:size(ys, 1)
 
         # predict
         filter_distribution = marginalise(filter_distribution, fw_kernel)
 
-        # create measurement model
-        y = ys[m, :]
-        likelihood = LogLike(m_kernel, y)
-
         # measurement update
+        likelihood = LogLike(m_kernel, ys[m, :])
         filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
-
         push!(filter_distributions, filter_distribution)
         loglike = loglike + loglike_increment
     end
