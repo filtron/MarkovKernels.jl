@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Implementing a Rauch-Tung-Striebel smoother · MarkovKernels.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://filtron.github.io/MarkovKernels.jl/tutorial_rts/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MarkovKernels.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../affinemap/">Affine maps</a></li><li><a class="tocitem" href="../covariance_parameter/">Covariance parametrisations</a></li><li><span class="tocitem">Distributions</span><ul><li><a class="tocitem" href="../normal/">Normal</a></li><li><a class="tocitem" href="../dirac/">Dirac</a></li></ul></li><li><span class="tocitem">Kernels</span><ul><li><a class="tocitem" href="../normalkernel/">NormalKernel</a></li><li><a class="tocitem" href="../dirackernel/">DiracKernel</a></li></ul></li><li><a class="tocitem" href="../likelihoods/">LogLikelihoods</a></li><li><a class="tocitem" href="../binary_operators/">Binary operators</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../tutorial_pomp_sampling/">Sampling from probabilistic state-space models</a></li><li><a class="tocitem" href="../tutorial_kalman_filter/">Implementing a Kalman filter</a></li><li class="is-active"><a class="tocitem" href>Implementing a Rauch-Tung-Striebel smoother</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Implementing a Rauch-Tung-Striebel smoother</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Implementing a Rauch-Tung-Striebel smoother</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/filtron/MarkovKernels.jl/blob/main/docs/src/tutorial_rts.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Implementing-a-Rauch-Tung-Striebel-smoother"><a class="docs-heading-anchor" href="#Implementing-a-Rauch-Tung-Striebel-smoother">Implementing a Rauch-Tung-Striebel smoother</a><a id="Implementing-a-Rauch-Tung-Striebel-smoother-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-a-Rauch-Tung-Striebel-smoother" title="Permalink"></a></h1><h3 id="Setting-up-the-environment-and-loading-some-data"><a class="docs-heading-anchor" href="#Setting-up-the-environment-and-loading-some-data">Setting up the environment and loading some data</a><a id="Setting-up-the-environment-and-loading-some-data-1"></a><a class="docs-heading-anchor-permalink" href="#Setting-up-the-environment-and-loading-some-data" title="Permalink"></a></h3><pre><code class="language- hljs">using MarkovKernels
+using Random, LinearAlgebra, Plots
+
+rng = MersenneTwister(1991)
+
+include(&quot;../../demo/sampling_implementation.jl&quot;)
+include(&quot;../../demo/sample_trajectory.jl&quot;)
+include(&quot;../../demo/kalman_filter_implementation.jl&quot;)
+
+output_plot = plot(ts, outs, label = &quot;output&quot;, xlabel = &quot;t&quot;)
+scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)</code></pre><h3 id="Implementing-a-Rauch-Tung-Striebel-smoother-2"><a class="docs-heading-anchor" href="#Implementing-a-Rauch-Tung-Striebel-smoother-2">Implementing a Rauch-Tung-Striebel smoother</a><a class="docs-heading-anchor-permalink" href="#Implementing-a-Rauch-Tung-Striebel-smoother-2" title="Permalink"></a></h3><pre><code class="language-julia hljs">function rts(
+    ys::AbstractVecOrMat,
+    init::AbstractNormal,
+    fw_kernel::AbstractNormalKernel,
+    m_kernel::AbstractNormalKernel,
+)
+    # run a Kalman filter
+    filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
+
+    # compute the backward kenrles for the Rauch-Tung-Striebel recursion
+    bw_kernels = NormalKernel[]
+    for m in 1:length(filter_distributions)-1
+        pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
+        push!(bw_kernels, bw_kernel)
+    end
+
+    # compute the smoother estimates
+    smoother_distributions = Normal[]
+    smoother_distribution = filter_distributions[end]
+    pushfirst!(smoother_distributions, smoother_distribution)
+    for m in length(filter_distributions)-1:-1:1
+        smoother_distribution = marginalise(smoother_distribution, bw_kernels[m])
+        pushfirst!(smoother_distributions, smoother_distribution)
+    end
+
+    return smoother_distributions, filter_distributions, loglike
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">rts (generic function with 1 method)</code></pre><h3 id="Computing-state-estimates"><a class="docs-heading-anchor" href="#Computing-state-estimates">Computing state estimates</a><a id="Computing-state-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-state-estimates" title="Permalink"></a></h3><pre><code class="language- hljs"># Rauch-Tung-Striebel smoother
+smoother_distributions, filter_distributions, loglike =
+    rts(ys, init, fw_kernel, m_kernel)
+
+# plotting the filter state estimates
+state_plt = plot(
+    ts,
+    xs,
+    layout = (2, 1),
+    xlabel = [&quot;&quot; &quot;t&quot;],
+    label = [&quot;x1&quot; &quot;x2&quot;],
+    title = [&quot;Filter estimates of the state&quot; &quot;&quot;],
+)
+plot!(ts, filter_distributions, layout = (2, 1), label = [&quot;x1filter&quot; &quot;x2filter&quot;])
+plot!(ts, smoother_distributions, layout = (2, 1), label = [&quot;x1smoother&quot; &quot;x2smoother&quot;])</code></pre><h3 id="Computing-the-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-output-estimates">Computing the output estimates</a><a id="Computing-the-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-output-estimates" title="Permalink"></a></h3><pre><code class="language- hljs">output_filter_estimate = map(z -&gt; marginalise(z, output_kernel), filter_distributions)
+output_smoother_estimate = map(z -&gt; marginalise(z, output_kernel), smoother_distributions)
+
+plt = plot(ts, outs, label = &quot;output&quot;, xlabel = &quot;t&quot;)
+scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)
+plot!(ts, output_filter_estimate, label = &quot;filter estimate&quot;)
+plot!(ts, output_smoother_estimate, label = &quot;smooher estimate&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Implementing a Kalman filter</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 10 January 2023 18:38">Tuesday 10 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
