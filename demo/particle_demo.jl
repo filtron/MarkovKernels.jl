@@ -44,13 +44,13 @@ display(mplot)
 
 include("bootstrap_filter.jl")
 
-K = 1000
+K = 100
 
 Pfilt, loglike_filt = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
 Xfilt = mapreduce(permutedims, vcat, particles.(Pfilt))
 
-bf_output_filt = [marginalise(Pfilt[i], output_kernel) for i in eachindex(Ps)]
+bf_output_filt = [marginalise(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
 Yfilt = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
 
 state_filt_plt = plot(
