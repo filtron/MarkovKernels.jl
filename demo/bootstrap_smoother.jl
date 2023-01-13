@@ -10,19 +10,20 @@ function bootstrap_smoother(
 )
 
     # initialize
-    X = permutedims([rand(rng, init) for k in 1:K])   # in principle much more efficient to allocate an array for the entire trajectories here
+    X = permutedims([rand(rng, init) for k in 1:K])
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
     L = LogLike(m_kernel, ys[1, :])
     loglike_incr = bayes_rule!(P, L)
-
     loglike = loglike + loglike_incr
     resample!(rng, P)
 
     for m in 2:size(ys, 1)
         L = LogLike(m_kernel, ys[m, :])
+
         P = predict(rng, P, fw_kernel)
         loglike_incr = bayes_rule!(P, L)
+
         loglike = loglike + loglike_incr
         resample!(rng, P)
     end
@@ -41,13 +42,8 @@ function predict(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     K::AbstractMarkovKernel,
 ) where {T,U}
-    #    X = copy.(particles(P)[end, :]) # this copies the particles at the latest time
 
-    #for i in eachindex(X)
-    #    X[i][:] .= rand(rng, K, X[i])
-    #end
+    X = [rand(rng, K, particles(P)[end, i]) for i in 1:nparticles(P)]
 
-    X = [rand(rng, K, particles(P)[end, i]) for i in eachindex(particles(P)[end, :])]
-
-    return ParticleSystem(copy(logweights(P)), vcat(particles(P), permutedims(X)))
+    return ParticleSystem(logweights(P), vcat(particles(P), permutedims(X)))
 end
