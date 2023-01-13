@@ -6,12 +6,12 @@ CurrentModule = MarkovKernels
 
 A Particle system is a mixture of Dirac distributions.
 ```math
-P(x) = \sum_{i= 1}^n \delta(x - μ^{(i)})
+P(x) = \sum_{i= 1}^n w_i \delta(x - μ^{(i)})
 ```
 
 It can also be used to represent a mixture of trajectories.
 ```math
-P(x) = \sum_{i= 1}^n \delta(x_{1:T} - μ^{(i)}_{1:T})
+P(x) = \sum_{i= 1}^n w_i \delta(x_{1:T} - μ^{(i)}_{1:T})
 ```
 
 
