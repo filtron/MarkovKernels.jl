@@ -44,11 +44,7 @@ function predict(
     P::ParticleSystem{T,U,<:AbstractVector},
     K::AbstractMarkovKernel,
 ) where {T,U}
-    X = copy.(particles(P))
-
-    for i in eachindex(X)
-        X[i][:] .= rand(rng, K, X[i])
-    end
+    X = [rand(rng, K, particles(P)[i]) for i in eachindex(particles(P))]
 
     return ParticleSystem(copy(logweights(P)), X)
 end

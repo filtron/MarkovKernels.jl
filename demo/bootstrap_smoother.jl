@@ -41,11 +41,13 @@ function predict(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     K::AbstractMarkovKernel,
 ) where {T,U}
-    X = copy.(particles(P)[end, :]) # this copies the particles at the latest time
+    #    X = copy.(particles(P)[end, :]) # this copies the particles at the latest time
 
-    for i in eachindex(X)
-        X[i][:] .= rand(rng, K, X[i])
-    end
+    #for i in eachindex(X)
+    #    X[i][:] .= rand(rng, K, X[i])
+    #end
+
+    X = [rand(rng, K, particles(P)[end, i]) for i in eachindex(particles(P)[end, :])]
 
     return ParticleSystem(copy(logweights(P)), vcat(particles(P), permutedims(X)))
 end

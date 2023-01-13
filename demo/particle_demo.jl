@@ -2,9 +2,7 @@ using MarkovKernels
 using Plots, Random
 using IterTools
 
-#rng = MersenneTwister(1991)
-
-rng = Random.GLOBAL_RNG
+rng = MersenneTwister(1991)
 
 include("sampling_implementation.jl")
 
@@ -15,7 +13,7 @@ ts = collect(LinRange(0, T, m))
 dt = T / (m - 1)
 
 # define transtion kernel
-λ = 1.0
+λ = 5.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
 fw_kernel = NormalKernel(Φ, Q)
@@ -44,7 +42,7 @@ display(mplot)
 
 include("bootstrap_filter.jl")
 
-K = 100
+K = 500
 
 Pfilt, loglike_filt = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
@@ -67,7 +65,7 @@ for k in 1:K
         mapreduce(permutedims, vcat, Xfilt[:, k]),
         markersize = 1,
         color = "red",
-        alpha = 0.05,
+        alpha = 0.025,
         label = "",
     )
 end
@@ -84,7 +82,7 @@ Psmooth, loglike_smooth = bootstrap_smoother(rng, ys, init, fw_kernel, m_kernel,
 Xsmooth = particles(Psmooth)
 
 bf_output_smooth = marginalise(Psmooth, output_kernel)
-Ysmooth = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
+Ysmooth = getindex.(particles(bf_output_smooth), 1)
 
 state_smooth_plt = plot(
     ts,
@@ -99,12 +97,12 @@ for k in 1:K
         ts,
         mapreduce(permutedims, vcat, Xsmooth[:, k]),
         color = "green",
-        alpha = 0.05,
+        alpha = 0.025,
         label = "",
     )
 end
 display(state_smooth_plt)
 
 output_smooth_plt = plot(ts, outs, label = "output", xlabel = "t", title = "log-variance")
-plot!(ts, Ysmooth, color = "green", alpha = 0.01, label = "")
+plot!(ts, Ysmooth, color = "green", alpha = 0.025, label = "")
 display(output_smooth_plt)

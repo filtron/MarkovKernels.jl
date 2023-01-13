@@ -66,6 +66,19 @@ function _test_bayes_rule_particle_system(T, n, m)
         @test weights(PC1) ≈ weights(P2) ≈ ws_gt
         @test particles(P1) == particles(P2) == particles(PC1)
     end
+
+    X2 = permutedims(X)
+    P3 = ParticleSystem(logws, X2)
+    P4 = ParticleSystem(copy(logws), copy.(X2))
+
+    @testset "bayes_rule | $(typeof(P3)) | $(typeof(K))" begin
+        PC3, loglike3 = bayes_rule(P3, L)
+        loglike4 = bayes_rule!(P4, L)
+
+        @test loglike3 ≈ loglike4 ≈ loglike_gt
+        @test weights(PC3) ≈ weights(P4) ≈ ws_gt
+        @test particles(P3) == particles(P4) == particles(PC3)
+    end
 end
 
 function _loglike(logws, logls)
