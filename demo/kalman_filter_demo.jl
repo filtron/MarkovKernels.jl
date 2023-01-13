@@ -1,7 +1,7 @@
 using MarkovKernels
-using Plots, Random, IterTools
+using LinearAlgebra, Plots, Random, IterTools
 
-## sample a partially observed Gauss-Markov process 
+## sample a partially observed Gauss-Markov process
 
 rng = MersenneTwister(1991)
 
@@ -35,10 +35,10 @@ R = fill(0.1, 1, 1)
 m_kernel = compose(NormalKernel(1.0I(1), R), output_kernel)
 
 # sample output and its measurements
-outs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
+zs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
 ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 
-## implement a the Kalman filter 
+## implement a the Kalman filter
 
 function kalman_filter(
     ys::AbstractVecOrMat,
@@ -72,7 +72,7 @@ function kalman_filter(
     return filter_distributions, loglike
 end
 
-## run Kalman filter and plot the results 
+## run Kalman filter and plot the results
 
 filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
 
@@ -88,14 +88,16 @@ plot!(ts, filter_distributions, layout = (2, 1), label = ["x1filter" "x2filter"]
 
 display(state_filter_plt)
 
+## computing the output estimates
+
 output_filter_estimate = map(z -> marginalise(z, output_kernel), filter_distributions)
 
-output_filter_plt = plot(ts, outs, label = "output", xlabel = "t")
+output_filter_plt = plot(ts, zs, label = "output", xlabel = "t")
 scatter!(ts, ys, label = "measurement", color = "black")
 plot!(ts, output_filter_estimate, label = "filter estimate")
 display(output_filter_plt)
 
-## implement Rauch-Tung-Striebel recursion 
+## implement Rauch-Tung-Striebel recursion
 
 function rts(filter_distributions, fw_kernel)
     smoother_distribution = filter_distributions[end]
@@ -108,10 +110,10 @@ function rts(filter_distributions, fw_kernel)
         smoother_distributions[m] = smoother_distribution
     end
 
-    return smoothing_distributions
+    return smoother_distributions
 end
 
-## run Rauch-Tung-Striebel smoother and plot the results 
+## Computing the snmoothed state estimate
 
 smoother_distributions = rts(filter_distributions, fw_kernel)
 
@@ -127,9 +129,10 @@ plot!(ts, smoother_distributions, layout = (2, 1), label = ["x1smoother" "x2smoo
 
 display(state_smoother_plt)
 
-output_smoother_estimate = map(z -> marginalise(z, output_kernel), smoother_distributions)
+## Computing the smoothed output estimate
 
-output_smoother_plt = plot(ts, outs, label = "output", xlabel = "t")
+output_smoother_estimate = map(z -> marginalise(z, output_kernel), smoother_distributions)
+output_smoother_plt = plot(ts, zs, label = "output", xlabel = "t")
 scatter!(ts, ys, label = "measurement", color = "black")
 plot!(ts, output_smoother_estimate, label = "smoother estimate")
 display(output_smoother_plt)

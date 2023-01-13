@@ -18,6 +18,15 @@ end
 # constructor for time marginals
 # X::AbstractMatrix -> trajectories
 # X::AbstractVector -> time marginals
+
+"""
+    ParticleSystem(logws::AbstractVector{<:Real}, X::AbstractArray{<:AbstractVector{T}})
+
+Creates a ParticleSystem with logarithm of the mixture weights given by logws and location parameters in X.
+If X is an AbstractVector the resulting object represents a classical Dirac mixtrue.
+Whereas if X is an AbstractMatrix, the resulting object represents a Dirac mixture over trajectories,
+where the row dimension represents time and the column dimension enumerates the particles.
+"""
 function ParticleSystem(
     logws::AbstractVector{<:Real},
     X::AbstractArray{<:AbstractVector{T}},
@@ -26,16 +35,48 @@ function ParticleSystem(
     return ParticleSystem{T,typeof(logws),typeof(X)}(logws, X)
 end
 
+"""
+    dim(P::AbstractParticleSystem)
+
+Returns the dimension of the particle system distribution P.
+"""
 dim(P::ParticleSystem) = unique(length.(particles(P)))[1]
+
+"""
+    logweights(P::AbstractParticleSystem)
+
+Returns the logarithms of the mixture weights of the particle system P.
+"""
 logweights(P::ParticleSystem) = P.logws
 
+"""
+    weights(P::AbstractParticleSystem)
+
+Returns the mixture weights of the particle system P.
+"""
 function weights(P::ParticleSystem)
     logc = maximum(logweights(P))
     logws = logweights(P) .- logc
     return exp.(logws) / sum(exp, logws)
 end
 
+"""
+    nparticles(P::AbstractParticleSystem)
+
+Computes the number of particles in the particle system P.
+"""
 nparticles(P::ParticleSystem) = length(logweights(P))
+
+"""
+    particles(P::AbstractParticleSystem)
+
+Returns the particle locations of the particle system P.
+"""
 particles(P::ParticleSystem) = P.X
 
+"""
+    mean(P::AbstractParticleSystem)
+
+Computes the mean of the particle system distribution P.
+"""
 mean(P::ParticleSystem) = reduce(hcat, P.X) * exp.(logweights(P))

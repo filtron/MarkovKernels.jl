@@ -42,4 +42,5 @@ That is, given a measurmeent ``y``, ``m`` evaluated at ``y`` is the marginal lik
 invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
 bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 bayes_rule(D::AbstractDistribution, L::AbstractLogLike)
+bayes_rule!(P::ParticleSystem{T,U,<:AbstractVector}, L::AbstractLogLike) where {T,U}
 ```

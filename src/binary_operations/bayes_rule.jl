@@ -23,11 +23,35 @@ function bayes_rule(P::ParticleSystem{T,U,<:AbstractVector}, L::AbstractLogLike)
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
 
+function bayes_rule(P::ParticleSystem{T,U,<:AbstractMatrix}, L::AbstractLogLike) where {T,U}
+    latest_time_marginal = ParticleSystem(logweights(P), particles(P)[end, :])
+    logws = copy(logweights(latest_time_marginal))
+    loglike = _update_weights_and_compute_loglike!(logws, latest_time_marginal, L)
+    return ParticleSystem(logws, copy.(particles(P))), loglike
+end
+
+"""
+    bayes_rule!(D::AbstractParticleSystem, L::AbstractLogLike)
+
+Computes the conditional distribution C in-place and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
+"""
 function bayes_rule!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,
 ) where {T,U}
     return _update_weights_and_compute_loglike!(logweights(P), P, L)
+end
+
+function bayes_rule!(
+    P::ParticleSystem{T,U,<:AbstractMatrix},
+    L::AbstractLogLike,
+) where {T,U}
+    latest_time_marginal = ParticleSystem(logweights(P), particles(P)[end, :])
+    return _update_weights_and_compute_loglike!(
+        logweights(latest_time_marginal),
+        latest_time_marginal,
+        L,
+    )
 end
 
 function _update_weights_and_compute_loglike!(
