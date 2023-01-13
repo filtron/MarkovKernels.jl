@@ -15,8 +15,8 @@ const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T}}
 
 ```@docs
 lsqrt(C::Cholesky)
-stein(Σ, Φ::AbstractMatrix)
-stein(Σ, Φ::AbstractMatrix, Q)
-schur_reduce(Π, C::AbstractMatrix)
-schur_reduce(Π, C::AbstractMatrix, R)
+stein(Σ::HermOrSym, Φ::AbstractMatrix)
+stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym)
+schur_reduce(Π::HermOrSym, C::AbstractMatrix)
+schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
 ```

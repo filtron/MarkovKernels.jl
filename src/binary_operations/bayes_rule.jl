@@ -30,6 +30,11 @@ function bayes_rule(P::ParticleSystem{T,U,<:AbstractMatrix}, L::AbstractLogLike)
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
 
+"""
+    bayes_rule!(D::AbstractParticleSystem, L::AbstractLogLike)
+
+Computes the conditional distribution C in-place and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
+"""
 function bayes_rule!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLogLike,

@@ -1,9 +1,26 @@
 # Bootstrap filtering and smoothing
 
+This tutorial describes how to perform filtering and smoothing in a the probabilistic state-space model given by
+
+```math
+\begin{aligned}
+x_0 &\sim \mathcal{N}(\mu_0 ,\Sigma_0), \\
+x_n \mid x_{n-1} &\sim \mathcal{N}(\Phi  x_{n-1}, Q),\\
+z_n &= C x_n,
+\end{aligned}
+```
+
+subject to the measurements given by
+
+```math
+y_n \mid x_n \sim \mathcal{N}(0, e^{z_n}).
+```
+
 ## Setting up the environment and generating some data
 
+```@example 3
 using MarkovKernels
-using Plots, Random
+using LinearAlgebra, Plots, Random
 using IterTools
 import StatsBase: wsample
 
@@ -46,10 +63,11 @@ zs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
 ys = mapreduce(z -> rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 
 measurement_plt = scatter(ts, ys, label = "measurements", color = "black")
-display(measurement_plt)
+```
 
 ## Implementing a bootstrap filter
 
+```@example 3
 function bootstrap_filter(
     rng::AbstractRNG,
     ys::AbstractVecOrMat,
@@ -98,9 +116,12 @@ function predict(
 
     return ParticleSystem(copy(logweights(P)), X)
 end
+```
+
 
 ## Computing the filtered state estimates
 
+```@example 3
 K = 500
 Pfilt, loglike_filt = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
 
@@ -124,19 +145,22 @@ for k in 1:K
         label = "",
     )
 end
-display(state_filt_plt)
+state_filt_plt
+```
 
 ## Computing the filtered output estimates
 
+```@example 3
 bf_output_filt = [marginalise(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
 Zfilt = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
 
 output_filt_plt = plot(ts, zs, label = "output", xlabel = "t", title = "log-variance")
 scatter!(ts, Zfilt, markersize = 1, color = "red", alpha = 0.01, label = "")
-display(output_filt_plt)
+```
 
 ## Implementing a bootstrap smoother
 
+```@example 3
 function bootstrap_smoother(
     rng::AbstractRNG,
     ys::AbstractVecOrMat,
@@ -179,16 +203,22 @@ function predict(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     K::AbstractMarkovKernel,
 ) where {T,U}
+
     X = [rand(rng, K, particles(P)[end, i]) for i in 1:nparticles(P)]
 
     return ParticleSystem(logweights(P), vcat(particles(P), permutedims(X)))
 end
+```
 
 ## Computing the smoothed state estimates
 
+```@example 3
 Psmooth, loglike_smooth = bootstrap_smoother(rng, ys, init, fw_kernel, m_kernel, K)
 
 Xsmooth = particles(Psmooth)
+
+bf_output_smooth = marginalise(Psmooth, output_kernel)
+Ysmooth = getindex.(particles(bf_output_smooth), 1)
 
 state_smooth_plt = plot(
     ts,
@@ -207,13 +237,16 @@ for k in 1:K
         label = "",
     )
 end
-display(state_smooth_plt)
+state_smooth_plt
+```
 
 ## Computing the smoothed output estimate
 
+```@example 3
 bf_output_smooth = marginalise(Psmooth, output_kernel)
 Zsmooth = getindex.(particles(bf_output_smooth), 1)
 
 output_smooth_plt = plot(ts, zs, label = "output", xlabel = "t", title = "log-variance")
 plot!(ts, Zsmooth, color = "green", alpha = 0.025, label = "")
-display(output_smooth_plt)
+output_smooth_plt
+```

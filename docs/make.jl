@@ -18,14 +18,18 @@ makedocs(;
         "Home" => "index.md",
         "Affine maps" => "affinemap.md",
         "Covariance parametrisations" => "covariance_parameter.md",
-        "Distributions" => ["Normal" => "normal.md", "Dirac" => "dirac.md"],
-        "Kernels" => ["normalkernel.md", "dirackernel.md"],
+        "Distributions" => [
+            "Normal" => "distributions/normal.md",
+            "Dirac" => "distributions/dirac.md",
+            "ParticleSystem" => "distributions/particle_system.md",
+        ],
+        "Kernels" => ["kernels/normalkernel.md", "kernels/dirackernel.md"],
         "LogLikelihoods" => "likelihoods.md",
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
             "Sampling from probabilistic state-space models" => "tutorial_pomp_sampling.md"
-            "Implementing a Kalman filter" => "tutorial_kalman_filter.md"
-            "Implementing a Rauch-Tung-Striebel smoother" => "tutorial_rts.md"
+            "Kalman filtering and smoothing" => "tutorial_kalman_filter.md"
+            "Bootstrap filtering and smoothing" => "tutorial_bootstrap.md"
         ],
     ],
 )

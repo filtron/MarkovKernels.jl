@@ -1,5 +1,3 @@
-import StatsBase
-
 function bootstrap_smoother(
     rng::AbstractRNG,
     ys::AbstractVecOrMat,
@@ -32,7 +30,7 @@ function bootstrap_smoother(
 end
 
 function resample!(rng::AbstractRNG, P::ParticleSystem{T,U,<:AbstractMatrix}) where {T,U}
-    idx = StatsBase.wsample(rng, eachindex(logweights(P)), weights(P), nparticles(P))
+    idx = wsample(rng, eachindex(logweights(P)), weights(P), nparticles(P))
     logweights(P)[:] .= zero(logweights(P))
     particles(P)[:, :] .= particles(P)[:, idx]
 end
@@ -42,7 +40,6 @@ function predict(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     K::AbstractMarkovKernel,
 ) where {T,U}
-
     X = [rand(rng, K, particles(P)[end, i]) for i in 1:nparticles(P)]
 
     return ParticleSystem(logweights(P), vcat(particles(P), permutedims(X)))
