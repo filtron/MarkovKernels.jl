@@ -128,7 +128,7 @@ display(state_filt_plt)
 
 ## Computing the filtered output estimates
 
-bf_output_filt = [marginalise(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
+bf_output_filt = [marginalize(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
 Zfilt = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
 
 output_filt_plt = plot(ts, zs, label = "output", xlabel = "t", title = "log-variance")
@@ -211,7 +211,7 @@ display(state_smooth_plt)
 
 ## Computing the smoothed output estimate
 
-bf_output_smooth = marginalise(Psmooth, output_kernel)
+bf_output_smooth = marginalize(Psmooth, output_kernel)
 Zsmooth = getindex.(particles(bf_output_smooth), 1)
 
 output_smooth_plt = plot(ts, zs, label = "output", xlabel = "t", title = "log-variance")

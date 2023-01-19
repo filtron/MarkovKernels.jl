@@ -20,7 +20,7 @@ include("kernels/dirackernel_test.jl")
 
 include("loglike_test.jl")
 include("binary_operations/compose_test.jl")
-include("binary_operations/marginalise_test.jl")
+include("binary_operations/marginalize_test.jl")
 include("binary_operations/invert_test.jl")
 include("binary_operations/bayes_rule_test.jl")
 
@@ -88,10 +88,10 @@ cov_types = (HermOrSym, Cholesky)
         end
     end
 
-    @testset "marginalise" begin
+    @testset "marginalize" begin
         for T in etypes
-            marginalise_test(T, n, m, cov_types, matrix_types)
-            _test_marginalse_particle_system(T, n, m)
+            marginalize_test(T, n, m, cov_types, matrix_types)
+            _test_marginalze_particle_system(T, n, m)
         end
     end
 
