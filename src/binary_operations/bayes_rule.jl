@@ -68,7 +68,7 @@ function _update_weights_and_compute_loglike!(
     logc1 = maximum(logws)
     logs1 = log(sum(exp, logws .- logc1))
 
-    logws[:] .= logws + [log(L, particles(P)[i]) for i  in eachindex(particles(P))] 
+    logws[:] .= logws + [log(L, particles(P)[i]) for i in eachindex(particles(P))]
     logc2 = maximum(logws)
 
     logws[:] = logws .- logc2
