@@ -24,7 +24,7 @@ makedocs(;
             "ParticleSystem" => "distributions/particle_system.md",
         ],
         "Kernels" => ["kernels/normalkernel.md", "kernels/dirackernel.md"],
-        "LogLikelihoods" => "likelihoods.md",
+        "Likelihoods" => "likelihoods.md",
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
             "Sampling from probabilistic state-space models" => "tutorial_pomp_sampling.md"
