@@ -15,7 +15,7 @@ include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
 
 include("general.jl")
-export AbstractDistribution, AbstractMarkovKernel, AbstractLogLike
+export AbstractDistribution, AbstractMarkovKernel, AbstractLikelihood
 
 include("distributions/normal.jl")
 include("distributions/dirac.jl")
@@ -53,7 +53,7 @@ export AbstractNormalKernel,
     AffineDiracKernel
 
 include("likelihoods.jl") # defines observation likelihoods
-export LogLike, measurement_model, measurement
+export Likelihood, measurement_model, measurement
 
 include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")

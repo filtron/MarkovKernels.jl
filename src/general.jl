@@ -6,10 +6,10 @@ abstract type AbstractMarkovKernel{T<:Number} end
 
 eltype(::AbstractMarkovKernel{T}) where {T} = T
 
-abstract type AbstractLogLike end
+abstract type AbstractLikelihood end
 
 for func in (:(==), :isequal, :isapprox),
-    type in (:AbstractDistribution, :AbstractMarkovKernel, :AbstractLogLike)
+    type in (:AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)
 
     @eval function Base.$func(P1::U, P2::V; kwargs...) where {U<:$type,V<:$type}
         nameof(U) === nameof(V) || return false

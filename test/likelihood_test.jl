@@ -1,4 +1,4 @@
-function loglike_test(T, n, m, cov_types, matrix_types)
+function likelihood_test(T, n, m, cov_types, matrix_types)
     μp = randn(T, m)
     Vp = randn(T, m, m)
     Vp = Vp * Vp'
@@ -19,18 +19,18 @@ function loglike_test(T, n, m, cov_types, matrix_types)
         N = Normal(μ, Σ)
 
         K = NormalKernel(C, R)
-        L = LogLike(K, y)
-        @testset "LogLike | AffineNormal | {$(T),$(cov_t),$(matrix_t)}" begin
-            @test L == LogLike(K, y)
+        L = Likelihood(K, y)
+        @testset "Likelihood | AffineNormal | {$(T),$(cov_t),$(matrix_t)}" begin
+            @test L == Likelihood(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
             @test L(x) ≈ logpdf(condition(K, x), y)
         end
 
         K = DiracKernel(C)
-        L = LogLike(K, y)
-        @testset "LogLike | AffineDirac | {$(T),$(cov_t),$(matrix_t)}" begin
-            @test L == LogLike(K, y)
+        L = Likelihood(K, y)
+        @testset "Likelihood | AffineDirac | {$(T),$(cov_t),$(matrix_t)}" begin
+            @test L == Likelihood(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
         end
