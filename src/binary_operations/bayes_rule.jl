@@ -16,14 +16,20 @@ Computes the conditional distribution C and the marginal log-likelihood ℓ asso
 bayes_rule(D::AbstractDistribution, L::AbstractLikelihood) =
     bayes_rule(D, measurement_model(L), measurement(L))
 
-function bayes_rule(P::ParticleSystem{T,U,<:AbstractVector}, L::AbstractLikelihood) where {T,U}
+function bayes_rule(
+    P::ParticleSystem{T,U,<:AbstractVector},
+    L::AbstractLikelihood,
+) where {T,U}
     logws = copy(logweights(P))
     loglike = _update_weights_and_compute_loglike!(logws, P, L)
 
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
 
-function bayes_rule(P::ParticleSystem{T,U,<:AbstractMatrix}, L::AbstractLikelihood) where {T,U}
+function bayes_rule(
+    P::ParticleSystem{T,U,<:AbstractMatrix},
+    L::AbstractLikelihood,
+) where {T,U}
     latest_time_marginal = ParticleSystem(logweights(P), particles(P)[end, :])
     logws = copy(logweights(latest_time_marginal))
     loglike = _update_weights_and_compute_loglike!(logws, latest_time_marginal, L)
