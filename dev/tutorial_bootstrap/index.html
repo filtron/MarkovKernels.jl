@@ -116,11 +116,12 @@ for k in 1:K
         label = &quot;&quot;,
     )
 end
-state_filt_plt</code></pre><h2 id="Computing-the-filtered-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-output-estimates">Computing the filtered output estimates</a><a id="Computing-the-filtered-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-output-estimates" title="Permalink"></a></h2><pre><code class="language- hljs">bf_output_filt = [marginalise(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
+state_filt_plt</code></pre><h2 id="Computing-the-filtered-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-output-estimates">Computing the filtered output estimates</a><a id="Computing-the-filtered-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-output-estimates" title="Permalink"></a></h2><pre><code class="language- hljs">bf_output_filt = [marginalize(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
 Zfilt = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
 
 output_filt_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;, title = &quot;log-variance&quot;)
-scatter!(ts, Zfilt, markersize = 1, color = &quot;red&quot;, alpha = 0.01, label = &quot;&quot;)</code></pre><h2 id="Implementing-a-bootstrap-smoother"><a class="docs-heading-anchor" href="#Implementing-a-bootstrap-smoother">Implementing a bootstrap smoother</a><a id="Implementing-a-bootstrap-smoother-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-a-bootstrap-smoother" title="Permalink"></a></h2><pre><code class="language-julia hljs">function bootstrap_smoother(
+scatter!(ts, Zfilt, markersize = 1, color = &quot;red&quot;, alpha = 0.01, label = &quot;&quot;)
+output_filt_plt</code></pre><h2 id="Implementing-a-bootstrap-smoother"><a class="docs-heading-anchor" href="#Implementing-a-bootstrap-smoother">Implementing a bootstrap smoother</a><a id="Implementing-a-bootstrap-smoother-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-a-bootstrap-smoother" title="Permalink"></a></h2><pre><code class="language-julia hljs">function bootstrap_smoother(
     rng::AbstractRNG,
     ys::AbstractVecOrMat,
     init::AbstractDistribution,
@@ -170,7 +171,7 @@ end</code></pre><pre class="documenter-example-output"><code class="nohighlight 
 
 Xsmooth = particles(Psmooth)
 
-bf_output_smooth = marginalise(Psmooth, output_kernel)
+bf_output_smooth = marginalize(Psmooth, output_kernel)
 Ysmooth = getindex.(particles(bf_output_smooth), 1)
 
 state_smooth_plt = plot(
@@ -190,9 +191,9 @@ for k in 1:K
         label = &quot;&quot;,
     )
 end
-state_smooth_plt</code></pre><h2 id="Computing-the-smoothed-output-estimate"><a class="docs-heading-anchor" href="#Computing-the-smoothed-output-estimate">Computing the smoothed output estimate</a><a id="Computing-the-smoothed-output-estimate-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-output-estimate" title="Permalink"></a></h2><pre><code class="language- hljs">bf_output_smooth = marginalise(Psmooth, output_kernel)
+state_smooth_plt</code></pre><h2 id="Computing-the-smoothed-output-estimate"><a class="docs-heading-anchor" href="#Computing-the-smoothed-output-estimate">Computing the smoothed output estimate</a><a id="Computing-the-smoothed-output-estimate-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-output-estimate" title="Permalink"></a></h2><pre><code class="language- hljs">bf_output_smooth = marginalize(Psmooth, output_kernel)
 Zsmooth = getindex.(particles(bf_output_smooth), 1)
 
 output_smooth_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;, title = &quot;log-variance&quot;)
 plot!(ts, Zsmooth, color = &quot;green&quot;, alpha = 0.025, label = &quot;&quot;)
-output_smooth_plt</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Kalman filtering and smoothing</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Friday 13 January 2023 18:47">Friday 13 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+output_smooth_plt</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Kalman filtering and smoothing</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 19 January 2023 19:08">Thursday 19 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

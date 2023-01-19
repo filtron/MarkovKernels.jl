@@ -62,7 +62,7 @@ scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)</co
     for m in 2:size(ys, 1)
 
         # predict
-        filter_distribution = marginalise(filter_distribution, fw_kernel)
+        filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
         likelihood = LogLike(m_kernel, ys[m, :])
@@ -82,7 +82,7 @@ state_filter_plt = plot(
     label = [&quot;x1&quot; &quot;x2&quot;],
     title = [&quot;Filter estimates of the state&quot; &quot;&quot;],
 )
-plot!(ts, filter_distributions, layout = (2, 1), label = [&quot;x1filter&quot; &quot;x2filter&quot;])</code></pre><h2 id="Computing-the-filtered-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-output-estimates">Computing the filtered output estimates</a><a id="Computing-the-filtered-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-output-estimates" title="Permalink"></a></h2><pre><code class="language- hljs">output_filter_estimate = map(z -&gt; marginalise(z, output_kernel), filter_distributions)
+plot!(ts, filter_distributions, layout = (2, 1), label = [&quot;x1filter&quot; &quot;x2filter&quot;])</code></pre><h2 id="Computing-the-filtered-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-output-estimates">Computing the filtered output estimates</a><a id="Computing-the-filtered-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-output-estimates" title="Permalink"></a></h2><pre><code class="language- hljs">output_filter_estimate = map(z -&gt; marginalize(z, output_kernel), filter_distributions)
 
 output_filter_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;)
 scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)
@@ -93,7 +93,7 @@ plot!(ts, output_filter_estimate, label = &quot;filter estimate&quot;)</code></p
 
     for m in length(smoother_distributions)-1:-1:1
         pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
-        smoother_distribution = marginalise(smoother_distribution, bw_kernel)
+        smoother_distribution = marginalize(smoother_distribution, bw_kernel)
         smoother_distributions[m] = smoother_distribution
     end
 
@@ -108,7 +108,7 @@ state_smoother_plt = plot(
     label = [&quot;x1&quot; &quot;x2&quot;],
     title = [&quot;Smoother estimates of the state&quot; &quot;&quot;],
 )
-plot!(ts, smoother_distributions, layout = (2, 1), label = [&quot;x1smoother&quot; &quot;x2smoother&quot;])</code></pre><h2 id="Computing-the-smoothed-output-estimate"><a class="docs-heading-anchor" href="#Computing-the-smoothed-output-estimate">Computing the smoothed output estimate</a><a id="Computing-the-smoothed-output-estimate-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-output-estimate" title="Permalink"></a></h2><pre><code class="language- hljs">output_smoother_estimate = map(z -&gt; marginalise(z, output_kernel), smoother_distributions)
+plot!(ts, smoother_distributions, layout = (2, 1), label = [&quot;x1smoother&quot; &quot;x2smoother&quot;])</code></pre><h2 id="Computing-the-smoothed-output-estimate"><a class="docs-heading-anchor" href="#Computing-the-smoothed-output-estimate">Computing the smoothed output estimate</a><a id="Computing-the-smoothed-output-estimate-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-output-estimate" title="Permalink"></a></h2><pre><code class="language- hljs">output_smoother_estimate = map(z -&gt; marginalize(z, output_kernel), smoother_distributions)
 output_smoother_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;)
 scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)
-plot!(ts, output_smoother_estimate, label = &quot;smoother estimate&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_pomp_sampling/">« Sampling from probabilistic state-space models</a><a class="docs-footer-nextpage" href="../tutorial_bootstrap/">Bootstrap filtering and smoothing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Friday 13 January 2023 18:47">Friday 13 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot!(ts, output_smoother_estimate, label = &quot;smoother estimate&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_pomp_sampling/">« Sampling from probabilistic state-space models</a><a class="docs-footer-nextpage" href="../tutorial_bootstrap/">Bootstrap filtering and smoothing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 19 January 2023 19:08">Thursday 19 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
