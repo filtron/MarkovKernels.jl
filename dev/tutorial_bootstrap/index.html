@@ -59,7 +59,7 @@ measurement_plt = scatter(ts, ys, label = &quot;measurements&quot;, color = &quo
     X = [rand(rng, init) for k in 1:K]
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
-    L = LogLike(m_kernel, ys[1, :])
+    L = Likelihood(m_kernel, ys[1, :])
     loglike_incr = bayes_rule!(P, L)
     loglike = loglike + loglike_incr
     resample!(rng, P)
@@ -68,7 +68,7 @@ measurement_plt = scatter(ts, ys, label = &quot;measurements&quot;, color = &quo
     sizehint!(Ps, size(ys, 1))
 
     for m in 2:size(ys, 1)
-        L = LogLike(m_kernel, ys[m, :])
+        L = Likelihood(m_kernel, ys[m, :])
         P = predict(rng, P, fw_kernel)
         loglike_incr = bayes_rule!(P, L)
         loglike = loglike + loglike_incr
@@ -134,13 +134,13 @@ output_filt_plt</code></pre><h2 id="Implementing-a-bootstrap-smoother"><a class=
     X = permutedims([rand(rng, init) for k in 1:K])
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
-    L = LogLike(m_kernel, ys[1, :])
+    L = Likelihood(m_kernel, ys[1, :])
     loglike_incr = bayes_rule!(P, L)
     loglike = loglike + loglike_incr
     resample!(rng, P)
 
     for m in 2:size(ys, 1)
-        L = LogLike(m_kernel, ys[m, :])
+        L = Likelihood(m_kernel, ys[m, :])
 
         P = predict(rng, P, fw_kernel)
         loglike_incr = bayes_rule!(P, L)
@@ -196,4 +196,4 @@ Zsmooth = getindex.(particles(bf_output_smooth), 1)
 
 output_smooth_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;, title = &quot;log-variance&quot;)
 plot!(ts, Zsmooth, color = &quot;green&quot;, alpha = 0.025, label = &quot;&quot;)
-output_smooth_plt</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Kalman filtering and smoothing</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 19 January 2023 19:08">Thursday 19 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+output_smooth_plt</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Kalman filtering and smoothing</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 19 January 2023 23:15">Thursday 19 January 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
