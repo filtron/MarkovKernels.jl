@@ -21,5 +21,6 @@ Likelihood(K::AbstractMarkovKernel, y)
 ```@docs
 measurement_model(L::Likelihood)
 measurement(L::Likelihood)
+log(L::Likelihood, x) 
 ```
 

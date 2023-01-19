@@ -131,7 +131,7 @@ display(state_smoother_plt)
 
 ## Computing the smoothed output estimate
 
-output_smoother_estimate = map(z -> marginalise(z, output_kernel), smoother_distributions)
+output_smoother_estimate = map(z -> marginalize(z, output_kernel), smoother_distributions)
 output_smoother_plt = plot(ts, zs, label = "output", xlabel = "t")
 scatter!(ts, ys, label = "measurement", color = "black")
 plot!(ts, output_smoother_estimate, label = "smoother estimate")

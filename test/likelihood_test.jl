@@ -17,7 +17,7 @@ function likelihood_test(T, n, m, cov_types, matrix_types)
             @test L == Likelihood(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
-            @test L(x) ≈ logpdf(condition(K, x), y)
+            @test log(L, x) ≈ logpdf(condition(K, x), y)
         end
 
         K = DiracKernel(C)

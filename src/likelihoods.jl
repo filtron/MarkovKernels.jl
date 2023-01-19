@@ -31,8 +31,8 @@ Computes the measurement y
 measurement(L::Likelihood) = L.y
 
 """
-    (L::AbstractLikelihood)(x)
+    log(L::Likelihood, x)
 
-Computes the log-likelihood associated with L evaluated at x.
+Computes the logarithm of the likelihood L at x. 
 """
-(L::Likelihood)(x) = logpdf(condition(measurement_model(L), x), measurement(L))
+log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))
