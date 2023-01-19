@@ -18,7 +18,7 @@ include("affinemap_test.jl")
 include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
 
-include("loglike_test.jl")
+include("likelihood_test.jl")
 include("binary_operations/compose_test.jl")
 include("binary_operations/marginalize_test.jl")
 include("binary_operations/invert_test.jl")
@@ -63,9 +63,9 @@ cov_types = (HermOrSym, Cholesky)
         end
     end
 
-    @testset "LogLike" begin
+    @testset "Likelihood" begin
         for T in etypes
-            loglike_test(T, n, m, cov_types, matrix_types)
+            likelihood_test(T, n, m, cov_types, matrix_types)
         end
     end
 

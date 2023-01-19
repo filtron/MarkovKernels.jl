@@ -17,7 +17,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
         N = Normal(μ, Σ)
 
         K = NormalKernel(C, R)
-        L = LogLike(K, y)
+        L = Likelihood(K, y)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
 
@@ -28,7 +28,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
         end
 
         K = DiracKernel(C)
-        L = LogLike(K, y)
+        L = Likelihood(K, y)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
 
@@ -47,16 +47,16 @@ function _test_bayes_rule_particle_system(T, n, m)
 
     X = [randn(T, n) for i in 1:k]
     logws = randn(real(T), k)
-    ws = exp.(logws) / sum(exp, logws)
+    #ws = exp.(logws) / sum(exp, logws)
     P1 = ParticleSystem(logws, X)
     P2 = ParticleSystem(copy(logws), copy.(X))
 
     C = randn(T, m, n)
     K = NormalKernel(C, diagm(ones(T, m)))
     y = randn(T, m)
-    L = LogLike(K, y)
-    loglike_gt = _loglike(logws, L.(X))
-    logws_gt = logws + L.(X)
+    L = Likelihood(K, y)
+    loglike_gt = _loglike(logws, [log(L, X[i]) for i in eachindex(X)])
+    logws_gt = logws + [log(L, X[i]) for i in eachindex(X)]
     ws_gt = exp.(logws_gt) / sum(exp, logws_gt)
     @testset "bayes_rule | $(typeof(P1)) | $(typeof(K))" begin
         PC1, loglike1 = bayes_rule(P1, L)

@@ -1,38 +1,38 @@
 """
-    LogLike{U,V}
+    Likelihood{U,V}
 
 Type for representing a log-likelihood associated with a kernel K(y, x) and a measurement y.
 """
-struct LogLike{U,V} <: AbstractLogLike
+struct Likelihood{U,V} <: AbstractLikelihood
     K::U
     y::V
-    LogLike{U,V}(K, y) where {U,V} = new{U,V}(K, y)
+    Likelihood{U,V}(K, y) where {U,V} = new{U,V}(K, y)
 end
 
 """
-    LogLike(K::AbstractMarkovKernel, y)
+    Likelihood(K::AbstractMarkovKernel, y)
 
-Creates a LogLike with measurement kernel K and measurement y.
+Creates a Likelihood with measurement kernel K and measurement y.
 """
-LogLike(K::AbstractMarkovKernel, y) = LogLike{typeof(K),typeof(y)}(K, y)
+Likelihood(K::AbstractMarkovKernel, y) = Likelihood{typeof(K),typeof(y)}(K, y)
 
 """
-    measurement_model(L::LogLike)
+    measurement_model(L::Likelihood)
 
 Computes the measurement kernel K.
 """
-measurement_model(L::LogLike) = L.K
+measurement_model(L::Likelihood) = L.K
 
 """
-    measurement(L::LogLike)
+    measurement(L::Likelihood)
 
 Computes the measurement y
 """
-measurement(L::LogLike) = L.y
+measurement(L::Likelihood) = L.y
 
 """
-    (L::AbstractLogLike)(x)
+    log(L::Likelihood, x)
 
-Computes the log-likelihood associated with L evaluated at x.
+Computes the logarithm of the likelihood L at x. 
 """
-(L::LogLike)(x) = logpdf(condition(measurement_model(L), x), measurement(L))
+log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))

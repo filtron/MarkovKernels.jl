@@ -76,7 +76,7 @@ function kalman_filter(
     filter_distributions = typeof(init)[]
 
     # initial measurement update
-    likelihood = LogLike(m_kernel, ys[1, :])
+    likelihood = Likelihood(m_kernel, ys[1, :])
     filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
     loglike = loglike_increment
@@ -87,7 +87,7 @@ function kalman_filter(
         filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
-        likelihood = LogLike(m_kernel, ys[m, :])
+        likelihood = Likelihood(m_kernel, ys[m, :])
         filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
         push!(filter_distributions, filter_distribution)
         loglike = loglike + loglike_increment

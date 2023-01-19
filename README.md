@@ -41,7 +41,7 @@ abstract type AbstractAffineMap end # used to represent affine conditional means
 
 abstract type AbstractDistribution end
 abstract type AbstractMarkovKernel end
-abstract type AbstractLogLike end
+abstract type AbstractLikelihood end
 ```
 
 Currently, the following concrete types are defined: 
@@ -53,7 +53,7 @@ Dirac  # Vector valued Dirac distributions
 NormalKernel # Vector valued Normal kernels 
 DiracKernel  # Vector valued Dirac kernels 
 
-LogLike   # AbstractMarkovKernel paired with a measurement 
+Likelihood   # AbstractMarkovKernel paired with a measurement 
 ```
 
 The following type union is used to represent the (conditional) covariance:
@@ -76,7 +76,7 @@ For the purpose of Bayesian state estimation, ideally the following functions ar
 ```julia
 marginalize(D::AbstractDistribution, K::AbstractMarkovKernel)
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
-bayes_rule(D::AbstractDistribution, L::AbstractLogLike)
+bayes_rule(D::AbstractDistribution, L::AbstractLikelihood)
 ```
 
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
@@ -87,7 +87,7 @@ Therefore, it is up to the user to define, when required, appropriate approximat
 
 ```julia
 predict(D::AbstractDistribution, K::AbstractMarkovKernel)
-update(D::AbstractDistribution, L::AbstractLogLike)
+update(D::AbstractDistribution, L::AbstractLikelihood)
 ```
 
 ## TODO: 
