@@ -13,7 +13,7 @@ function bootstrap_filter(
     X = [rand(rng, init) for k in 1:K]
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
-    L = LogLike(m_kernel, ys[1, :])
+    L = Likelihood(m_kernel, ys[1, :])
     loglike_incr = bayes_rule!(P, L)
     loglike = loglike + loglike_incr
     resample!(rng, P)
@@ -22,7 +22,7 @@ function bootstrap_filter(
     sizehint!(Ps, size(ys, 1))
 
     for m in 2:size(ys, 1)
-        L = LogLike(m_kernel, ys[m, :])
+        L = Likelihood(m_kernel, ys[m, :])
         P = predict(rng, P, fw_kernel)
         loglike_incr = bayes_rule!(P, L)
         loglike = loglike + loglike_incr
