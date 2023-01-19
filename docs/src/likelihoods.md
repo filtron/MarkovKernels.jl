@@ -1,4 +1,4 @@
-# LogLike
+# Likelihood
 
 ```@meta
 CurrentModule = MarkovKernels
@@ -8,18 +8,18 @@ CurrentModule = MarkovKernels
 ### Types
 
 ```@docs
-LogLike{U,V}
+Likelihood{U,V}
 ```
 ### Constructors
 
 ```@docs
-LogLike(K::AbstractMarkovKernel, y)
+Likelihood(K::AbstractMarkovKernel, y)
 ```
 
 ### Basics
 
 ```@docs
-measurement_model(L::LogLike)
-measurement(L::LogLike)
+measurement_model(L::Likelihood)
+measurement(L::Likelihood)
 ```
 

@@ -1,7 +1,4 @@
 function likelihood_test(T, n, m, cov_types, matrix_types)
-    μp = randn(T, m)
-    Vp = randn(T, m, m)
-    Vp = Vp * Vp'
     Cp = randn(T, n, m)
     xp = randn(T, m)
     yp = randn(T, n)
@@ -13,10 +10,6 @@ function likelihood_test(T, n, m, cov_types, matrix_types)
         x = _make_vector(xp, matrix_t)
         y = _make_vector(yp, matrix_t)
         R = _make_covp(_make_matrix(Rp, matrix_t), cov_t)
-
-        μ = _make_vector(μp, matrix_t)
-        Σ = _make_covp(_make_matrix(Vp, matrix_t), cov_t)
-        N = Normal(μ, Σ)
 
         K = NormalKernel(C, R)
         L = Likelihood(K, y)
