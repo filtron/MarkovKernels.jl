@@ -56,10 +56,10 @@ include("likelihoods.jl") # defines observation likelihoods
 export LogLike, measurement_model, measurement
 
 include("binary_operations/compose.jl")
-include("binary_operations/marginalise.jl")
+include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/bayes_rule.jl")
-export compose, marginalise, invert, bayes_rule, bayes_rule!
+export compose, marginalize, invert, bayes_rule, bayes_rule!
 
 include("matrix_utils.jl") # helper functions
 

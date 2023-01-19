@@ -25,8 +25,8 @@ plot!(ts, smoother_distributions, layout = (2, 1), label = ["x1smoother" "x2smoo
 
 display(state_plt)
 
-output_filter_estimate = map(z -> marginalise(z, output_kernel), filter_distributions)
-output_smoother_estimate = map(z -> marginalise(z, output_kernel), smoother_distributions)
+output_filter_estimate = map(z -> marginalize(z, output_kernel), filter_distributions)
+output_smoother_estimate = map(z -> marginalize(z, output_kernel), smoother_distributions)
 
 plt = plot(ts, outs, label = "output", xlabel = "t")
 scatter!(ts, ys, label = "measurement", color = "black")

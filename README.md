@@ -4,7 +4,7 @@ A package implementing distributions, Markov kernels, and likelihoods that all p
 The main motivation is to simplify the implementation of Bayesian filtering and smoothing algorithms. 
 Let $\pi(x)$ be a probability distribution and $k(y\mid x)$ a Markov kernel then only the following operations are required for Bayesian state estimation
 
-* Marginalisation: 
+* Marginalization: 
 
 $$
 k(y) = \int k(y\mid x) \pi(x) \mathrm{d} x, 
@@ -74,13 +74,13 @@ const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
 For the purpose of Bayesian state estimation, ideally the following functions are defined:   
 
 ```julia
-marginalise(D::AbstractDistribution, K::AbstractMarkovKernel)
+marginalize(D::AbstractDistribution, K::AbstractMarkovKernel)
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 bayes_rule(D::AbstractDistribution, L::AbstractLogLike)
 ```
 
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
-Additionally, marginalise is implemented for Dirac with respect to the aforementioned kernels. 
+Additionally, marginalize is implemented for Dirac with respect to the aforementioned kernels. 
 
 In practice, these functions can not be implemented exactly for a given distribution / Markov kernel pair.
 Therefore, it is up to the user to define, when required, appropriate approximations, i.e.: 

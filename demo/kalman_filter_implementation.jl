@@ -36,7 +36,7 @@ function kalman_filter(
     for m in 2:size(ys, 1)
 
         # predict
-        filter_distribution = marginalise(filter_distribution, fw_kernel)
+        filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
         likelihood = LogLike(m_kernel, ys[m, :])

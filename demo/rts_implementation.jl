@@ -38,7 +38,7 @@ function rts(
     smoother_distribution = filter_distributions[end]
     pushfirst!(smoother_distributions, smoother_distribution)
     for m in length(filter_distributions)-1:-1:1
-        smoother_distribution = marginalise(smoother_distribution, bw_kernels[m])
+        smoother_distribution = marginalize(smoother_distribution, bw_kernels[m])
         pushfirst!(smoother_distributions, smoother_distribution)
     end
 

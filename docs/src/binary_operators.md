@@ -15,16 +15,16 @@ compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T}
 ```
 
 
-### marginalisation
+### marginalization
 
-Given a distribution ``\pi(x)`` and a Markov kernel ``k(y,x)``, marginalisation is a binary operator producing a new distriubution ``p(y)`` according to
+Given a distribution ``\pi(x)`` and a Markov kernel ``k(y,x)``, marginalization is a binary operator producing a new distriubution ``p(y)`` according to
 
 ```math
 p(y) = \int k(y, x) \pi(x) \mathrm{d} x.
 ```
 
 ```@docs
-marginalise(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
+marginalize(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
 ```
 
 ### invert & Bayes' rule

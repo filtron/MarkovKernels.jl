@@ -60,7 +60,7 @@ function kalman_filter(
     for m in 2:size(ys, 1)
 
         # predict
-        filter_distribution = marginalise(filter_distribution, fw_kernel)
+        filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
         likelihood = LogLike(m_kernel, ys[m, :])
@@ -90,7 +90,7 @@ display(state_filter_plt)
 
 ## computing the output estimates
 
-output_filter_estimate = map(z -> marginalise(z, output_kernel), filter_distributions)
+output_filter_estimate = map(z -> marginalize(z, output_kernel), filter_distributions)
 
 output_filter_plt = plot(ts, zs, label = "output", xlabel = "t")
 scatter!(ts, ys, label = "measurement", color = "black")
@@ -106,7 +106,7 @@ function rts(filter_distributions, fw_kernel)
 
     for m in length(smoother_distributions)-1:-1:1
         pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
-        smoother_distribution = marginalise(smoother_distribution, bw_kernel)
+        smoother_distribution = marginalize(smoother_distribution, bw_kernel)
         smoother_distributions[m] = smoother_distribution
     end
 
