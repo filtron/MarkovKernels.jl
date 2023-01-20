@@ -17,7 +17,7 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Affine maps" => "affinemap.md",
-        "Covariance parametrisations" => "covariance_parameter.md",
+        "Covariance parametrizations" => "covariance_parameter.md",
         "Distributions" => [
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
