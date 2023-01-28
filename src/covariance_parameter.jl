@@ -12,7 +12,7 @@ convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
 Computes a square matrix L such that A = L*L'.
 L need not be a Cholesky factor.
 """
-lsqrt(C::Cholesky) = C.uplo == "L" ? C.L : C.U'
+lsqrt(C::Cholesky) = C.uplo == 'L' ? C.L : C.U'
 lsqrt(A::HermOrSym) = lsqrt(cholesky(A))
 
 """
