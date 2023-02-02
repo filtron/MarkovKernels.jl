@@ -108,7 +108,7 @@ var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp
     std(N::AbstractNormal)
 Computes the vector of marginal standard deviations of the Normal distribution N.
 """
-std(N::AbstractNormal) = sqrt.(var(N)) # this is broken for StaticArrays
+std(N::AbstractNormal) = sqrt.(var(N))
 
 """
     residual(N::AbstractNormal, x::AbstractVector)
