@@ -93,6 +93,5 @@ update(D::AbstractDistribution, L::AbstractLikelihood)
 ## TODO: 
 
 1. Implement Mixture ditributions / kernels (e.g. for particle filtering). 
-2. Resampling kernels (i.e. resampling step in particle filters is a draw from a Markov kernel).
-3. Normal distributions in information vector / matrix parametrisation.   
+2. Normal distributions in information vector / matrix parametrisation.   
 
