@@ -102,7 +102,6 @@ covp(N::Normal) = N.Σ
 Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
-#var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = vec(sum(abs2, covp(N).L, dims = 2)) # this is broken for StaticArrays
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
 
 """
