@@ -65,7 +65,7 @@ function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
 end
 
 function schur_reduce(Π::Cholesky, C::AbstractMatrix)
-    Rfac = ArrayInterfaceCore.zeromatrix(diag(C))
+    Rfac = ArrayInterface.zeromatrix(diag(C))
     zero_array = hcat(Rfac, zero(C))
     post_array = vcat(_make_post_array(hcat(lsqrt(Π)' * C', lsqrt(Π)')), zero_array)
     S, K, Σ = _make_schur_output_cholesky(post_array, C)
