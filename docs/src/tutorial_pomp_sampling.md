@@ -53,7 +53,7 @@ init = Normal(zeros(2), 1.0I(2))
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)
 
-state_plt = plot(
+plot(
     ts,
     xs,
     layout = (2, 1),
