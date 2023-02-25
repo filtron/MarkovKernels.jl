@@ -12,15 +12,16 @@ k_3(y,x) = \int k_2(y,x) k_1(z,x) \mathrm{d} z.
 
 ```@docs
 compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T}
+∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T}) where {T}
 ```
 
 ### algebra 
 
 ```@docs
++(D::AbstractDistribution{T}, v::AbstractVector{T}) where {T}
+-(v::AbstractVector{T}, D::AbstractDistribution{T}) where {T}
 *(C::AbstractMatrix{T}, D::AbstractDistribution{T}) where {T}
 ```
-
-
 
 
 ### marginalization
