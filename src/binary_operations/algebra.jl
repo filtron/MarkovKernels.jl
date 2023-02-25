@@ -10,9 +10,6 @@ x ∼ D then -x ∼ -D.
 -(N::Normal) = Normal(-mean(N), covp(N)) # should techically be in src/distributions
 -(D::Dirac) = Dirac(-mean(D)) # should techically be in src/distributions
 
-#-(v::AbstractVector{T}, N::Normal{T}) where {T} = +(v, -N)
-#-(v::AbstractVector{T}, D::Dirac{T}) where {T} = +(v, -D)
-
 """
 +(v::AbstractVector{T}, D::AbstractDistribution{T})
 +(D::AbstractDistribution{T}, v::AbstractVector{T})
