@@ -14,6 +14,14 @@ k_3(y,x) = \int k_2(y,x) k_1(z,x) \mathrm{d} z.
 compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T}
 ```
 
+### algebra 
+
+```@docs
+*(C::AbstractMatrix{T}, D::AbstractDistribution{T}) where {T}
+```
+
+
+
 
 ### marginalization
 
