@@ -31,5 +31,4 @@ Computes K3, the composition of K2 ∘ K1 i.e.,
 
 See also [`compose`](@ref)
 """
-∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T}) where {T} = 
-    compose(K2, K1) 
+∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T}) where {T} = compose(K2, K1)
