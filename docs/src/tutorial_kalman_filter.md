@@ -95,6 +95,7 @@ function kalman_filter(
 
     return filter_distributions, loglike
 end
+nothing # hide
 ```
 
 ## Computing the filtered state estimates
@@ -140,6 +141,7 @@ function rts(filter_distributions, fw_kernel)
 
     return smoother_distributions
 end
+nothing # hide
 ```
 
 ## Computing the smoothed state estimate

@@ -116,6 +116,7 @@ function predict(
 
     return ParticleSystem(copy(logweights(P)), X)
 end
+nothing # hide
 ```
 
 
@@ -209,6 +210,7 @@ function predict(
 
     return ParticleSystem(logweights(P), vcat(particles(P), permutedims(X)))
 end
+nothing # hide 
 ```
 
 ## Computing the smoothed state estimates

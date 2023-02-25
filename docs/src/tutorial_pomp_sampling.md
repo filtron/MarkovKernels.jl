@@ -59,7 +59,6 @@ state_plt = plot(
     labels = ["x1" "x2"],
     title = ["Latent Gauss-Markov process" ""],
 )
-display(state_plt)
 ```
 
 ## Sampling and plotting the output
