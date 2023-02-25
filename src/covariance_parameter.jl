@@ -119,9 +119,9 @@ function _make_schur_output_cholesky(post_array, C)
     @inbounds yidx[1:ny] = 1:ny
     @inbounds xidx[1:nx] = ny+1:ny+nx
 
-    S = @inbounds view(post_array, yidx, yidx) |> _upper_cholesky
-    Σ = @inbounds view(post_array, xidx, xidx) |> _upper_cholesky
-    Kadj = @inbounds view(post_array, yidx, xidx)
+    S = @inbounds post_array[yidx, yidx] |> _upper_cholesky
+    Σ = @inbounds post_array[xidx, xidx] |> _upper_cholesky
+    Kadj = @inbounds post_array[yidx, xidx]
     K = Kadj' / lsqrt(S)
     return S, K, Σ
 end
