@@ -6,6 +6,9 @@ function marginalize_test(T, n, m, cov_types, matrix_types)
     Qp = randn(T, n, n)
     Qp = Qp * Qp'
 
+    vp = randn(T, n)
+    Cp = randn(T, n, n)
+
     for cov_t in cov_types, matrix_t in matrix_types
         μ = _make_vector(μp, matrix_t)
         Σ = _make_matrix(Σp, matrix_t)
@@ -17,8 +20,23 @@ function marginalize_test(T, n, m, cov_types, matrix_types)
         NK = NormalKernel(A, _make_covp(Q, cov_t))
         DK = DiracKernel(A)
 
+        # marginalize 
         for distribution in (N, D), kernel in (NK, DK)
             _test_pair_marginalize(distribution, kernel, (μ, Σ), (A, Q))
+        end
+
+        # plus / minus  
+        v = _make_vector(vp, matrix_t)
+        for distribution in (N, D)
+            @test mean(distribution + v) == mean(v + distribution) == mean(distribution) + v
+            @test mean(distribution - v) == mean(distribution) - v
+            @test mean(v - distribution) == v - mean(distribution)
+        end
+
+        # multiplication 
+        C = _make_matrix(Cp, matrix_t)
+        for distribution in (N, D)
+            @test C * distribution == marginalize(distribution, DiracKernel(C))
         end
     end
 end

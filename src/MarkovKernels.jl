@@ -2,7 +2,8 @@ module MarkovKernels
 
 using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
 
-import Base: *, +, eltype, length, size, log, ==, similar, convert, show, log, copy
+import Base:
+    *, +, -, ∘, eltype, length, size, log, ==, similar, convert, show, log, copy, vcat
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
@@ -59,6 +60,7 @@ include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/bayes_rule.jl")
+include("binary_operations/algebra.jl")
 export compose, marginalize, invert, bayes_rule, bayes_rule!
 
 include("matrix_utils.jl") # helper functions
