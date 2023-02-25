@@ -28,6 +28,7 @@ function sample(rng, init, K, nstep)
     it = Iterators.take(iterated(z -> rand(rng, K, z), x), nstep + 1)
     return mapreduce(permutedims, vcat, collect(it))
 end
+nothing # hide
 ```
 
 ## Sampling latent states
@@ -53,7 +54,7 @@ init = Normal(zeros(2), 1.0I(2))
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)
 
-plot(
+state_plt = plot(
     ts,
     xs,
     layout = (2, 1),
@@ -61,6 +62,7 @@ plot(
     labels = ["x1" "x2"],
     title = ["Latent Gauss-Markov process" ""],
 )
+display(state_plt)
 ```
 
 ## Sampling and plotting the output
