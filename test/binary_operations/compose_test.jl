@@ -26,6 +26,7 @@ function compose_test(T, n, cov_types, matrix_types)
             K1, K2 = kernels
             @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
                 @test mean(compose(K2, K1)) == compose(LinearMap(A2), LinearMap(A1))
+                @test K2 ∘ K1 == compose(K2, K1)
 
                 if all(typeof.(kernels) .<: NormalKernel)
                     @test cov(condition(compose(K2, K1), x)) ≈
