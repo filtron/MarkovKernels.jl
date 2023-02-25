@@ -11,7 +11,8 @@ function sample(rng, init, K, nstep)
     x = rand(rng, init)
     it = Iterators.take(iterated(z -&gt; rand(rng, K, z), x), nstep + 1)
     return mapreduce(permutedims, vcat, collect(it))
-end</code></pre><h2 id="Sampling-latent-states"><a class="docs-heading-anchor" href="#Sampling-latent-states">Sampling latent states</a><a id="Sampling-latent-states-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-latent-states" title="Permalink"></a></h2><pre><code class="language- hljs"># set rng
+end
+nothing # hide</code></pre><h2 id="Sampling-latent-states"><a class="docs-heading-anchor" href="#Sampling-latent-states">Sampling latent states</a><a id="Sampling-latent-states-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-latent-states" title="Permalink"></a></h2><pre><code class="language- hljs"># set rng
 rng = MersenneTwister(1991)
 
 # time grid
@@ -32,14 +33,15 @@ init = Normal(zeros(2), 1.0I(2))
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)
 
-plot(
+state_plt = plot(
     ts,
     xs,
     layout = (2, 1),
     xlabel = &quot;t&quot;,
     labels = [&quot;x1&quot; &quot;x2&quot;],
     title = [&quot;Latent Gauss-Markov process&quot; &quot;&quot;],
-)</code></pre><h2 id="Sampling-and-plotting-the-output"><a class="docs-heading-anchor" href="#Sampling-and-plotting-the-output">Sampling and plotting the output</a><a id="Sampling-and-plotting-the-output-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-and-plotting-the-output" title="Permalink"></a></h2><pre><code class="language- hljs"># output kernel and measurement kernel
+)
+display(state_plt)</code></pre><h2 id="Sampling-and-plotting-the-output"><a class="docs-heading-anchor" href="#Sampling-and-plotting-the-output">Sampling and plotting the output</a><a id="Sampling-and-plotting-the-output-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-and-plotting-the-output" title="Permalink"></a></h2><pre><code class="language- hljs"># output kernel and measurement kernel
 C = 1.0 / sqrt(2) * [1.0 -1.0]
 output_kernel = DiracKernel(C)
 R = fill(0.1, 1, 1)
@@ -50,4 +52,4 @@ outs = mapreduce(z -&gt; rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
 ys = mapreduce(z -&gt; rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
 
 output_plot = plot(ts, outs, label = &quot;output&quot;, xlabel = &quot;t&quot;)
-scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../binary_operators/">« Binary operators</a><a class="docs-footer-nextpage" href="../tutorial_kalman_filter/">Kalman filtering and smoothing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Saturday 25 February 2023 16:09">Saturday 25 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+scatter!(ts, ys, label = &quot;measurement&quot;, color = &quot;black&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../binary_operators/">« Binary operators</a><a class="docs-footer-nextpage" href="../tutorial_kalman_filter/">Kalman filtering and smoothing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Saturday 25 February 2023 16:16">Saturday 25 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
