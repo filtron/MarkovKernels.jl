@@ -17,21 +17,19 @@ Additionally, noisy measurements of the output process will be generated accordi
 y_n \mid x_n \sim \mathcal{N}(Cx_n,R).
 ```
 
-## Sampling a Gauss-Markov process
+
+## Sampling latent states
+
 ```@example 1
 using MarkovKernels
 using Random, LinearAlgebra, Plots, IterTools
 
-# sample a homogeneous Markov model
 function sample(rng, init, K, nstep)
     x = rand(rng, init)
     it = Iterators.take(iterated(z -> rand(rng, K, z), x), nstep + 1)
     return mapreduce(permutedims, vcat, collect(it))
 end
-```
 
-## Sampling latent states
-```@example 1
 # set rng
 rng = MersenneTwister(1991)
 
