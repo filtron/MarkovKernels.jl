@@ -22,7 +22,6 @@ y_n \mid x_n \sim \mathcal{N}(Cx_n,R).
 using MarkovKernels
 using Random, LinearAlgebra, Plots, IterTools
 
-# sample a homogeneous Markov model
 function sample(rng, init, K, nstep)
     x = rand(rng, init)
     it = Iterators.take(iterated(z -> rand(rng, K, z), x), nstep + 1)
