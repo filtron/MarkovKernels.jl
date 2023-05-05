@@ -159,7 +159,7 @@ Computes a random vector distributed according to the Normal distribution N
 using the random number generator RNG.
 """
 rand(RNG::AbstractRNG, N::AbstractNormal) =
-    mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
+    mean(N) + lsqrt(covp(N)) * typeof(mean(N))(randn(RNG, eltype(N), dim(N)))
 
 """
     rand(N::AbstractNormal)

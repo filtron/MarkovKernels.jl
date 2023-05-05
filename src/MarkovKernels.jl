@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
+using LinearAlgebra, ArrayInterface, Statistics, Random, GPUArraysCore, RecipesBase
 
 import Base:
     *, +, -, ∘, eltype, length, size, log, ==, similar, convert, show, log, copy, vcat

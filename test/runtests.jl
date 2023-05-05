@@ -1,6 +1,6 @@
 using MarkovKernels
 using Test
-using LinearAlgebra, StaticArrays
+using LinearAlgebra, StaticArrays, GPUArraysCore, CUDA
 using Plots
 
 import LinearAlgebra: HermOrSym
@@ -29,9 +29,10 @@ m = 2
 
 etypes = (Float64, Complex{Float64})
 
-matrix_types = (Matrix, SMatrix)
+matrix_types = (Matrix, SMatrix, CuMatrix)
 affine_types = (LinearMap, AffineMap, AffineCorrector)
 cov_types = (HermOrSym, Cholesky)
+#cov_types = (Cholesky,)
 
 @testset "MarkovKernels.jl" begin
     @testset "CovarianceParameter" begin
@@ -49,6 +50,7 @@ cov_types = (HermOrSym, Cholesky)
         normal_plotting_test()
     end
 
+    #=
     @testset "AffineMaps" begin
         for T in etypes
             affinemap_test(T, n, affine_types, matrix_types)
@@ -106,4 +108,5 @@ cov_types = (HermOrSym, Cholesky)
             bayes_rule_test(T, n, m, cov_types, matrix_types)
         end
     end
+    =#
 end

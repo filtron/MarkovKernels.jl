@@ -1,9 +1,11 @@
 
 _make_vector(v::AbstractVector, ::Type{Matrix}) = Vector(v)
 _make_vector(v::AbstractVector, ::Type{SMatrix}) = SVector{length(v)}(v)
+_make_vector(v::AbstractVector, ::Type{CuMatrix}) = CuVector(v)
 
 _make_matrix(A::AbstractMatrix, ::Type{Matrix}) = Matrix(A)
 _make_matrix(A::AbstractMatrix, ::Type{SMatrix}) = SMatrix{size(A)...}(A)
+_make_matrix(A::AbstractMatrix, ::Type{CuMatrix}) = CuMatrix(A)
 
 _make_covp(A::AbstractMatrix{T}, ::Type{HermOrSym}) where {T} =
     T <: Complex ? Hermitian(A) : Symmetric(A)
