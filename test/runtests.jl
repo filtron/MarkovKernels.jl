@@ -29,13 +29,12 @@ m = 2
 
 etypes = (Float64, Complex{Float64})
 
-
 if CUDA.has_cuda()
     matrix_types = (Matrix, CuMatrix)
     #matrix_types = (Matrix, SMatrix, CuMatrix)
-else 
+else
     matrix_types = (Matrix,)
-end 
+end
 
 affine_types = (LinearMap, AffineMap, AffineCorrector)
 cov_types = (HermOrSym, Cholesky)
