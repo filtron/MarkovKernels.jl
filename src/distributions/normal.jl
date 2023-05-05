@@ -49,6 +49,18 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     end
 end
 
+# dont wrap in HermOrSym for GPUArrays 
+function Normal(μ::AbstractGPUVector, Σ::AbstractGPUMatrix)
+    T = promote_type(eltype(μ), eltype(Σ))
+    if T <: Real
+        issymmetric(Σ) && return Normal{T}(μ, Σ)
+        throw(DomainError(Σ, "Real valued covariance must be symmetric"))
+    elseif T <: Complex
+        ishermitian(Σ) && return Normal{T}(μ, Σ)
+        throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
+    end
+end
+
 """
     Normal{T}(N::Normal{U,V,W})
 
@@ -103,6 +115,8 @@ Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
+var(N::Normal{T,U,Cholesky{T,A}}) where {T,U,A<:AbstractGPUMatrix} =
+    real(T).(diag(lsqrt(covp(N)) * lsqrt(covp(N))'))
 
 """
     std(N::AbstractNormal)

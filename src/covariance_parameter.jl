@@ -1,7 +1,8 @@
-const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T}}
+const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T},AbstractGPUMatrix{T}}
 
 CovarianceParameter{T}(Σ::Factorization) where {T} = convert(Factorization{T}, Σ)
 CovarianceParameter{T}(Σ::HermOrSym) where {T} = convert(AbstractMatrix{T}, Σ)
+CovarianceParameter{T}(Σ::AbstractGPUMatrix) where {T} = convert(AbstractMatrix{T}, Σ)
 
 convert(::Type{CovarianceParameter{T}}, Σ::CovarianceParameter) where {T} =
     CovarianceParameter{T}(Σ)
@@ -14,6 +15,7 @@ L need not be a Cholesky factor.
 """
 lsqrt(C::Cholesky) = C.uplo == 'L' ? C.L : C.U'
 lsqrt(A::HermOrSym) = lsqrt(cholesky(A))
+lsqrt(A::AbstractGPUMatrix) = lsqrt(cholesky(A))
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
@@ -24,7 +26,8 @@ Computes the output of the stein  operator
 
 The type of CovarianceParameter is preserved at the output.
 """
-stein(Σ::HermOrSym, Φ::AbstractMatrix) = symmetrise(Φ * Σ * Φ')
+stein(Σ::HermOrSym, Φ::AbstractMatrix) = symmetrize(Φ * Σ * Φ')
+stein(Σ::AbstractGPUMatrix, Φ::AbstractGPUMatrix) = symmetrize(Φ * Σ * Φ')
 stein(Σ::Cholesky, Φ::AbstractMatrix) = _make_post_array(lsqrt(Σ)' * Φ') |> _upper_cholesky
 
 """
@@ -37,7 +40,9 @@ Computes the output of the stein  operator
 Both Σ and Q need to be of the same CovarianceParameter type, e.g. both SymOrHerm or both Cholesky.
 The type of the CovarianceParameter is preserved at the output.
 """
-stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym) = symmetrise(Φ * Σ * Φ' + Q)
+stein(Σ::HermOrSym, Φ::AbstractMatrix, Q::HermOrSym) = symmetrize(Φ * Σ * Φ' + Q)
+stein(Σ::AbstractGPUMatrix, Φ::AbstractGPUMatrix, Q::AbstractGPUMatrix) =
+    symmetrize(Φ * Σ * Φ' + Q)
 stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky) =
     _make_post_array(vcat(lsqrt(Σ)' * Φ', lsqrt(Q)')) |> _upper_cholesky
 
@@ -57,10 +62,19 @@ The type of the CovarianceParameter is preserved at the output.
 """
 function schur_reduce(Π::HermOrSym, C::AbstractMatrix)
     K = Π * C'
-    S = symmetrise(C * K)
+    S = symmetrize(C * K)
     K = K / S
     L = (I - K * C)
-    Σ = symmetrise(L * Π * L')
+    Σ = symmetrize(L * Π * L')
+    return S, K, Σ
+end
+
+function schur_reduce(Π::AbstractGPUMatrix, C::AbstractGPUMatrix)
+    K = Π * C'
+    S = symmetrize(C * K)
+    K = K / S
+    L = (I - K * C)
+    Σ = symmetrize(L * Π * L')
     return S, K, Σ
 end
 
@@ -87,10 +101,19 @@ The type of the CovarianceParameter is preserved at the output.
 """
 function schur_reduce(Π::HermOrSym, C::AbstractMatrix, R::HermOrSym)
     K = Π * C'
-    S = symmetrise(C * K + R)
+    S = symmetrize(C * K + R)
     K = K / S
     L = (I - K * C)
-    Σ = symmetrise(L * Π * L' + K * R * K')
+    Σ = symmetrize(L * Π * L' + K * R * K')
+    return S, K, Σ
+end
+
+function schur_reduce(Π::AbstractGPUMatrix, C::AbstractGPUMatrix, R::AbstractGPUMatrix)
+    K = Π * C'
+    S = symmetrize(C * K + R)
+    K = K / S
+    L = (I - K * C)
+    Σ = symmetrize(L * Π * L' + K * R * K')
     return S, K, Σ
 end
 
@@ -104,7 +127,8 @@ end
 schur_reduce(Π, C::AbstractAffineMap) = schur_reduce(Π, slope(C))
 schur_reduce(Π, C::AbstractAffineMap, R) = schur_reduce(Π, slope(C), R)
 
-symmetrise(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+symmetrize(Σ::AbstractMatrix{T}) where {T} = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+symmetrize(Σ::AbstractGPUMatrix{T}) where {T<:Number} = (Σ + Σ') / T(2)
 
 function _make_post_array(pre_array)
     U = qr(pre_array).R
