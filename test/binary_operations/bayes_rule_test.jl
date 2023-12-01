@@ -38,16 +38,14 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
             @test loglike ≈ logpdf(M, y)
         end
 
-
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             NC, loglike = bayes_rule(N, FlatLikelihood())
-            @test NC === N 
+            @test NC === N
             @test loglike === 0.0
         end
     end
 
     _test_bayes_rule_particle_system(T, n, m)
-
 end
 
 function _test_bayes_rule_particle_system(T, n, m)

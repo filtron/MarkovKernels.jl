@@ -14,8 +14,7 @@ end
 Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
 """
 bayes_rule(D::AbstractDistribution, L::AbstractLikelihood) =
-    bayes_rule(D, measurement_model(L), measurement(L))  
- 
+    bayes_rule(D, measurement_model(L), measurement(L))
 
 #= 
 loglike is always Float64, bad?
@@ -27,8 +26,6 @@ last(twople_types(first(Base.return_types(logpdf, (typeof(D), sample_type(D)))))
 but Base.return_types is internal and sample_type is not implemented 
 =#
 bayes_rule(D::AbstractDistribution, ::FlatLikelihood) = D, 0.0
-
-
 
 function bayes_rule(
     P::ParticleSystem{T,U,<:AbstractVector},

@@ -3,7 +3,7 @@
 
 Type for representing flat likelihoods.
 """
-struct FlatLikelihood end 
+struct FlatLikelihood end
 
 """
     Likelihood{U,V}
@@ -45,4 +45,4 @@ Computes the logarithm of the likelihood L at x.
 log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))
 
 # this is also a bit imperfect e.g. a discrete distribution would still have Float valued logpdfs
-log(::FlatLikelihood, x) = zero(real(eltype(x)))  
+log(::FlatLikelihood, x) = zero(real(eltype(x)))
