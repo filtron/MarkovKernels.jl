@@ -54,7 +54,7 @@ export AbstractNormalKernel,
     AffineDiracKernel
 
 include("likelihoods.jl") # defines observation likelihoods
-export Likelihood, measurement_model, measurement
+export FlatLikelihood, Likelihood, measurement_model, measurement
 
 include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")

@@ -8,6 +8,7 @@ CurrentModule = MarkovKernels
 ### Types
 
 ```@docs
+FlatLikelihood
 Likelihood{U,V}
 ```
 ### Constructors
