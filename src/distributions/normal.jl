@@ -67,6 +67,27 @@ AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
 
+Base.copy(N::AbstractNormal) = Normal(copy(mean(N)), copy(covp(N)))
+function Base.copy!(Ndst::A, Nsrc::A) where {A<:AbstractNormal}  
+    copy!(mean(Ndst), mean(Nsrc))
+    copy!(covp(Ndst), covp(Nsrc))
+    return Ndst 
+end
+function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}  
+    copy!(mean(Ndst), mean(Nsrc))
+    covp(Ndst).uplo !== covp(Nsrc).uplo && throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
+    # should throw on different info as well? 
+    copy!(covp(Ndst).factors, covp(Nsrc).factors)
+    return Ndst 
+end
+Base.similar(N::AbstractNormal) = Normal(similar(mean(N)), similar(covp(N)))
+# similar not implemented for Cholesky, argh...
+function Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky} 
+    C = covp(N)
+    return Normal(similar(mean(N)), Cholesky(similar(C.factors), C.uplo, C.info))
+end
+
+
 """
     dim(N::AbstractNormal)
 

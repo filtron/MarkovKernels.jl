@@ -35,6 +35,16 @@ function ParticleSystem(
     return ParticleSystem{T,typeof(logws),typeof(X)}(logws, X)
 end
 
+
+Base.copy(P::ParticleSystem) =  ParticleSystem(copy(P.logws), copy(P.X))
+function Base.copy!(Pdst::ParticleSystem, Psrc::ParticleSystem)
+    copy!(Pdst.logws, Psrc.logws)
+    copy!(Pdst.X, Pdst.X)
+    return Pdst
+end
+Base.similar(P::ParticleSystem) =  ParticleSystem(similar(P.logws), similar(P.X))
+
+
 """
     dim(P::AbstractParticleSystem)
 

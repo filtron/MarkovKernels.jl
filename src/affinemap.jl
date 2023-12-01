@@ -84,6 +84,12 @@ intercept(F::AffineMap) = F.b
 AffineMap{T}(F::AffineMap) where {T} =
     AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
 
+Base.copy(F::AffineMap) = AffineMap(copy(F.A), copy(F.b))
+function Base.copy!(Fdst::AffineMap, Fsrc::AffineMap) 
+    copy!(Fdst.A, Fsrc.)
+end
+Base.similar(F::AffineMap) = AffineMap(similar(F.A), similar(F.b))
+
 """
     AbstractAffineMap{T}(F::AbstractAffineMap)
 
@@ -109,6 +115,9 @@ LinearMap(A::AbstractMatrix) = LinearMap{eltype(A),typeof(A)}(A)
 
 Base.iterate(F::LinearMap) = (F.A, Val(:done))
 Base.iterate(F::LinearMap, ::Val{:done}) = nothing
+
+Base.copy(F::LinearMap) = LinearMap(copy(F.A))
+Base.similar(F::LinearMap) = LinearMap(similar(F.A))
 
 slope(F::LinearMap) = F.A
 intercept(F::LinearMap) = zero(diag(slope(F)))
@@ -158,6 +167,9 @@ Base.iterate(F::AffineCorrector) = (F.A, Val(:b))
 Base.iterate(F::AffineCorrector, ::Val{:b}) = (F.b, Val(:c))
 Base.iterate(F::AffineCorrector, ::Val{:c}) = (F.c, Val(:done))
 Base.iterate(F::AffineCorrector, ::Val{:done}) = nothing
+
+Base.copy(F::AffineCorrector) = AffineCorrector(copy(F.A), copy(F.b), copy(F.c))
+Base.similar(F::AffineCorrector) = AffineCorrector(similar(F.A), similar(F.b), similar(F.c))
 
 slope(F::AffineCorrector) = F.A
 intercept(F::AffineCorrector) = F.b - F.A * F.c

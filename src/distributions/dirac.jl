@@ -72,6 +72,13 @@ Computes the mean vector of the Dirac distribution D.
 """
 mean(D::Dirac) = D.μ
 
+Base.copy(D::Dirac) = Dirac(copy(mean(D))) 
+function Base.copy!(Ddst::Dirac, Dsrc::Dirac)  
+    copy!(mean(Ddst), mean(Dsrc))
+    return Ddst
+end
+Base.similar(D::Dirac) = Dirac(similar(mean(D)))
+
 """
     rand(RNG::AbstractRNG, D::AbstractDirac)
 
