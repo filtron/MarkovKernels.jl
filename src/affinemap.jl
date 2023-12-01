@@ -86,7 +86,8 @@ AffineMap{T}(F::AffineMap) where {T} =
 
 Base.copy(F::AffineMap) = AffineMap(copy(F.A), copy(F.b))
 function Base.copy!(Fdst::AffineMap, Fsrc::AffineMap) 
-    copy!(Fdst.A, Fsrc.)
+    copy!(Fdst.A, Fsrc.A)
+    copy!(Fdst.b, Fsrc.b)
 end
 Base.similar(F::AffineMap) = AffineMap(similar(F.A), similar(F.b))
 
