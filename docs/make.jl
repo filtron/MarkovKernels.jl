@@ -19,6 +19,7 @@ makedocs(;
         "Affine maps" => "affinemap.md",
         "Covariance parametrizations" => "covariance_parameter.md",
         "Distributions" => [
+            "General" => "distributions/general.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
             "ParticleSystem" => "distributions/particle_system.md",

@@ -51,7 +51,8 @@ function normal_test(T, n, cov_types, matrix_types)
 
             @test length(rand(N)) == dim(N)
             @test eltype(rand(N)) == T
-            @test _ofsametype(μ, rand(N))
+            @test typeof(rand(N)) == typeof_sample(N)
+            @test eltype(rand(N)) == eltype_sample(N)
         end
     end
 
