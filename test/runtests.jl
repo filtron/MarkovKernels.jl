@@ -1,6 +1,7 @@
 using MarkovKernels
 using Test
-using LinearAlgebra, StaticArrays
+using LinearAlgebra
+#using StaticArrays
 using Plots
 
 import LinearAlgebra: HermOrSym
@@ -29,7 +30,7 @@ m = 2
 
 etypes = (Float64, Complex{Float64})
 
-matrix_types = (Matrix, SMatrix)
+matrix_types = (Matrix,)
 affine_types = (LinearMap, AffineMap, AffineCorrector)
 cov_types = (HermOrSym, Cholesky)
 

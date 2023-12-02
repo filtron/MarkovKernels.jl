@@ -13,8 +13,9 @@ Standard mean vector / covariance matrix parametrisation of Normal kernels.
 struct NormalKernel{T,U,V} <: AbstractNormalKernel{T}
     μ::U
     Σ::V
-    NormalKernel{T}(μ, Σ) where {T} = new{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
+
+NormalKernel{T}(μ, Σ) where {T} = NormalKernel{T,typeof(μ),typeof(Σ)}(μ, Σ)
 
 """
     NormalKernel(F::AbstractAffineMap, Σ)
@@ -62,6 +63,20 @@ NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
     NormalKernel(AffineCorrector(Φ, b, c), Σ)
 
 const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
+
+function Base.copy!(Kdst::A, Ksrc::A) where {T,U,V<:Cholesky,A<:AffineNormalKernel{T,U,V}}
+    copy!(mean(Kdst), mean(Ksrc))
+    covp(Kdst).uplo !== covp(Ksrc).uplo &&
+        throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
+    # should throw on different info as well? 
+    copy!(covp(Kdst).factors, covp(Ksrc).factors)
+    return Kdst
+end
+# similar not implemented for Cholesky, argh...
+function Base.similar(K::AffineNormalKernel{T,U,<:Cholesky}) where {T,U}
+    C = covp(K)
+    return NormalKernel(similar(mean(K)), Cholesky(similar(C.factors), C.uplo, C.info))
+end
 
 """
     NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)

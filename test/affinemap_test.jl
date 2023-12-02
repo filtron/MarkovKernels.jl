@@ -25,6 +25,11 @@ function affinemap_test(T, n, affine_types, matrix_types)
             @test eltype(F) == T
             @test convert(typeof(F), F) == F
 
+            @test !(copy(F) === F)
+            @test typeof(copy(F)) === typeof(F)
+            @test typeof(similar(F)) === typeof(F)
+            @test copy!(similar(F), F) == F
+
             for U in Us
                 eltype(AbstractAffineMap{U}(F)) == U
                 convert(AbstractAffineMap{U}, F) == AbstractAffineMap{U}(F)

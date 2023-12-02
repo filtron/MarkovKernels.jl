@@ -12,8 +12,9 @@ Type for representing Dirac kernels K(y,x) = δ(y - μ(x)).
 """
 struct DiracKernel{T,U} <: AbstractDiracKernel{T}
     μ::U
-    DiracKernel{T}(μ) where {T} = new{T,typeof(μ)}(μ)
 end
+
+DiracKernel{T}(μ) where {T} = DiracKernel{T,typeof(μ)}(μ)
 
 """
     DiracKernel(F::AbstractAffineMap)

@@ -22,6 +22,12 @@ function normal_test(T, n, cov_types, matrix_types)
         @testset "Normal | Unary | $(T) | " begin
             @test_nowarn repr(N)
             @test eltype(N) == T
+
+            @test !(copy(N) === N)
+            @test typeof(copy(N)) === typeof(N)
+            @test typeof(similar(N)) === typeof(N)
+            @test copy!(similar(N), N) == N
+
             for U in eltypes
                 @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
                 @test eltype(AbstractNormal{U}(N)) == U
