@@ -49,7 +49,7 @@ std(::AbstractNormal)
 
 ```@docs
 residual(N::AbstractNormal, x::AbstractVector)
-logpdf(N::AbstractNormal, x)
+logpdf(N::AbstractNormal{T}, x) where {T}
 ```
 
 ### Information theory

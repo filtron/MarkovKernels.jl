@@ -9,11 +9,12 @@ CurrentModule = MarkovKernels
 ```@docs
 typeof_sample(D::AbstractDistribution)
 eltype_sample(D::AbstractDistribution)
+```
 
 ### Probability densities
 
 ```@docs 
-logpdf(D::AbstractDistribution, x)
+logpdf(D::AbstractDistribution, x) 
 ```
 
 ### Sampling 
