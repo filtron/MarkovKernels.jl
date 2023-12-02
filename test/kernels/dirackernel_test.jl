@@ -17,6 +17,12 @@ function dirackernel_test(T, n, matrix_types)
         @testset "AffineDiracKernel | Unary | $(T)" begin
             @test_nowarn repr(K)
             @test eltype(K) == T
+
+            @test !(copy(K) === K)
+            @test typeof(copy(K)) === typeof(K)
+            @test typeof(similar(K)) === typeof(K)
+            @test copy!(similar(K), K) == K
+
             @test typeof(K) <: AffineDiracKernel
             @test K == DiracKernel(mean(K)...)
             @test convert(typeof(K), K) == K

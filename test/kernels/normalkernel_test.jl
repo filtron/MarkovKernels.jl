@@ -41,6 +41,12 @@ function affine_normalkernel_test(T, n, cov_types, matrix_types)
         @testset "AffineNormalKernel | Unary | $(T) | $(cov_t) | $(matrix_t)" begin
             @test_nowarn repr(K)
             @test eltype(K) == T
+
+            @test !(copy(K) === K)
+            @test typeof(copy(K)) === typeof(K)
+            @test typeof(similar(K)) === typeof(K)
+            @test copy!(similar(K), K) == K
+
             @test typeof(K) <: AffineNormalKernel
             @test K == NormalKernel(mean(K)..., Σ)
             for U in eltypes

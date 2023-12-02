@@ -8,6 +8,12 @@ function dirac_test(T, n)
     @testset "Dirac | $(T) " begin
         @test_nowarn repr(D)
         @test eltype(D) == T
+
+        @test !(copy(D) === D)
+        @test typeof(copy(D)) === typeof(D)
+        @test typeof(similar(D)) === typeof(D)
+        @test copy!(similar(D), D) == D
+
         @test dim(D) == n
         for U in compatible_eltypes
             @test AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)

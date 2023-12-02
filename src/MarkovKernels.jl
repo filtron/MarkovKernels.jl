@@ -3,7 +3,22 @@ module MarkovKernels
 using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
 
 import Base:
-    *, +, -, ∘, eltype, length, size, log, ==, similar, convert, show, log, copy, copy!, vcat
+    *,
+    +,
+    -,
+    ∘,
+    eltype,
+    length,
+    size,
+    log,
+    ==,
+    similar,
+    convert,
+    show,
+    log,
+    copy,
+    copy!,
+    vcat
 
 import LinearAlgebra: logdet, norm_sqr, HermOrSym
 import Statistics: mean, cov, var, std
