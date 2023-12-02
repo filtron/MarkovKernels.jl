@@ -89,9 +89,3 @@ Therefore, it is up to the user to define, when required, appropriate approximat
 predict(D::AbstractDistribution, K::AbstractMarkovKernel)
 update(D::AbstractDistribution, L::AbstractLikelihood)
 ```
-
-## TODO: 
-
-1. Implement Mixture ditributions / kernels (e.g. for particle filtering). 
-2. Normal distributions in information vector / matrix parametrisation.   
-
