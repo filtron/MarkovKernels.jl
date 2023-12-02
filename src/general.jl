@@ -39,7 +39,7 @@ for T in
         fields = fieldnames(A)
         dst = Tuple(getfield(Fdst, f) for f in fields)
         src = Tuple(getfield(Fsrc, f) for f in fields)
-        foreach(Base.Splat(copy!), zip(dst, src))
+        foreach(Base.splat(copy!), zip(dst, src))
         return Fdst
     end
 end
