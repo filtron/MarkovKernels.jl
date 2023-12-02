@@ -13,31 +13,28 @@ abstract type AbstractLikelihood end
 
 Computes the type of samples from D, e.g. same as typeof(rand(D)).
 """
-function typeof_sample(D::AbstractDistribution) end 
+function typeof_sample(D::AbstractDistribution) end
 
 """
 eltype_sample(D::AbstractDistribution)
 
 Computes the eltype of samples from D, e.g. same as eltype(rand(D)).
 """
-eltype_sample(D::AbstractDistribution) = eltype(typeof_sample(D)) 
-
+eltype_sample(D::AbstractDistribution) = eltype(typeof_sample(D))
 
 """
     logpdf(D::AbstractDistribution, x)
 
 Computes the logarithm of the probabilidty density of D, evaluated at x. 
 """
-function logpdf(D::AbstractDistribution, x) end 
-
+function logpdf(D::AbstractDistribution, x) end
 
 """
     rand([rng], D::AbstractDistribution)
 
 Draws one sample from D. 
 """
-function Base.rand(rng::AbstractRNG, D::AbstractDistribution) end 
-
+function Base.rand(rng::AbstractRNG, D::AbstractDistribution) end
 
 for T in
     (:AbstractAffineMap, :AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)

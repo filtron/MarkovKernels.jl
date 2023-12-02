@@ -14,7 +14,6 @@ struct Dirac{T,U} <: AbstractDirac{T}
     μ::U
 end
 
-
 """
     Dirac(μ::AbstractVector{<:Number})
 
@@ -58,7 +57,6 @@ end
 AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
-
 
 typeof_sample(D::Dirac) = typeof(D.μ)
 

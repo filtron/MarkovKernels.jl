@@ -31,7 +31,8 @@ include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
 
 include("general.jl")
-export AbstractDistribution, AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
+export AbstractDistribution,
+    AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
 
 include("distributions/normal.jl")
 include("distributions/dirac.jl")
