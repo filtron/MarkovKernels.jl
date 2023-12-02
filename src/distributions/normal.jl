@@ -68,6 +68,8 @@ AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
 
+typeof_sample(N::Normal) = typeof(mean(N))
+
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
     copy!(mean(Ndst), mean(Nsrc))
     covp(Ndst).uplo !== covp(Nsrc).uplo &&

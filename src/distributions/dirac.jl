@@ -58,6 +58,8 @@ AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
 
+typeof_sample(D::Dirac) = typeof(D.μ)
+
 """
     dim(D::AbstractDirac)
 

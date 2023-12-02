@@ -26,9 +26,11 @@ function dirac_test(T, n)
         end
         @test mean(D) == μ
         @test rand(D) == mean(D)
+        @test typeof(rand(D)) == typeof_sample(D)
+        @test eltype(rand(D)) == eltype_sample(D)
     end
 
-    # Dirac over trjaectories
+    # Dirac over trajectories
     μ = [[T(k)] for k in 1:5]
     D = Dirac(μ)
 
