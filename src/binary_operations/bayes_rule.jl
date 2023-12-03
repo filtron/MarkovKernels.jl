@@ -18,11 +18,6 @@ function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
     return condition(C, y)
 end
 
-const bayes_rule_and_loglike = posterior_and_loglike
-const bayes_rule_and_loglike! = posterior_and_loglike!
-const bayes_rule = posterior 
-
-
 
 """
     posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
@@ -113,3 +108,8 @@ function _update_weights_and_compute_loglike!(
 
     return logc2 - logc1 + logs2 - logs1
 end
+
+
+const bayes_rule_and_loglike = posterior_and_loglike
+const bayes_rule_and_loglike! = posterior_and_loglike!
+const bayes_rule = posterior 
