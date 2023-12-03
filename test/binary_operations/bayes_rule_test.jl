@@ -25,7 +25,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
             @test mean(NC) ≈ mean(condition(KC, y))
             @test cov(NC) ≈ cov(condition(KC, y))
             @test loglike ≈ logpdf(M, y)
-            
+
             NC2 = posterior(N, L)
             @test NC2 ≈ NC
         end
@@ -50,7 +50,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
             @test iszero(loglike)
 
             NC2 = posterior(N, FlatLikelihood())
-            @test NC2 ≈ NC 
+            @test NC2 ≈ NC
         end
     end
 

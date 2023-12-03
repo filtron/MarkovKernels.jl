@@ -13,11 +13,10 @@ end
 
 Computes the conditional distribution C associated with the prior distribution D, measurement kernel K, and measurement y.
 """
-function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y) 
+function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
     _, C = invert(D, K)
     return condition(C, y)
 end
-
 
 """
     posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
@@ -27,13 +26,12 @@ Computes the conditional distribution C and the marginal log-likelihood ℓ asso
 posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
 
-
 """
     posterior(D::AbstractDistribution, L::AbstractLikelihood)
 
 Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
 """
-posterior(D::AbstractDistribution, L::AbstractLikelihood) = 
+posterior(D::AbstractDistribution, L::AbstractLikelihood) =
     posterior(D, measurement_model(L), measurement(L))
 
 #= 
@@ -109,7 +107,6 @@ function _update_weights_and_compute_loglike!(
     return logc2 - logc1 + logs2 - logs1
 end
 
-
 const bayes_rule_and_loglike = posterior_and_loglike
 const bayes_rule_and_loglike! = posterior_and_loglike!
-const bayes_rule = posterior 
+const bayes_rule = posterior

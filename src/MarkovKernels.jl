@@ -77,7 +77,8 @@ include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/bayes_rule.jl")
 include("binary_operations/algebra.jl")
-export compose, marginalize, invert, posterior_and_loglike, posterior, posterior_and_loglike!
+export compose,
+    marginalize, invert, posterior_and_loglike, posterior, posterior_and_loglike!
 
 # these will be removed
 export bayes_rule_and_loglike, bayes_rule_and_loglike!, bayes_rule
