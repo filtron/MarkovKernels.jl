@@ -82,7 +82,7 @@ function bootstrap_filter(
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
     L = Likelihood(m_kernel, ys[1, :])
-    loglike_incr = bayes_rule!(P, L)
+    loglike_incr = posterior_and_loglike!(P, L)
     loglike = loglike + loglike_incr
     resample!(rng, P)
 
@@ -92,7 +92,7 @@ function bootstrap_filter(
     for m in 2:size(ys, 1)
         L = Likelihood(m_kernel, ys[m, :])
         P = predict(rng, P, fw_kernel)
-        loglike_incr = bayes_rule!(P, L)
+        loglike_incr = posterior_and_loglike!(P, L)
         loglike = loglike + loglike_incr
         resample!(rng, P)
         push!(Ps, P)
@@ -177,7 +177,7 @@ function bootstrap_smoother(
     P = ParticleSystem(zeros(K), X)
     loglike = 0.0
     L = Likelihood(m_kernel, ys[1, :])
-    loglike_incr = bayes_rule!(P, L)
+    loglike_incr = posterior_and_loglike!(P, L)
     loglike = loglike + loglike_incr
     resample!(rng, P)
 
@@ -185,7 +185,7 @@ function bootstrap_smoother(
         L = Likelihood(m_kernel, ys[m, :])
 
         P = predict(rng, P, fw_kernel)
-        loglike_incr = bayes_rule!(P, L)
+        loglike_incr = posterior_and_loglike!(P, L)
 
         loglike = loglike + loglike_incr
         resample!(rng, P)

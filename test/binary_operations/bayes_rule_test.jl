@@ -21,10 +21,13 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
 
-            NC, loglike = bayes_rule(N, L)
+            NC, loglike = posterior_and_loglike(N, L)
             @test mean(NC) ≈ mean(condition(KC, y))
             @test cov(NC) ≈ cov(condition(KC, y))
             @test loglike ≈ logpdf(M, y)
+
+            NC2 = posterior(N, L)
+            @test NC2 ≈ NC
         end
 
         K = DiracKernel(C)
@@ -32,16 +35,22 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
 
-            NC, loglike = bayes_rule(N, L)
+            NC, loglike = posterior_and_loglike(N, L)
             @test mean(NC) ≈ mean(condition(KC, y))
             @test cov(NC) ≈ cov(condition(KC, y))
             @test loglike ≈ logpdf(M, y)
+
+            NC2 = posterior(N, L)
+            @test NC2 ≈ NC
         end
 
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
-            NC, loglike = bayes_rule(N, FlatLikelihood())
+            NC, loglike = posterior_and_loglike(N, FlatLikelihood())
             @test NC === N
-            @test loglike === 0.0
+            @test iszero(loglike)
+
+            NC2 = posterior(N, FlatLikelihood())
+            @test NC2 ≈ NC
         end
     end
 
@@ -65,8 +74,8 @@ function _test_bayes_rule_particle_system(T, n, m)
     logws_gt = logws + [log(L, X[i]) for i in eachindex(X)]
     ws_gt = exp.(logws_gt) / sum(exp, logws_gt)
     @testset "bayes_rule | $(typeof(P1)) | $(typeof(K))" begin
-        PC1, loglike1 = bayes_rule(P1, L)
-        loglike2 = bayes_rule!(P2, L)
+        PC1, loglike1 = posterior_and_loglike(P1, L)
+        loglike2 = posterior_and_loglike!(P2, L)
 
         @test loglike1 ≈ loglike2 ≈ loglike_gt
         @test weights(PC1) ≈ weights(P2) ≈ ws_gt
@@ -78,8 +87,8 @@ function _test_bayes_rule_particle_system(T, n, m)
     P4 = ParticleSystem(copy(logws), copy.(X2))
 
     @testset "bayes_rule | $(typeof(P3)) | $(typeof(K))" begin
-        PC3, loglike3 = bayes_rule(P3, L)
-        loglike4 = bayes_rule!(P4, L)
+        PC3, loglike3 = posterior_and_loglike(P3, L)
+        loglike4 = posterior_and_loglike!(P4, L)
 
         @test loglike3 ≈ loglike4 ≈ loglike_gt
         @test weights(PC3) ≈ weights(P4) ≈ ws_gt

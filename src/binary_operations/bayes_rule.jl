@@ -1,20 +1,38 @@
 """
-    bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
+    posterior_and_loglike(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 
 Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D, measurement kernel K, and measurement y.
 """
-function bayes_rule(D::AbstractDistribution, K::AbstractMarkovKernel, y)
+function posterior_and_loglike(D::AbstractDistribution, K::AbstractMarkovKernel, y)
     M, C = invert(D, K)
     return condition(C, y), logpdf(M, y)
 end
 
 """
-    bayes_rule(D::AbstractDistribution, L::AbstractLikelihood)
+    posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
+
+Computes the conditional distribution C associated with the prior distribution D, measurement kernel K, and measurement y.
+"""
+function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
+    _, C = invert(D, K)
+    return condition(C, y)
+end
+
+"""
+    posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
 
 Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
 """
-bayes_rule(D::AbstractDistribution, L::AbstractLikelihood) =
-    bayes_rule(D, measurement_model(L), measurement(L))
+posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood) =
+    posterior_and_loglike(D, measurement_model(L), measurement(L))
+
+"""
+    posterior(D::AbstractDistribution, L::AbstractLikelihood)
+
+Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
+"""
+posterior(D::AbstractDistribution, L::AbstractLikelihood) =
+    posterior(D, measurement_model(L), measurement(L))
 
 #= 
 loglike is always Float64, bad?
@@ -25,9 +43,10 @@ last(twople_types(first(Base.return_types(logpdf, (typeof(D), sample_type(D)))))
 
 but Base.return_types is internal and sample_type is not implemented 
 =#
-bayes_rule(D::AbstractDistribution, ::FlatLikelihood) = D, 0.0
+posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0.0
+posterior(D::AbstractDistribution, ::FlatLikelihood) = D
 
-function bayes_rule(
+function posterior_and_loglike(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLikelihood,
 ) where {T,U}
@@ -37,7 +56,7 @@ function bayes_rule(
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
 
-function bayes_rule(
+function posterior_and_loglike(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     L::AbstractLikelihood,
 ) where {T,U}
@@ -52,14 +71,14 @@ end
 
 Computes the conditional distribution C in-place and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
 """
-function bayes_rule!(
+function posterior_and_loglike!(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLikelihood,
 ) where {T,U}
     return _update_weights_and_compute_loglike!(logweights(P), P, L)
 end
 
-function bayes_rule!(
+function posterior_and_loglike!(
     P::ParticleSystem{T,U,<:AbstractMatrix},
     L::AbstractLikelihood,
 ) where {T,U}
@@ -87,3 +106,7 @@ function _update_weights_and_compute_loglike!(
 
     return logc2 - logc1 + logs2 - logs1
 end
+
+const bayes_rule_and_loglike = posterior_and_loglike
+const bayes_rule_and_loglike! = posterior_and_loglike!
+const bayes_rule = posterior
