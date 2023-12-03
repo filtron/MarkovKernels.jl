@@ -76,7 +76,8 @@ For the purpose of Bayesian state estimation, ideally the following functions ar
 ```julia
 marginalize(D::AbstractDistribution, K::AbstractMarkovKernel)
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
-bayes_rule(D::AbstractDistribution, L::AbstractLikelihood)
+posterior(D::AbstractDistribution, L::AbstractLikelihood)
+posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
 ```
 
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
