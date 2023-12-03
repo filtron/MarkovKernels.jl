@@ -83,6 +83,13 @@ function Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky}
     C = covp(N)
     return Normal(similar(mean(N)), Cholesky(similar(C.factors), C.uplo, C.info))
 end
+# isapprox not implemented for cholesky... 
+function Base.isapprox(N1::Normal{T,U,V}, N2::Normal{T,U,V}, kwargs...)  where {T,U,V<:Cholesky}
+    C1, C2 = covp(N1), covp(N2) 
+    C1.uplo !== C2.uplo && 
+        throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
+    return isapprox(mean(N1), mean(N2); kwargs...) && isapprox(C1.factors, C2.factors; kwargs...)
+end 
 
 """
     dim(N::AbstractNormal)
