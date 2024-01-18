@@ -43,8 +43,8 @@ function marginalize_test(T, n, m, cov_types, matrix_types)
 end
 
 function _test_pair_marginalize(D::Normal, K::AffineNormalKernel)
-    μ, Σ = mean(D), AbstractMatrix(covp(D))
-    A, Q = slope(mean(K)), AbstractMatrix(covp(K))
+    μ, Σ = mean(D), Matrix(covp(D))
+    A, Q = slope(mean(K)), Matrix(covp(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
         @test cov(marginalize(D, K)) ≈ A * Σ * A' + Q
@@ -52,7 +52,7 @@ function _test_pair_marginalize(D::Normal, K::AffineNormalKernel)
 end
 
 function _test_pair_marginalize(D::Normal, K::AffineDiracKernel)
-    μ, Σ = mean(D), AbstractMatrix(covp(D))
+    μ, Σ = mean(D), Matrix(covp(D))
     A = slope(mean(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
@@ -62,7 +62,7 @@ end
 
 function _test_pair_marginalize(D::Dirac, K::AffineNormalKernel)
     μ = mean(D)
-    A, Q = slope(mean(K)), AbstractMatrix(covp(K))
+    A, Q = slope(mean(K)), Matrix(covp(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
         @test cov(marginalize(D, K)) ≈ Q
