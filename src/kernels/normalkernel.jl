@@ -1,7 +1,7 @@
 """
-    AbstractNormalKernel{T<:Number}
+    AbstractNormalKernel
 
-Abstract type for representing Normal kernels taking values in T.
+Abstract type for representing Normal kernels.
 """
 abstract type AbstractNormalKernel <: AbstractMarkovKernel end
 

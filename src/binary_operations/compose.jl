@@ -27,7 +27,7 @@ compose(::IdentityKernel, K1::AbstractMarkovKernel) = K1
 compose(K2::IdentityKernel, ::IdentityKernel) = K2 # tie-breaker
 
 """ 
-    ∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T})
+    ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 
 Computes K3, the composition of K2 ∘ K1 i.e.,
 

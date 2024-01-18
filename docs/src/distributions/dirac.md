@@ -33,5 +33,4 @@ mean(::Dirac)
 
 ```@docs
 rand(::AbstractRNG, ::AbstractDirac)
-rand( ::AbstractDirac)
 ```
