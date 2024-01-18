@@ -32,8 +32,7 @@ etypes = (Float64, Complex{Float64})
 
 matrix_types = (Matrix,)
 affine_types = (LinearMap, AffineMap, AffineCorrector)
-#cov_types = (HermOrSym, Cholesky)
-cov_types = (Cholesky,)
+cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
     @testset "CovarianceParameter" begin
