@@ -45,7 +45,7 @@ export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercep
 include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
 
-include("general.jl")
+include("generic.jl")
 export AbstractDistribution,
     AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
 

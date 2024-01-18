@@ -82,14 +82,6 @@ using the random number generator RNG. Equivalent to mean(D).
 """
 rand(::AbstractRNG, D::AbstractDirac) = mean(D)
 
-"""
-    rand(D::AbstractDirac)
-
-Computes a random vector distributed according to the Dirac distribution D
-using the random number generator Random.GLOBAL_RNG. Equivalent to mean(D).
-"""
-rand(D::AbstractDirac) = rand(GLOBAL_RNG, D)
-
 function Base.show(io::IO, D::Dirac)
     println(io, summary(D))
     print(io, "μ = ")

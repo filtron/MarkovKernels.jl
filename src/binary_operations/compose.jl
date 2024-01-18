@@ -14,7 +14,7 @@ compose(K2::AffineNormalKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), covp(K2))
 
 compose(K2::NormalKernel{<:AbstractAffineMap{T}}, K1::AffineDiracKernel{T}) where {T} =
-    NormalKernel(compose(mean(K2), mean(K1)), cov(K2) ∘ mean(K1))
+    NormalKernel(compose(mean(K2), mean(K1)), covp(K2) ∘ mean(K1))
 
 compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     DiracKernel(compose(mean(K2), mean(K1)))
@@ -24,6 +24,7 @@ compose(K2::AffineDiracKernel{T}, K1::AffineNormalKernel{T}) where {T} =
 
 compose(K2::AbstractMarkovKernel, ::IdentityKernel) = K2
 compose(::IdentityKernel, K1::AbstractMarkovKernel) = K1
+compose(K2::IdentityKernel, ::IdentityKernel) = K2 # tie-breaker
 
 """ 
     ∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T})

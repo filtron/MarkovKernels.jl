@@ -187,16 +187,8 @@ end
 Computes a random vector distributed according to the Normal distribution N
 using the random number generator RNG.
 """
-rand(RNG::AbstractRNG, N::AbstractNormal) =
-    mean(N) + lsqrt(covp(N)) * randn(RNG, eltype(N), dim(N))
-
-"""
-    rand(N::AbstractNormal)
-
-Computes a random vector distributed according to the Normal distribution N
-using the random number generator Random.GLOBAL_RNG.
-"""
-rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
+rand(rng::AbstractRNG, N::AbstractNormal) =
+    mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N), dim(N))
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))
