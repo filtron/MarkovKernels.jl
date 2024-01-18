@@ -34,16 +34,7 @@ Computes the conditional distribution C associated with the prior distribution D
 posterior(D::AbstractDistribution, L::AbstractLikelihood) =
     posterior(D, measurement_model(L), measurement(L))
 
-#= 
-loglike is always Float64, bad?
-should be: 
-
-twople_types(::Tuple{A,B}) where {A,B} = A, B 
-last(twople_types(first(Base.return_types(logpdf, (typeof(D), sample_type(D))))))
-
-but Base.return_types is internal and sample_type is not implemented 
-=#
-posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0.0
+posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0
 posterior(D::AbstractDistribution, ::FlatLikelihood) = D
 
 function posterior_and_loglike(

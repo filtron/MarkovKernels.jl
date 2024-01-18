@@ -19,10 +19,11 @@ function marginalize_test(T, n, m, cov_types, matrix_types)
         D = Dirac(μ)
         NK = NormalKernel(A, _make_covp(Q, cov_t))
         DK = DiracKernel(A)
+        IK = IdentityKernel()
 
         # marginalize 
-        for distribution in (N, D), kernel in (NK, DK)
-            _test_pair_marginalize(distribution, kernel, (μ, Σ), (A, Q))
+        for distribution in (N, D), kernel in (NK, DK, IK)
+            _test_pair_marginalize(distribution, kernel)
         end
 
         # plus / minus  
@@ -41,38 +42,44 @@ function marginalize_test(T, n, m, cov_types, matrix_types)
     end
 end
 
-function _test_pair_marginalize(D::Normal, K::AffineNormalKernel, P1, P2)
-    μ, Σ = P1
-    A, Q = P2
+function _test_pair_marginalize(D::Normal, K::AffineNormalKernel)
+    μ, Σ = mean(D), AbstractMatrix(covp(D))
+    A, Q = slope(mean(K)), AbstractMatrix(covp(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
         @test cov(marginalize(D, K)) ≈ A * Σ * A' + Q
     end
 end
 
-function _test_pair_marginalize(D::Normal, K::AffineDiracKernel, P1, P2)
-    μ, Σ = P1
-    A = P2[1]
+function _test_pair_marginalize(D::Normal, K::AffineDiracKernel)
+    μ, Σ = mean(D), AbstractMatrix(covp(D))
+    A = slope(mean(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
         @test cov(marginalize(D, K)) ≈ A * Σ * A'
     end
 end
 
-function _test_pair_marginalize(D::Dirac, K::AffineNormalKernel, P1, P2)
-    μ, Σ = P1
-    A, Q = P2
+function _test_pair_marginalize(D::Dirac, K::AffineNormalKernel)
+    μ = mean(D)
+    A, Q = slope(mean(K)), AbstractMatrix(covp(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
         @test mean(marginalize(D, K)) ≈ A * μ
         @test cov(marginalize(D, K)) ≈ Q
     end
 end
 
-function _test_pair_marginalize(D::Dirac, K::AffineDiracKernel, P1, P2)
-    μ, Σ = P1
-    A, Q = P2
+function _test_pair_marginalize(D::Dirac, K::AffineDiracKernel)
+    μ = mean(D)
+    A, b = slope(mean(K)), intercept(mean(K))
     @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test mean(marginalize(D, K)) ≈ A * μ
+        @test mean(marginalize(D, K)) ≈ A * μ + b
+    end
+end
+
+function _test_pair_marginalize(D::AbstractDistribution, K::IdentityKernel)
+    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
+        @test D === marginalize(D, K)
     end
 end
 

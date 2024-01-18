@@ -16,7 +16,6 @@ function dirackernel_test(T, n, matrix_types)
         K = DiracKernel(A)
         @testset "AffineDiracKernel | Unary | $(T)" begin
             @test_nowarn repr(K)
-            @test eltype(K) == T
 
             @test !(copy(K) === K)
             @test typeof(copy(K)) === typeof(K)
@@ -26,12 +25,7 @@ function dirackernel_test(T, n, matrix_types)
             @test typeof(K) <: AffineDiracKernel
             @test K == DiracKernel(mean(K)...)
             @test convert(typeof(K), K) == K
-            for U in eltypes
-                @test AbstractMarkovKernel{U}(K) ==
-                      AbstractDiracKernel{U}(K) ==
-                      DiracKernel{U}(K)
-                @test eltype(AbstractDiracKernel{U}(K)) == U
-            end
+
             @test mean(K)(x) == A * x
             @test condition(K, x) == Dirac(A * x)
             @test eltype(rand(K, x)) == T

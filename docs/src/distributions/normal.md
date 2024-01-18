@@ -62,6 +62,5 @@ kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
 ### Sampling
 
 ```@docs
-rand(::AbstractRNG, ::AbstractNormal)
-rand( ::AbstractNormal)
+rand(rng::AbstractRNG, N::AbstractNormal) 
 ```
