@@ -11,8 +11,9 @@ marginalize(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T} =
 marginalize(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
     Normal(mean(K)(mean(N)), stein(covp(N), mean(K)))
 
-marginalize(D::AbstractDirac{T}, K::AbstractMarkovKernel{T}) where {T} =
-    condition(K, mean(D))
+marginalize(D::AbstractDirac, K::AbstractMarkovKernel) = condition(K, mean(D))
+
+marginalize(D::AbstractDistribution, ::IdentityKernel) = D # should maybe return a copy? 
 
 function marginalize(
     P::ParticleSystem{T,U,<:AbstractArray},

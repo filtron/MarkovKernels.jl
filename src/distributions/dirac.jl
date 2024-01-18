@@ -90,8 +90,8 @@ using the random number generator Random.GLOBAL_RNG. Equivalent to mean(D).
 """
 rand(D::AbstractDirac) = rand(GLOBAL_RNG, D)
 
-function Base.show(io::IO, N::Dirac{T,U}) where {T,U}
-    print(io, "Dirac{$T,$U}(μ)")
-    print(io, "\n μ = ")
-    show(io, N.μ)
+function Base.show(io::IO, D::Dirac)
+    println(io, summary(D))
+    print(io, "μ = ")
+    show(io, D.μ)
 end

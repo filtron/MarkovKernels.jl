@@ -13,7 +13,7 @@ compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T} =
 compose(K2::AffineNormalKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), covp(K2))
 
-compose(K2::NormalKernel{T,<:AbstractAffineMap}, K1::AffineDiracKernel{T}) where {T} =
+compose(K2::NormalKernel{<:AbstractAffineMap{T}}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), cov(K2) ∘ mean(K1))
 
 compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
@@ -21,6 +21,9 @@ compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
 
 compose(K2::AffineDiracKernel{T}, K1::AffineNormalKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), stein(covp(K1), mean(K2)))
+
+compose(K2::AbstractMarkovKernel, ::IdentityKernel) = K2
+compose(::IdentityKernel, K1::AbstractMarkovKernel) = K1
 
 """ 
     ∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T})
@@ -31,4 +34,4 @@ Computes K3, the composition of K2 ∘ K1 i.e.,
 
 See also [`compose`](@ref)
 """
-∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T}) where {T} = compose(K2, K1)
+∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel) = compose(K2, K1)

@@ -198,10 +198,10 @@ using the random number generator Random.GLOBAL_RNG.
 """
 rand(N::AbstractNormal) = rand(GLOBAL_RNG, N)
 
-function Base.show(io::IO, N::Normal{T,U,V}) where {T,U,V}
-    print(io, "Normal{$T,$U,$V}(μ, Σ)")
-    print(io, "\n μ = ")
+function Base.show(io::IO, N::Normal)
+    println(io, summary(N))
+    print(io, "μ = ")
     show(io, (N.μ))
-    print(io, "\n Σ = ")
+    print(io, "\nΣ = ")
     show(io, N.Σ)
 end

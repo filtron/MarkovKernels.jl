@@ -18,3 +18,5 @@ function invert(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T}
     Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
     return Nout, Kout
 end
+
+invert(D::AbstractDistribution, K::IdentityKernel) = D, K

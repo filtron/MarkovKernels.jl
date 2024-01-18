@@ -2,9 +2,7 @@ abstract type AbstractDistribution{T<:Number} end
 
 eltype(::AbstractDistribution{T}) where {T} = T
 
-abstract type AbstractMarkovKernel{T<:Number} end
-
-eltype(::AbstractMarkovKernel{T}) where {T} = T
+abstract type AbstractMarkovKernel end
 
 abstract type AbstractLikelihood end
 
