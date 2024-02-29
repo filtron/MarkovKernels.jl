@@ -1,27 +1,18 @@
 """
-    AbstractDiracKernel{T<:Number}
+    AbstractDiracKernel
 
-Abstract type for representing Dirac kernels taking values in T.
+Abstract type for representing Dirac kernels.
 """
-abstract type AbstractDiracKernel{T} <: AbstractMarkovKernel{T} end
+abstract type AbstractDiracKernel <: AbstractMarkovKernel end
 
 """
     DiracKernel
 
 Type for representing Dirac kernels K(y,x) = δ(y - μ(x)).
 """
-struct DiracKernel{T,U} <: AbstractDiracKernel{T}
-    μ::U
+struct DiracKernel{L} <: AbstractDiracKernel
+    μ::L
 end
-
-DiracKernel{T}(μ) where {T} = DiracKernel{T,typeof(μ)}(μ)
-
-"""
-    DiracKernel(F::AbstractAffineMap)
-
-Creates a DiracKernel with conditional mean function F.
-"""
-DiracKernel(F::AbstractAffineMap) = DiracKernel{eltype(F)}(F)
 
 """
     DiracKernel(Φ::AbstractMatrix, Σ)
@@ -51,22 +42,14 @@ Creates a DiracKernel with an affine corrector conditional mean function given b
 DiracKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector) =
     DiracKernel(AffineCorrector(Φ, b, c))
 
-const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
+const AffineDiracKernel{T} = DiracKernel{<:AbstractAffineMap{T}} where {T}
 
 """
-    DiracKernel{T}(K::AffineDiracKernel{U}) where {T,U}
+    IdentityKernel
 
-Computes a Dirac kernel of eltype T from the Dirac kernel K if T and U are compatible.
-That is T and U must both be Real or both be Complex.
+Struct for representing kernels that act like identity under marginalization.
 """
-DiracKernel{T}(K::AffineDiracKernel{U}) where {T,U} =
-    T <: Real && U <: Real || T <: Complex && U <: Complex ?
-    DiracKernel(convert(AbstractAffineMap{T}, K.μ)) :
-    error("T and U must both be complex or both be real")
-
-AbstractMarkovKernel{T}(K::AbstractDiracKernel) where {T} = AbstractDiracKernel{T}(K)
-AbstractDiracKernel{T}(K::AbstractDiracKernel{T}) where {T} = K
-AbstractDiracKernel{T}(K::DiracKernel) where {T} = DiracKernel{T}(K)
+struct IdentityKernel <: AbstractDiracKernel end
 
 """
     mean(K::AbstractDiracKernel)
@@ -75,13 +58,14 @@ Computes the conditonal mean function of the Dirac kernel K.
 That is, the output is callable.
 """
 mean(K::DiracKernel) = K.μ
+mean(::IdentityKernel) = identity
 
 """
     condition(K::AbstractDiracKernel, x)
 
 Returns a Dirac distribution corresponding to the Dirac kernel K evaluated at x.
 """
-condition(K::DiracKernel, x) = Dirac(mean(K)(x))
+condition(K::AbstractDiracKernel, x) = Dirac(mean(K)(x))
 
 """
     rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector)
@@ -99,8 +83,8 @@ using the random number generator Random.GLOBAL_RNG. Equivalent to mean(K)(x).
 """
 rand(K::AbstractDiracKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
 
-function Base.show(io::IO, N::DiracKernel{T,U}) where {T,U}
-    print(io, "DiracKernel{$T,$U}(μ)")
-    print(io, "\n μ = ")
-    show(io, N.μ)
+function Base.show(io::IO, D::DiracKernel)
+    println(io, summary(D))
+    println(io, "μ = ")
+    show(io, D.μ)
 end

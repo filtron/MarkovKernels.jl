@@ -13,8 +13,9 @@ k(y\mid x) = \delta(y - \mu(x)).
 ### Types
 
 ```@docs
-AbstractDiracKernel{T}
-DiracKernel{T}
+AbstractDiracKernel
+DiracKernel
+IdentityKernel
 ```
 
 #### Type aliases
@@ -26,11 +27,9 @@ const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
 ### Constructors
 
 ```@docs
-DiracKernel(F::AbstractAffineMap)
 DiracKernel(Φ::AbstractMatrix)
 DiracKernel(Φ::AbstractMatrix, b::AbstractVector)
 DiracKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector)
-DiracKernel{T}(K::AffineDiracKernel{U}) where {T,U}
 ```
 
 ### Basics
@@ -42,7 +41,7 @@ mean(K::DiracKernel)
 ### Conditioning and sampling
 
 ```@docs
-condition(K::DiracKernel, x)
+condition(K::AbstractDiracKernel, x)
 rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector)
 rand(K::AbstractDiracKernel, x::AbstractVector)
 ```

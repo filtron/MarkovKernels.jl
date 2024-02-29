@@ -15,8 +15,8 @@ As with the Normal distributions, the explicit expression on the kernel depends 
 ### Types
 
 ```@docs
-AbstractNormalKernel{T}
-NormalKernel{T}
+AbstractNormalKernel
+NormalKernel
 ```
 
 #### Type aliases
@@ -28,13 +28,11 @@ const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovariancePar
 ### Constructors
 
 ```@docs
-NormalKernel(F::AbstractAffineMap, Σ)
 NormalKernel(Φ::AbstractMatrix, Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ)
 NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
 NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
-NormalKernel{T}(K::AffineNormalKernel{U}) where {T,U}
 ```
 
 ### Basics

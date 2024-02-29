@@ -18,6 +18,7 @@ function invert_test(T, n, m, cov_types, matrix_types)
         N = Normal(μ, _make_covp(Σ, cov_t))
         NK = NormalKernel(A, _make_covp(R, cov_t))
         DK = DiracKernel(A)
+        IK = IdentityKernel()
 
         S, G, Π = _schur(Σ, A, R)
         Ngt = Normal(A * μ, S)
@@ -49,6 +50,12 @@ function invert_test(T, n, m, cov_types, matrix_types)
             @test intercept(mean(KC)) ≈ intercept(mean(Kgt))
             @test cov(condition(KC, y)) ≈ cov(condition(Kgt, y))
             @test mean(condition(KC, y)) ≈ mean(condition(Kgt, y))
+        end
+
+        NC, KC = invert(N, IK)
+        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(IK)))" begin
+            @test N == NC
+            @test IK == KC
         end
     end
 end

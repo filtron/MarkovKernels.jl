@@ -12,7 +12,7 @@ k_3(y,x) = \int k_2(y,x) k_1(z,x) \mathrm{d} z.
 
 ```@docs
 compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T}
-∘(K2::AbstractMarkovKernel{T}, K1::AbstractMarkovKernel{T}) where {T}
+∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 ```
 
 ### Algebra 

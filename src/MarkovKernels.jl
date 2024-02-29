@@ -20,7 +20,22 @@ import Base:
     copy!,
     vcat
 
-import LinearAlgebra: logdet, norm_sqr, HermOrSym
+import LinearAlgebra:
+    Factorization,
+    AbstractMatrix,
+    AbstractArray,
+    Matrix,
+    Array,
+    HermOrSym,
+    Cholesky,
+    det,
+    logdet,
+    inv,
+    pinv,
+    diag,
+    tr,
+    norm_sqr
+
 import Statistics: mean, cov, var, std
 import Random: rand, rand!, GLOBAL_RNG
 
@@ -30,7 +45,7 @@ export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercep
 include("covariance_parameter.jl")
 export CovarianceParameter, lsqrt, stein, schur_reduce
 
-include("general.jl")
+include("generic.jl")
 export AbstractDistribution,
     AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
 
@@ -67,7 +82,8 @@ export AbstractNormalKernel,
     condition,
     AbstractDiracKernel,
     DiracKernel,
-    AffineDiracKernel
+    AffineDiracKernel,
+    IdentityKernel
 
 include("likelihoods.jl") # defines observation likelihoods
 export FlatLikelihood, Likelihood, measurement_model, measurement
@@ -75,7 +91,7 @@ export FlatLikelihood, Likelihood, measurement_model, measurement
 include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
-include("binary_operations/bayes_rule.jl")
+include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
 export compose,
     marginalize, invert, posterior_and_loglike, posterior, posterior_and_loglike!

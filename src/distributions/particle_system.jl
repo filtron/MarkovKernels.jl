@@ -15,10 +15,6 @@ struct ParticleSystem{T,A,B} <: AbstractParticleSystem{T}
     X::B
 end
 
-# constructor for time marginals
-# X::AbstractMatrix -> trajectories
-# X::AbstractVector -> time marginals
-
 """
     ParticleSystem(logws::AbstractVector{<:Real}, X::AbstractArray{<:AbstractVector{T}})
 
