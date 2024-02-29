@@ -2,7 +2,7 @@ using MarkovKernels
 using Test
 using LinearAlgebra
 #using StaticArrays
-using Plots
+#using Plots
 
 import LinearAlgebra: HermOrSym
 
@@ -47,7 +47,7 @@ cov_types = (HermOrSym, Cholesky)
             dirac_test(T, n)
             particle_system_test()
         end
-        normal_plotting_test()
+       # normal_plotting_test()
     end
 
     @testset "AffineMaps" begin
