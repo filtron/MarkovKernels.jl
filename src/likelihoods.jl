@@ -3,7 +3,7 @@
 
 Type for representing flat likelihoods.
 """
-struct FlatLikelihood end
+struct FlatLikelihood <: AbstractLikelihood end
 
 """
     Likelihood{U,V}
@@ -40,7 +40,7 @@ measurement(L::Likelihood) = L.y
 """
     log(L::Likelihood, x)
 
-Computes the logarithm of the likelihood L at x. 
+Computes the logarithm of the likelihood L at x.
 """
 log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))
 
