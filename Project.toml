@@ -1,6 +1,6 @@
 name = "MarkovKernels"
 uuid = "202a2b00-fae3-41a1-a054-d2db40c1e3ea"
-authors = ["Filip Tronarp <filip.tronarp@uni-tuebingen.de> and contributors"]
+authors = ["Filip Tronarp <filip.tronarp@matstat.lu.se> and contributors"]
 version = "0.2.1"
 
 [deps]
