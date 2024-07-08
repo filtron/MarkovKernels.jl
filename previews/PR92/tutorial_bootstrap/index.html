@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Bootstrap filtering and smoothing · MarkovKernels.jl</title><meta name="title" content="Bootstrap filtering and smoothing · MarkovKernels.jl"/><meta property="og:title" content="Bootstrap filtering and smoothing · MarkovKernels.jl"/><meta property="twitter:title" content="Bootstrap filtering and smoothing · MarkovKernels.jl"/><meta name="description" content="Documentation for MarkovKernels.jl."/><meta property="og:description" content="Documentation for MarkovKernels.jl."/><meta property="twitter:description" content="Documentation for MarkovKernels.jl."/><meta property="og:url" content="https://filtron.github.io/MarkovKernels.jl/tutorial_bootstrap/"/><meta property="twitter:url" content="https://filtron.github.io/MarkovKernels.jl/tutorial_bootstrap/"/><link rel="canonical" href="https://filtron.github.io/MarkovKernels.jl/tutorial_bootstrap/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MarkovKernels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../affinemap/">Affine maps</a></li><li><a class="tocitem" href="../covariance_parameter/">Covariance parametrizations</a></li><li><span class="tocitem">Distributions</span><ul><li><a class="tocitem" href="../distributions/general/">General</a></li><li><a class="tocitem" href="../distributions/normal/">Normal</a></li><li><a class="tocitem" href="../distributions/dirac/">Dirac</a></li><li><a class="tocitem" href="../distributions/particle_system/">ParticleSystem</a></li></ul></li><li><span class="tocitem">Kernels</span><ul><li><a class="tocitem" href="../kernels/normalkernel/">NormalKernel</a></li><li><a class="tocitem" href="../kernels/dirackernel/">DiracKernel</a></li></ul></li><li><a class="tocitem" href="../likelihoods/">Likelihoods</a></li><li><a class="tocitem" href="../binary_operators/">Binary operators</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../tutorial_pomp_sampling/">Sampling from probabilistic state-space models</a></li><li><a class="tocitem" href="../tutorial_kalman_filter/">Kalman filtering and smoothing</a></li><li class="is-active"><a class="tocitem" href>Bootstrap filtering and smoothing</a><ul class="internal"><li><a class="tocitem" href="#Setting-up-the-environment-and-generating-some-data"><span>Setting up the environment and generating some data</span></a></li><li><a class="tocitem" href="#Implementing-a-bootstrap-filter"><span>Implementing a bootstrap filter</span></a></li><li><a class="tocitem" href="#Computing-the-filtered-state-estimates"><span>Computing the filtered state estimates</span></a></li><li><a class="tocitem" href="#Computing-the-filtered-output-estimates"><span>Computing the filtered output estimates</span></a></li><li><a class="tocitem" href="#Implementing-a-bootstrap-smoother"><span>Implementing a bootstrap smoother</span></a></li><li><a class="tocitem" href="#Computing-the-smoothed-state-estimates"><span>Computing the smoothed state estimates</span></a></li><li><a class="tocitem" href="#Computing-the-smoothed-output-estimate"><span>Computing the smoothed output estimate</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Bootstrap filtering and smoothing</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Bootstrap filtering and smoothing</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/filtron/MarkovKernels.jl/blob/main/docs/src/tutorial_bootstrap.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Bootstrap-filtering-and-smoothing"><a class="docs-heading-anchor" href="#Bootstrap-filtering-and-smoothing">Bootstrap filtering and smoothing</a><a id="Bootstrap-filtering-and-smoothing-1"></a><a class="docs-heading-anchor-permalink" href="#Bootstrap-filtering-and-smoothing" title="Permalink"></a></h1><p>This tutorial describes how to perform filtering and smoothing in a the probabilistic state-space model given by</p><p class="math-container">\[\begin{aligned}
+x_0 &amp;\sim \mathcal{N}(\mu_0 ,\Sigma_0), \\
+x_n \mid x_{n-1} &amp;\sim \mathcal{N}(\Phi  x_{n-1}, Q),\\
+z_n &amp;= C x_n,
+\end{aligned}\]</p><p>subject to the measurements given by</p><p class="math-container">\[y_n \mid x_n \sim \mathcal{N}(0, e^{z_n}).\]</p><h2 id="Setting-up-the-environment-and-generating-some-data"><a class="docs-heading-anchor" href="#Setting-up-the-environment-and-generating-some-data">Setting up the environment and generating some data</a><a id="Setting-up-the-environment-and-generating-some-data-1"></a><a class="docs-heading-anchor-permalink" href="#Setting-up-the-environment-and-generating-some-data" title="Permalink"></a></h2><pre><code class="language-julia hljs">using MarkovKernels
+using LinearAlgebra, Plots, Random
+using IterTools
+import StatsBase: wsample
+
+rng = MersenneTwister(1991)
+
+function sample(rng, init, K, nstep)
+    it = Iterators.take(iterated(z -&gt; rand(rng, K, z), rand(rng, init)), nstep + 1)
+    return mapreduce(permutedims, vcat, collect(it))
+end
+
+# time grid
+m = 50
+T = 5
+ts = collect(LinRange(0, T, m))
+dt = T / (m - 1)
+
+# define transtion kernel
+λ = 1.0
+Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
+Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
+fw_kernel = NormalKernel(Φ, Q)
+
+# initial distribution
+init = Normal(zeros(2), 1.0I(2))
+
+# sample state
+xs = sample(rng, init, fw_kernel, m - 1)
+
+# output kernel
+σ = 5.0
+C = σ / sqrt(2) * [1.0 -1.0]
+
+output_kernel = DiracKernel(C)
+
+variance(x) = fill(exp.(x)[1], 1, 1)
+m_kernel = compose(NormalKernel(zeros(1, 1), variance), output_kernel)
+
+# sample output
+zs = mapreduce(z -&gt; rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
+ys = mapreduce(z -&gt; rand(rng, m_kernel, xs[z, :]), vcat, 1:m)
+
+measurement_plt = scatter(ts, ys, label = &quot;measurements&quot;, color = &quot;black&quot;)</code></pre><img src="d787ca21.svg" alt="Example block output"/><h2 id="Implementing-a-bootstrap-filter"><a class="docs-heading-anchor" href="#Implementing-a-bootstrap-filter">Implementing a bootstrap filter</a><a id="Implementing-a-bootstrap-filter-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-a-bootstrap-filter" title="Permalink"></a></h2><pre><code class="language-julia hljs">function bootstrap_filter(
+    rng::AbstractRNG,
+    ys::AbstractVecOrMat,
+    init::AbstractDistribution,
+    fw_kernel::AbstractMarkovKernel,
+    m_kernel::AbstractMarkovKernel,
+    K::Integer,
+)
+
+    # initialize
+    X = [rand(rng, init) for k in 1:K]
+    P = ParticleSystem(zeros(K), X)
+    loglike = 0.0
+    L = Likelihood(m_kernel, ys[1, :])
+    loglike_incr = posterior_and_loglike!(P, L)
+    loglike = loglike + loglike_incr
+    resample!(rng, P)
+
+    Ps = [P]
+    sizehint!(Ps, size(ys, 1))
+
+    for m in 2:size(ys, 1)
+        L = Likelihood(m_kernel, ys[m, :])
+        P = predict(rng, P, fw_kernel)
+        loglike_incr = posterior_and_loglike!(P, L)
+        loglike = loglike + loglike_incr
+        resample!(rng, P)
+        push!(Ps, P)
+    end
+
+    return Ps, loglike
+end
+
+function resample!(rng::AbstractRNG, P::ParticleSystem{T,U,&lt;:AbstractVector}) where {T,U}
+    idx = wsample(rng, eachindex(logweights(P)), weights(P), nparticles(P))
+    logweights(P)[:] .= zero(logweights(P))
+    particles(P)[:] .= particles(P)[idx]
+end
+
+function predict(
+    rng::AbstractRNG,
+    P::ParticleSystem{T,U,&lt;:AbstractVector},
+    K::AbstractMarkovKernel,
+) where {T,U}
+    X = [rand(rng, K, particles(P)[i]) for i in eachindex(particles(P))]
+
+    return ParticleSystem(copy(logweights(P)), X)
+end</code></pre><h2 id="Computing-the-filtered-state-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-state-estimates">Computing the filtered state estimates</a><a id="Computing-the-filtered-state-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-state-estimates" title="Permalink"></a></h2><pre><code class="language-julia hljs">K = 500
+Pfilt, loglike_filt = bootstrap_filter(rng, ys, init, fw_kernel, m_kernel, K)
+
+Xfilt = mapreduce(permutedims, vcat, particles.(Pfilt))
+
+state_filt_plt = plot(
+    ts,
+    xs,
+    layout = (2, 1),
+    xlabel = &quot;t&quot;,
+    labels = [&quot;x1&quot; &quot;x2&quot;],
+    title = [&quot;Latent Gauss-Markov process&quot; &quot;&quot;],
+)
+for k in 1:K
+    scatter!(
+        ts,
+        mapreduce(permutedims, vcat, Xfilt[:, k]),
+        markersize = 1,
+        color = &quot;red&quot;,
+        alpha = 0.025,
+        label = &quot;&quot;,
+    )
+end
+state_filt_plt</code></pre><img src="b5e0cdc6.svg" alt="Example block output"/><h2 id="Computing-the-filtered-output-estimates"><a class="docs-heading-anchor" href="#Computing-the-filtered-output-estimates">Computing the filtered output estimates</a><a id="Computing-the-filtered-output-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-filtered-output-estimates" title="Permalink"></a></h2><pre><code class="language-julia hljs">bf_output_filt = [marginalize(Pfilt[i], output_kernel) for i in eachindex(Pfilt)]
+Zfilt = getindex.(mapreduce(permutedims, vcat, particles.(bf_output_filt)), 1)
+
+output_filt_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;, title = &quot;log-variance&quot;)
+scatter!(ts, Zfilt, markersize = 1, color = &quot;red&quot;, alpha = 0.01, label = &quot;&quot;)
+output_filt_plt</code></pre><img src="5106ae81.svg" alt="Example block output"/><h2 id="Implementing-a-bootstrap-smoother"><a class="docs-heading-anchor" href="#Implementing-a-bootstrap-smoother">Implementing a bootstrap smoother</a><a id="Implementing-a-bootstrap-smoother-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-a-bootstrap-smoother" title="Permalink"></a></h2><pre><code class="language-julia hljs">function bootstrap_smoother(
+    rng::AbstractRNG,
+    ys::AbstractVecOrMat,
+    init::AbstractDistribution,
+    fw_kernel::AbstractMarkovKernel,
+    m_kernel::AbstractMarkovKernel,
+    K::Integer,
+)
+
+    # initialize
+    X = permutedims([rand(rng, init) for k in 1:K])
+    P = ParticleSystem(zeros(K), X)
+    loglike = 0.0
+    L = Likelihood(m_kernel, ys[1, :])
+    loglike_incr = posterior_and_loglike!(P, L)
+    loglike = loglike + loglike_incr
+    resample!(rng, P)
+
+    for m in 2:size(ys, 1)
+        L = Likelihood(m_kernel, ys[m, :])
+
+        P = predict(rng, P, fw_kernel)
+        loglike_incr = posterior_and_loglike!(P, L)
+
+        loglike = loglike + loglike_incr
+        resample!(rng, P)
+    end
+
+    return P, loglike
+end
+
+function resample!(rng::AbstractRNG, P::ParticleSystem{T,U,&lt;:AbstractMatrix}) where {T,U}
+    idx = wsample(rng, eachindex(logweights(P)), weights(P), nparticles(P))
+    logweights(P)[:] .= zero(logweights(P))
+    particles(P)[:, :] .= particles(P)[:, idx]
+end
+
+function predict(
+    rng::AbstractRNG,
+    P::ParticleSystem{T,U,&lt;:AbstractMatrix},
+    K::AbstractMarkovKernel,
+) where {T,U}
+
+    X = [rand(rng, K, particles(P)[end, i]) for i in 1:nparticles(P)]
+
+    return ParticleSystem(logweights(P), vcat(particles(P), permutedims(X)))
+end
+nothing # hide</code></pre><h2 id="Computing-the-smoothed-state-estimates"><a class="docs-heading-anchor" href="#Computing-the-smoothed-state-estimates">Computing the smoothed state estimates</a><a id="Computing-the-smoothed-state-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-state-estimates" title="Permalink"></a></h2><pre><code class="language-julia hljs">Psmooth, loglike_smooth = bootstrap_smoother(rng, ys, init, fw_kernel, m_kernel, K)
+
+Xsmooth = particles(Psmooth)
+
+bf_output_smooth = marginalize(Psmooth, output_kernel)
+Ysmooth = getindex.(particles(bf_output_smooth), 1)
+
+state_smooth_plt = plot(
+    ts,
+    xs,
+    layout = (2, 1),
+    xlabel = &quot;t&quot;,
+    labels = [&quot;x1&quot; &quot;x2&quot;],
+    title = [&quot;Latent Gauss-Markov process&quot; &quot;&quot;],
+)
+for k in 1:K
+    plot!(
+        ts,
+        mapreduce(permutedims, vcat, Xsmooth[:, k]),
+        color = &quot;green&quot;,
+        alpha = 0.025,
+        label = &quot;&quot;,
+    )
+end
+state_smooth_plt</code></pre><img src="69a4bc94.svg" alt="Example block output"/><h2 id="Computing-the-smoothed-output-estimate"><a class="docs-heading-anchor" href="#Computing-the-smoothed-output-estimate">Computing the smoothed output estimate</a><a id="Computing-the-smoothed-output-estimate-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-smoothed-output-estimate" title="Permalink"></a></h2><pre><code class="language-julia hljs">bf_output_smooth = marginalize(Psmooth, output_kernel)
+Zsmooth = getindex.(particles(bf_output_smooth), 1)
+
+output_smooth_plt = plot(ts, zs, label = &quot;output&quot;, xlabel = &quot;t&quot;, title = &quot;log-variance&quot;)
+plot!(ts, Zsmooth, color = &quot;green&quot;, alpha = 0.025, label = &quot;&quot;)
+output_smooth_plt</code></pre><img src="e85d1f06.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial_kalman_filter/">« Kalman filtering and smoothing</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Monday 8 July 2024 14:03">Monday 8 July 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
