@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
+using LinearAlgebra, ArrayInterface, Statistics, Random
 
 import Base:
     *,
@@ -52,7 +52,6 @@ export AbstractDistribution,
 include("distributions/normal.jl")
 include("distributions/dirac.jl")
 include("distributions/particle_system.jl")
-include("distributions/plotting.jl")
 export AbstractNormal,
     Normal,
     dim,
