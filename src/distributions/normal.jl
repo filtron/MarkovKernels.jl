@@ -74,7 +74,7 @@ function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
     copy!(mean(Ndst), mean(Nsrc))
     covp(Ndst).uplo !== covp(Nsrc).uplo &&
         throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
-    # should throw on different info as well? 
+    # should throw on different info as well?
     copy!(covp(Ndst).factors, covp(Nsrc).factors)
     return Ndst
 end
@@ -83,7 +83,7 @@ function Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky}
     C = covp(N)
     return Normal(similar(mean(N)), Cholesky(similar(C.factors), C.uplo, C.info))
 end
-# isapprox not implemented for cholesky... 
+# isapprox not implemented for cholesky...
 function Base.isapprox(
     N1::Normal{T,U,V},
     N2::Normal{T,U,V},
@@ -158,7 +158,8 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 Computes the logarithm of the probability density function of the Normal distribution N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * log(_piconst(T)) + logdet(covp(N)) + norm_sqr(residual(N, x)))
+    -_nscale(T) *
+    (dim(N) * log(_piconst(T)) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
 
 """
     entropy(N::AbstractNormal)
@@ -166,7 +167,7 @@ logpdf(N::AbstractNormal{T}, x) where {T} =
 Computes the entropy of the Normal distribution N.
 """
 entropy(N::AbstractNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + logdet(covp(N)))
+    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + real(logdet(covp(N))))
 
 """
     kldivergence(N1::AbstractNormal, N2::AbstractNormal)
