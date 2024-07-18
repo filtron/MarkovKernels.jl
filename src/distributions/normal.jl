@@ -158,7 +158,8 @@ _piconst(T::Type{<:Complex}) = real(T)(π)
 Computes the logarithm of the probability density function of the Normal distribution N evaluated at x.
 """
 logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) * (dim(N) * log(_piconst(T)) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
+    -_nscale(T) *
+    (dim(N) * log(_piconst(T)) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
 
 """
     entropy(N::AbstractNormal)
