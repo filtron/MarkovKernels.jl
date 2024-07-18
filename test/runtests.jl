@@ -118,9 +118,6 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "Code linting (JET.jl)" begin
-        JET.test_package(
-            MarkovKernels;
-            target_defined_modules = true,
-        )
+        JET.test_package(MarkovKernels; target_defined_modules = true)
     end
 end
