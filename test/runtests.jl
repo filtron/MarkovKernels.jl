@@ -1,5 +1,5 @@
 using MarkovKernels
-using Test
+using Test, Aqua, JET
 using LinearAlgebra
 #using StaticArrays
 #using Plots
@@ -106,5 +106,18 @@ cov_types = (HermOrSym, Cholesky)
         for T in etypes
             bayes_rule_test(T, n, m, cov_types, matrix_types)
         end
+    end
+
+    @testset "Code quality (Aqua.jl)" begin
+        Aqua.test_all(
+            MarkovKernels,
+            ambiguities = false,
+            unbound_args = false,
+            piracies = false,
+        )
+    end
+
+    @testset "Code linting (JET.jl)" begin
+        JET.test_package(MarkovKernels; target_defined_modules = true)
     end
 end
