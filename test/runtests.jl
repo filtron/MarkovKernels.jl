@@ -3,6 +3,7 @@ using Test, Aqua, JET
 using LinearAlgebra
 #using StaticArrays
 #using Plots
+import RecursiveArrayTools: recursivecopy, recursivecopy!
 
 import LinearAlgebra: HermOrSym
 

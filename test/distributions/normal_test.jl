@@ -24,9 +24,19 @@ function normal_test(T, n, cov_types, matrix_types)
             @test eltype(N) == T
 
             @test !(copy(N) === N)
+            @test copy(N) == N
             @test typeof(copy(N)) === typeof(N)
             @test typeof(similar(N)) === typeof(N)
-            @test copy!(similar(N), N) == N
+            _N = similar(N)
+            @test (copy!(_N, N); _N) == N
+
+            if Σ isa AbstractMatrix
+                @test !(recursivecopy(N) === N)
+                @test recursivecopy(N) == N
+                @test typeof(recursivecopy(N)) === typeof(N)
+                _N = similar(N)
+                @test (recursivecopy!(_N, N); _N) == N
+            end
 
             for U in eltypes
                 @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
