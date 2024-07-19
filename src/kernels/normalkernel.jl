@@ -153,7 +153,6 @@ rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
 
 """
     rand(K::AbstractNormalKernel, x::AbstractVector)
-    \n
 Computes a random vector conditionally on x with respect the the Normal kernel K
 using the random number generator Random.GLOBAL_RNG.
 """
