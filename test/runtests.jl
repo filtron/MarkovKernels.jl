@@ -112,8 +112,8 @@ cov_types = (HermOrSym, Cholesky)
     @testset "Code quality (Aqua.jl)" begin
         Aqua.test_all(
             MarkovKernels,
-            ambiguities = false,
-            unbound_args = false,
+            ambiguities = true,
+            unbound_args = true,
             piracies = false,
         )
     end

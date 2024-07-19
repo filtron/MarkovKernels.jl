@@ -13,8 +13,8 @@ marginalize(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T} =
 
 marginalize(D::AbstractDirac, K::AbstractMarkovKernel) = condition(K, mean(D))
 
-marginalize(D::AbstractDistribution, ::IdentityKernel) = D # should maybe return a copy? 
-marginalize(D::Dirac, ::IdentityKernel) = D # tie-breaker
+marginalize(D::AbstractDistribution, ::IdentityKernel) = D # should maybe return a copy?
+marginalize(D::AbstractDirac, ::IdentityKernel) = D # tie-breaker
 
 function marginalize(
     P::ParticleSystem{T,U,<:AbstractArray},

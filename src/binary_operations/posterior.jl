@@ -37,6 +37,11 @@ posterior(D::AbstractDistribution, L::AbstractLikelihood) =
 posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0
 posterior(D::AbstractDistribution, ::FlatLikelihood) = D
 
+posterior_and_loglike(
+    D::ParticleSystem{T,U,<:AbstractVector},
+    ::FlatLikelihood,
+) where {T,U} = D, 0
+
 function posterior_and_loglike(
     P::ParticleSystem{T,U,<:AbstractVector},
     L::AbstractLikelihood,
@@ -46,6 +51,11 @@ function posterior_and_loglike(
 
     return ParticleSystem(logws, copy.(particles(P))), loglike
 end
+
+posterior_and_loglike(
+    D::ParticleSystem{T,U,<:AbstractMatrix},
+    ::FlatLikelihood,
+) where {T,U} = D, 0
 
 function posterior_and_loglike(
     P::ParticleSystem{T,U,<:AbstractMatrix},
