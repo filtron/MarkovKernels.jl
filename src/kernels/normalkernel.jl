@@ -55,16 +55,19 @@ NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
 const AffineNormalKernel{T} =
     NormalKernel{<:AbstractAffineMap{T},<:CovarianceParameter{T}} where {T}
 
-function Base.copy!(Kdst::A, Ksrc::A) where {T,U,V<:Cholesky,A<:AffineNormalKernel{T,U,V}}
+function Base.copy!(
+    Kdst::A,
+    Ksrc::A,
+) where {T,V<:Cholesky,A<:AffineNormalKernel{T,<:AbstractAffineMap{T},V}}
     copy!(mean(Kdst), mean(Ksrc))
     covp(Kdst).uplo !== covp(Ksrc).uplo &&
         throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
-    # should throw on different info as well? 
+    # should throw on different info as well?
     copy!(covp(Kdst).factors, covp(Ksrc).factors)
     return Kdst
 end
 # similar not implemented for Cholesky, argh...
-function Base.similar(K::AffineNormalKernel{T,U,<:Cholesky}) where {T,U}
+function Base.similar(K::AffineNormalKernel{T,<:AbstractAffineMap{T},<:Cholesky}) where {T}
     C = covp(K)
     return NormalKernel(similar(mean(K)), Cholesky(similar(C.factors), C.uplo, C.info))
 end
@@ -150,7 +153,6 @@ rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
 
 """
     rand(K::AbstractNormalKernel, x::AbstractVector)
-    \n 
 Computes a random vector conditionally on x with respect the the Normal kernel K
 using the random number generator Random.GLOBAL_RNG.
 """
