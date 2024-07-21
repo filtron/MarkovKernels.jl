@@ -50,6 +50,7 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     end
 end
 
+
 """
     Normal{T}(N::Normal{U,V,W})
 
@@ -57,11 +58,7 @@ Computes a Normal distribution of eltype T from the Normal distribution N if T a
 That is T and U must both be Real or both be Complex.
 """
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
-    T <: Real && U <: Real || T <: Complex && U <: Complex ?
-    Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) :
-    error(
-        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
-    )
+    return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) 
 end
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
@@ -144,7 +141,7 @@ std(N::AbstractNormal) = sqrt.(var(N))
 
 Computes the whitened residual associated with the Normal distribution N and observed vector x.
 """
-residual(N::AbstractNormal, x::AbstractVector) = lsqrt(covp(N)) \ (x - mean(N))
+residual(N::AbstractNormal, x) = lsqrt(covp(N)) \ (x - mean(N))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
