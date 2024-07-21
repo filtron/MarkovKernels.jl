@@ -50,7 +50,6 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
     end
 end
 
-
 """
     Normal{T}(N::Normal{U,V,W})
 
@@ -58,7 +57,7 @@ Computes a Normal distribution of eltype T from the Normal distribution N if T a
 That is T and U must both be Real or both be Complex.
 """
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
-    return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) 
+    return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ))
 end
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
