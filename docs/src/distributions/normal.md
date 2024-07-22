@@ -30,7 +30,6 @@ Normal{T}
 
 ```@docs
 Normal(μ::AbstractVector, Σ::CovarianceParameter)
-Normal(μ::AbstractVector, Σ::AbstractMatrix)
 Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
 ```
 

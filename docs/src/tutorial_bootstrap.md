@@ -41,10 +41,10 @@ dt = T / (m - 1)
 λ = 1.0
 Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
 Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
-fw_kernel = NormalKernel(Φ, Q)
+fw_kernel = NormalKernel(Φ, Symmetric(Q))
 
 # initial distribution
-init = Normal(zeros(2), 1.0I(2))
+init = Normal(zeros(2), Symmetric(1.0I(2)))
 
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)
@@ -55,7 +55,7 @@ C = σ / sqrt(2) * [1.0 -1.0]
 
 output_kernel = DiracKernel(C)
 
-variance(x) = fill(exp.(x)[1], 1, 1)
+variance(x) = Symmetric(fill(exp.(x)[1], 1, 1))
 m_kernel = compose(NormalKernel(zeros(1, 1), variance), output_kernel)
 
 # sample output
