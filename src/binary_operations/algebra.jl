@@ -11,8 +11,8 @@ x ∼ D then -x ∼ -D.
 -(D::Dirac) = Dirac(-mean(D)) # should techically be in src/distributions
 
 """
-+(v::AbstractVector{T}, D::AbstractDistribution{T})
-+(D::AbstractDistribution{T}, v::AbstractVector{T})
++(v::AbstractNumOrVec, D::AbstractDistribution)
++(D::AbstractDistribution, v::AbstractNumOrVec)
 
 Computes a translation of D by v, i.e. if 
 x ∼ D then x + v ∼ D + v.
@@ -20,11 +20,11 @@ x ∼ D then x + v ∼ D + v.
 +(D::AbstractDistribution, v::AbstractNumOrVec) = +(v, D)
 
 """
--(v::AbstractVector{T}, D::AbstractDistribution{T})
+-(v::AbstractVector, D::AbstractDistribution)
 
 Equivalent to +(v, -D).
 
--(D::AbstractDistribution{T}, v::AbstractVector{T})
+-(D::AbstractDistribution, v::AbstractVector)
 
 Equivalent to +(D, -v).
 """

@@ -18,9 +18,9 @@ compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T}
 ### Algebra 
 
 ```@docs
-+(D::AbstractDistribution{T}, v::AbstractVector{T}) where {T}
++(D::AbstractDistribution, v::AbstractNumOrVec)
 -(N::Normal)
--(v::AbstractVector{T}, D::AbstractDistribution{T}) where {T}
+-(v::AbstractNumOrVec, D::AbstractDistribution)
 *(C::AbstractMatrix{T}, D::AbstractDistribution{T}) where {T}
 ```
 
