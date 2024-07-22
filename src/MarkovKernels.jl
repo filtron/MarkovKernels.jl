@@ -39,6 +39,8 @@ import LinearAlgebra:
 import Statistics: mean, cov, var, std
 import Random: rand, rand!, GLOBAL_RNG
 
+include("utils.jl") # helper functions
+
 include("affinemap.jl") # define affine maps to use as conditional means
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
 
@@ -99,7 +101,5 @@ export compose,
 
 # these will be removed
 export bayes_rule_and_loglike, bayes_rule_and_loglike!, bayes_rule
-
-include("matrix_utils.jl") # helper functions
 
 end

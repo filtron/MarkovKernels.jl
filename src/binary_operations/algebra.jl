@@ -1,5 +1,5 @@
-+(v::AbstractVector{T}, N::Normal{T}) where {T} = Normal(v + mean(N), covp(N))
-+(v::AbstractVector{T}, D::Dirac{T}) where {T} = Dirac(v + mean(D))
++(v::AbstractNumOrVec, N::Normal) = Normal(v + mean(N), covp(N))
++(v::AbstractNumOrVec, D::Dirac) = Dirac(v + mean(D))
 
 """
 -(D::AbstractDistribution)
@@ -17,7 +17,7 @@ x ∼ D then -x ∼ -D.
 Computes a translation of D by v, i.e. if 
 x ∼ D then x + v ∼ D + v.
 """
-+(D::AbstractDistribution{T}, v::AbstractVector{T}) where {T} = +(v, D)
++(D::AbstractDistribution, v::AbstractNumOrVec) = +(v, D)
 
 """
 -(v::AbstractVector{T}, D::AbstractDistribution{T})
@@ -28,8 +28,8 @@ Equivalent to +(v, -D).
 
 Equivalent to +(D, -v).
 """
--(v::AbstractVector{T}, D::AbstractDistribution{T}) where {T} = +(v, -D)
--(D::AbstractDistribution{T}, v::AbstractVector{T}) where {T} = +(D, -v)
+-(v::AbstractNumOrVec, D::AbstractDistribution) = +(v, -D)
+-(D::AbstractDistribution, v::AbstractNumOrVec) = +(D, -v)
 
 """
     *(C::AbstractMatrix{T}, D::AbstractDistribution{T})
