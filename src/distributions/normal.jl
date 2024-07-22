@@ -33,6 +33,7 @@ function Normal(μ::AbstractVector, Σ::Symmetric)
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
+#=
 """
     Normal(μ::AbstractVector, Σ::AbstractMatrix)
 
@@ -49,6 +50,7 @@ function Normal(μ::AbstractVector, Σ::AbstractMatrix)
         throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
     end
 end
+=#
 
 """
     Normal{T}(N::Normal{U,V,W})

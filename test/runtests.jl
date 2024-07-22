@@ -9,9 +9,6 @@ import LinearAlgebra: HermOrSym
 
 include("matrix_test_utils.jl")
 
-#include("covariance_parameter_test.jl")
-
-include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
 #include("distributions/normal_plotting_test.jl")
 include("distributions/particle_system_test.jl")
@@ -40,7 +37,7 @@ cov_types = (HermOrSym, Cholesky)
 
     @testset "Distributions" begin
         for T in etypes
-            normal_test(T, n, cov_types, matrix_types)
+            include("distributions/normal_test.jl")
             dirac_test(T, n)
             particle_system_test()
         end

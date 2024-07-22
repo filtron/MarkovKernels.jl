@@ -5,9 +5,10 @@ function Normal(μ::Number, Σ::Number)
 end
 
 const UvNormal{T} = Normal{T,T,T} where {T<:Number}
+#const UvNormal{T,V} = Union{Normal{T,T,T},Normal{T,T,V}} where {T<:Real,V<:Complex{T}}
 
-cov(N::UvNormal) = N.Σ
-var(N::UvNormal) = N.Σ
+cov(N::UvNormal) = real(N.Σ)
+var(N::UvNormal) = cov(N)
 
 Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(T, covp(N)))
 

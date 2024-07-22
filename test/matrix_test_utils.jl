@@ -34,7 +34,8 @@ function _ofsametype(Ain::AbstractMatrix, Aout::SubArray)
 end
 
 _symmetrise(T, Σ) = Σ
-_symmetrise(T, Σ::AbstractMatrix) = T <: Real ? Symmetric(Σ) : Hermitian(Σ)
+_symmetrise(::Type{T}, Σ::AbstractMatrix{T}) where {T<:Real} = Symmetric(Σ)
+_symmetrise(::Type{T}, Σ::AbstractMatrix{T}) where {T<:Complex} = Hermitian(Σ)
 
 function _schur(Σ, C)
     S = C * Σ * C'
