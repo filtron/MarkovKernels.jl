@@ -20,11 +20,11 @@ x ∼ D then x + v ∼ D + v.
 +(D::AbstractDistribution, v::AbstractNumOrVec) = +(v, D)
 
 """
--(v::AbstractVector, D::AbstractDistribution)
+-(v::AbstractNumOrVec, D::AbstractDistribution)
 
 Equivalent to +(v, -D).
 
--(D::AbstractDistribution, v::AbstractVector)
+-(D::AbstractDistribution, v::AbstractNumOrVec)
 
 Equivalent to +(D, -v).
 """
