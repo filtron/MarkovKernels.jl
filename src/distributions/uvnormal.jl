@@ -10,7 +10,7 @@ end
 
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
-cov(N::UvNormal) = real(N.Σ)
+cov(N::UvNormal) = N.Σ
 var(N::UvNormal) = cov(N)
 
 Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))

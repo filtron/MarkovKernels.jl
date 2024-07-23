@@ -36,8 +36,8 @@ cov_types = (HermOrSym, Cholesky)
     include("covariance_parameter_test.jl")
 
     @testset "Distributions" begin
+        include("distributions/normal_test.jl")
         for T in etypes
-            include("distributions/normal_test.jl")
             dirac_test(T, n)
             particle_system_test()
         end
