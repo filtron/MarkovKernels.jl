@@ -56,12 +56,12 @@ end
         @testset "UvNormal | $(T)" begin
             m1 = randn(T)
             l1 = randn(T)
-            v1 = l1 * adjoint(l1)
+            v1 = abs2(l1)
             uvN1 = Normal(m1, v1)
 
             m2 = randn(T)
             l2 = randn(T)
-            v2 = l2 * adjoint(l2)
+            v2 = abs2(l2)
             uvN2 = Normal(m2, v2)
 
             x = randn(T)

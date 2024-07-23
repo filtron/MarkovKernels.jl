@@ -58,6 +58,7 @@ include("distributions/particle_system.jl")
 include("distributions/plotting.jl")
 export AbstractNormal,
     Normal,
+    UvNormal,
     dim,
     mean,
     cov,

@@ -33,25 +33,6 @@ function Normal(μ::AbstractVector, Σ::Symmetric)
     return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
 end
 
-#=
-"""
-    Normal(μ::AbstractVector, Σ::AbstractMatrix)
-
-Creates a Normal distribution with mean vector μ and covariance matrix Σ
-if Σ is Symmetric / Hermitian. Throws domain error otherwise.
-"""
-function Normal(μ::AbstractVector, Σ::AbstractMatrix)
-    T = promote_type(eltype(μ), eltype(Σ))
-    if T <: Real
-        issymmetric(Σ) && return Normal(μ, Symmetric(Σ))
-        throw(DomainError(Σ, "Real valued covariance must be symmetric"))
-    elseif T <: Complex
-        ishermitian(Σ) && return Normal(μ, Hermitian(Σ))
-        throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
-    end
-end
-=#
-
 """
     Normal{T}(N::Normal{U,V,W})
 
