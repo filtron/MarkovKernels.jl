@@ -52,7 +52,6 @@ export AbstractDistribution,
     AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
 
 include("distributions/normal.jl")
-include("distributions/uvnormal.jl")
 include("distributions/dirac.jl")
 include("distributions/particle_system.jl")
 include("distributions/plotting.jl")

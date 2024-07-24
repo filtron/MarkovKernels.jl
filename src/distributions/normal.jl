@@ -34,6 +34,18 @@ function Normal(μ::AbstractVector, Σ::Symmetric)
 end
 
 """
+    Normal(μ::Number, Σ::Real)
+
+Creates a univariate Normal distribution with mean μ and variance Σ. 
+"""
+function Normal(μ::Number, Σ::Real)
+    T = promote_type(typeof(μ), typeof(Σ))
+    return Normal{T}(convert(T, μ), convert(real(T), Σ))
+end
+
+const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
+
+"""
     Normal{T}(N::Normal{U,V,W})
 
 Computes a Normal distribution of eltype T from the Normal distribution N if T and U are compatible.
@@ -42,6 +54,9 @@ That is T and U must both be Real or both be Complex.
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
     return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ))
 end
+
+Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))
+
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
@@ -96,6 +111,7 @@ Computes the covariance matrix of the Normal distribution N.
 """
 cov(N::Normal) = AbstractMatrix(N.Σ)
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
+cov(N::UvNormal) = N.Σ
 
 """
     covp(N::AbstractNormal)
@@ -111,6 +127,8 @@ Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
+var(N::UvNormal) = cov(N)
+
 
 """
     std(N::AbstractNormal)
@@ -169,6 +187,9 @@ using the random number generator RNG.
 """
 rand(rng::AbstractRNG, N::AbstractNormal) =
     mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N), dim(N))
+
+rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N))
+
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))
