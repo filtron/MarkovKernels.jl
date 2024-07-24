@@ -57,7 +57,6 @@ end
 
 Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))
 
-
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
@@ -129,7 +128,6 @@ var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
 var(N::UvNormal) = cov(N)
 
-
 """
     std(N::AbstractNormal)
 Computes the vector of marginal standard deviations of the Normal distribution N.
@@ -189,7 +187,6 @@ rand(rng::AbstractRNG, N::AbstractNormal) =
     mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N), dim(N))
 
 rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N))
-
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))
