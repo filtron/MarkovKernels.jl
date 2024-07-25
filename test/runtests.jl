@@ -102,6 +102,10 @@ cov_types = (HermOrSym, Cholesky)
         end
     end
 
+    @testset "PSDMatrices" begin 
+        include("psdmatrices_test.jl")
+    end
+
     @testset "Code quality (Aqua.jl)" begin
         Aqua.test_all(MarkovKernels, piracies = false)
     end
