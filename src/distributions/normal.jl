@@ -34,21 +34,16 @@ function Normal(μ::AbstractVector, Σ::Symmetric)
 end
 
 """
-    Normal(μ::AbstractVector, Σ::AbstractMatrix)
+    Normal(μ::Number, Σ::Real)
 
-Creates a Normal distribution with mean vector μ and covariance matrix Σ
-if Σ is Symmetric / Hermitian. Throws domain error otherwise.
+Creates a univariate Normal distribution with mean μ and variance Σ. 
 """
-function Normal(μ::AbstractVector, Σ::AbstractMatrix)
-    T = promote_type(eltype(μ), eltype(Σ))
-    if T <: Real
-        issymmetric(Σ) && return Normal(μ, Symmetric(Σ))
-        throw(DomainError(Σ, "Real valued covariance must be symmetric"))
-    elseif T <: Complex
-        ishermitian(Σ) && return Normal(μ, Hermitian(Σ))
-        throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
-    end
+function Normal(μ::Number, Σ::Real)
+    T = promote_type(typeof(μ), typeof(Σ))
+    return Normal{T}(convert(T, μ), convert(real(T), Σ))
 end
+
+const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
 """
     Normal{T}(N::Normal{U,V,W})
@@ -57,12 +52,10 @@ Computes a Normal distribution of eltype T from the Normal distribution N if T a
 That is T and U must both be Real or both be Complex.
 """
 function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
-    T <: Real && U <: Real || T <: Complex && U <: Complex ?
-    Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ)) :
-    error(
-        "The constructor type $(T) and the argument type $(U) must both be real or both be complex",
-    )
+    return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ))
 end
+
+Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
@@ -117,6 +110,7 @@ Computes the covariance matrix of the Normal distribution N.
 """
 cov(N::Normal) = AbstractMatrix(N.Σ)
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
+cov(N::UvNormal) = N.Σ
 
 """
     covp(N::AbstractNormal)
@@ -132,6 +126,7 @@ Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
+var(N::UvNormal) = cov(N)
 
 """
     std(N::AbstractNormal)
@@ -144,7 +139,7 @@ std(N::AbstractNormal) = sqrt.(var(N))
 
 Computes the whitened residual associated with the Normal distribution N and observed vector x.
 """
-residual(N::AbstractNormal, x::AbstractVector) = lsqrt(covp(N)) \ (x - mean(N))
+residual(N::AbstractNormal, x) = lsqrt(covp(N)) \ (x - mean(N))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
@@ -190,6 +185,8 @@ using the random number generator RNG.
 """
 rand(rng::AbstractRNG, N::AbstractNormal) =
     mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N), dim(N))
+
+rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N))
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))

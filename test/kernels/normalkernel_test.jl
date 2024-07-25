@@ -1,6 +1,6 @@
 function normalkernel_test(T)
     A = ones(T, 1, 1)
-    Σ = x -> diagm(exp.(abs.(x)))
+    Σ = x -> _symmetrise(eltype(x), T.(diagm(exp.(abs.(x)))))
     K = NormalKernel(A, Σ)
     x = randn(T, 1)
 

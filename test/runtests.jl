@@ -9,9 +9,6 @@ import LinearAlgebra: HermOrSym
 
 include("matrix_test_utils.jl")
 
-include("covariance_parameter_test.jl")
-
-include("distributions/normal_test.jl")
 include("distributions/dirac_test.jl")
 #include("distributions/normal_plotting_test.jl")
 include("distributions/particle_system_test.jl")
@@ -36,15 +33,11 @@ affine_types = (LinearMap, AffineMap, AffineCorrector)
 cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
-    @testset "CovarianceParameter" begin
-        for T in etypes
-            covariance_parameter_test(T, cov_types, matrix_types)
-        end
-    end
+    include("covariance_parameter_test.jl")
 
     @testset "Distributions" begin
+        include("distributions/normal_test.jl")
         for T in etypes
-            normal_test(T, n, cov_types, matrix_types)
             dirac_test(T, n)
             particle_system_test()
         end
@@ -107,6 +100,10 @@ cov_types = (HermOrSym, Cholesky)
         for T in etypes
             bayes_rule_test(T, n, m, cov_types, matrix_types)
         end
+    end
+
+    @testset "PSDMatrices" begin
+        include("psdmatrices_test.jl")
     end
 
     @testset "Code quality (Aqua.jl)" begin

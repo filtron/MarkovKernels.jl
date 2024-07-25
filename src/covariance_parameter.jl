@@ -14,6 +14,7 @@ L need not be a Cholesky factor.
 """
 lsqrt(C::Cholesky) = C.uplo == 'L' ? C.L : C.U'
 lsqrt(A::HermOrSym) = lsqrt(cholesky(A))
+lsqrt(x::Number) = sqrt(x)
 
 """
     stein(Σ::CovarianceParameter, Φ::AbstractMatrix)
