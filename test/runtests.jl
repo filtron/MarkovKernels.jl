@@ -102,7 +102,7 @@ cov_types = (HermOrSym, Cholesky)
         end
     end
 
-    @testset "PSDMatrices" begin 
+    @testset "PSDMatrices" begin
         include("psdmatrices_test.jl")
     end
 
