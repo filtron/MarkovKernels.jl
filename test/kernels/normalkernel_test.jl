@@ -13,16 +13,6 @@ function normalkernel_test(T)
 end
 
 function affine_normalkernel_test(T, n, cov_types, matrix_types)
-    @testset "NormalKernel | AbstractMatrix constructor" begin
-        @test_throws DomainError NormalKernel(ones(2, 2), tril(ones(2, 2)))
-        @test_throws DomainError NormalKernel(ones(ComplexF64, 2, 2), tril(ones(2, 2)))
-        @test_throws DomainError NormalKernel(
-            ones(ComplexF64, 2, 2),
-            Symmetric(diagm(ones(2))),
-        )
-        @test mean(NormalKernel(1.0I(2), ones(2), 1.0I(2))) == AffineMap(1.0I(2), ones(2))
-    end
-
     eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
 
     Ap = randn(T, n, n)

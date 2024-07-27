@@ -22,17 +22,20 @@ Normal{T}(μ, Σ) where {T} = Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
 
 Creates a Normal distribution with mean vector μ and covariance matrix parametrised by Σ.
 """
-function Normal(μ::AbstractVector, Σ::CovarianceParameter)
+function Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
     T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
 end
 
-function Normal(μ::AbstractVector, Σ::Symmetric)
+function Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
     T = promote_type(eltype(μ), eltype(Σ))
-    T <: Complex && throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
-    return Normal{T}(convert(AbstractVector{T}, μ), convert(CovarianceParameter{T}, Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
 end
 
+function Normal(μ::AbstractVector, Σ::Cholesky)
+    T = promote_type(eltype(μ), eltype(Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), convert(Factorization{T}, Σ))
+end
 """
     Normal(μ::Number, Σ::Real)
 
@@ -45,16 +48,12 @@ end
 
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
-"""
-    Normal{T}(N::Normal{U,V,W})
-
-Computes a Normal distribution of eltype T from the Normal distribution N if T and U are compatible.
-That is T and U must both be Real or both be Complex.
-"""
-function Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
-    return Normal(convert(AbstractVector{T}, N.μ), convert(CovarianceParameter{T}, N.Σ))
-end
-
+Normal{T}(N::Normal{U,V,<:Symmetric}) where {T,U,V} =
+    Normal(convert(AbstractVector{T}, mean(N)), convert(AbstractMatrix{T}, covp(N)))
+Normal{T}(N::Normal{U,V,<:Hermitian}) where {T,U,V} =
+    Normal(convert(AbstractVector{T}, mean(N)), convert(AbstractMatrix{T}, covp(N)))
+Normal{T}(N::Normal{U,V,<:Factorization}) where {T,U,V} =
+    Normal(convert(AbstractVector{T}, mean(N)), convert(Factorization{T}, covp(N)))
 Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)

@@ -67,7 +67,7 @@ function _test_bayes_rule_particle_system(T, n, m)
     P2 = ParticleSystem(copy(logws), copy.(X))
 
     C = randn(T, m, n)
-    K = NormalKernel(C, diagm(ones(T, m)))
+    K = NormalKernel(C, _symmetrise(T, diagm(ones(T, m))))
     y = randn(T, m)
     L = Likelihood(K, y)
     loglike_gt = _loglike(logws, [log(L, X[i]) for i in eachindex(X)])
