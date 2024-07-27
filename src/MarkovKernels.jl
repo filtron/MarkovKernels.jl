@@ -44,7 +44,6 @@ include("utils.jl") # helper functions
 include("affinemap.jl") # define affine maps to use as conditional means
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
 
-#include("covariance_parameter.jl")
 include("covariance_parameters/covariance_parameters.jl")
 export CovarianceParameter, SelfAdjoint, selfadjoint, rsqrt, lsqrt, stein, schur_reduce
 
