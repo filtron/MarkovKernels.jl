@@ -31,8 +31,6 @@ const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovariancePar
 NormalKernel(Φ::AbstractMatrix, Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ)
 NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ)
-NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
-NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
 ```
 
 ### Basics

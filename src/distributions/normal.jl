@@ -18,24 +18,36 @@ end
 Normal{T}(μ, Σ) where {T} = Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
 
 """
-    Normal(μ::AbstractVector, Σ::CovarianceParameter)
+    Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
 
-Creates a Normal distribution with mean vector μ and covariance matrix parametrised by Σ.
+Creates a Normal distribution with mean vector μ and covariance matrix Σ.
 """
 function Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
     T = promote_type(eltype(μ), eltype(Σ))
     return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
 end
 
+"""
+    Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
+
+Creates a Normal distribution with mean vector μ and covariance matrix Σ.
+"""
 function Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
     T = promote_type(eltype(μ), eltype(Σ))
     return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
 end
 
+
+"""
+    Normal(μ::AbstractVector, Σ::Cholesky)
+
+Creates a Normal distribution with mean vector μ and covariance matrix parametrized by Σ.
+"""
 function Normal(μ::AbstractVector, Σ::Cholesky)
     T = promote_type(eltype(μ), eltype(Σ))
     return Normal{T}(convert(AbstractVector{T}, μ), convert(Factorization{T}, Σ))
 end
+
 """
     Normal(μ::Number, Σ::Real)
 

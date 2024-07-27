@@ -1,10 +1,11 @@
 """
-    fix_sign!(A::AbstractMatrix{T}) where {T}
+    fix_sign!(A::AbstractMatrix)
 
 Applies an in-place orthogonal transform to the upper triangular matrix A, such that
 the diagonal entries are real and positive.  
 """
-function fix_sign!(A::AbstractMatrix{T}) where {T}
+function fix_sign!(A::AbstractMatrix)
+    T = eltype(A)
     LinearAlgebra.require_one_based_indexing(A)
     for row in axes(A, 1)
         dval = A[row, row]
@@ -17,13 +18,13 @@ function fix_sign!(A::AbstractMatrix{T}) where {T}
 end
 
 """
-    positive_qrwoq!(A::AbstractMatrix{T}) where {T}
+    positive_qrwoq!(A::AbstractMatrix)
 
 Computes the R factor in the QR decomposition of A, in-place,
 ensuring that the diagonal entries of R are positive.
 The returned object is a view of A. 
 """
-function positive_qrwoq!(A::AbstractMatrix{T}) where {T}
+function positive_qrwoq!(A::AbstractMatrix)
     LinearAlgebra.require_one_based_indexing(A)
     m, n = size(A)
     qr!(A)
