@@ -22,7 +22,7 @@ makedocs(;
             "Self-adjoint" => "covariance_parameters/selfadjoint.md",
             "Cholesky" => "covariance_parameters/cholesky.md",
             "Scalar" => "covariance_parameters/scalar.md",
-            "Internal" => "covariance_parameters/internal.md"
+            "Internal" => "covariance_parameters/internal.md",
         ],
         "Distributions" => [
             "General" => "distributions/general.md",

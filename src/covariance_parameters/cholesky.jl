@@ -13,7 +13,6 @@ Computes the left-square root of C.
 """
 lsqrt(C::Cholesky) = adjoint(rsqrt(C))
 
-
 """
     stein(Σ::Cholesky, Φ::AbstractMatrix)
 

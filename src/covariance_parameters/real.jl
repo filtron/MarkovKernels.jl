@@ -31,7 +31,6 @@ Computes the output of the stein  operator
 """
 stein(Σ::Real, Φ::Number, Q::Real) = stein(Σ, Φ) + Q
 
-
 """
     schur_reduce(Π::Real, C::Number)
 
@@ -43,7 +42,7 @@ In terms of Kalman filtering, Π is the predictive covariance, C the measurement
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 """
 function schur_reduce(Π::Real, C::Number)
-# this probably breaks if iszero(C) returns true 
+    # this probably breaks if iszero(C) returns true 
     S = abs2(C) * Π
     K = Π * adjoint(C) / S
     L = (I - K * C)
@@ -62,7 +61,7 @@ In terms of Kalman filtering, Π is the predictive covariance, C the measurement
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 """
 function schur_reduce(Π::Real, C::Number, R::Real)
-# this probably breaks if iszero(C) && iszero(R) returns true 
+    # this probably breaks if iszero(C) && iszero(R) returns true 
     S = abs2(C) * Π + R
     K = Π * adjoint(C) / S
     L = (I - K * C)

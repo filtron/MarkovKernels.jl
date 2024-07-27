@@ -37,7 +37,6 @@ function Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
     return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
 end
 
-
 """
     Normal(μ::AbstractVector, Σ::Cholesky)
 

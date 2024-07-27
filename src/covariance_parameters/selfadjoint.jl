@@ -2,7 +2,6 @@ const RSym{T,S} = Symmetric{T,S} where {T<:Real,S}
 const CHerm{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const SelfAdjoint{T,S} = Union{RSym{T,S},CHerm{T,S}} where {T,S}
 
-
 """
     selfadjoint(x::Number)
 
@@ -60,7 +59,6 @@ The type of the CovarianceParameter is preserved at the output.
 stein(Σ::SelfAdjoint, Φ::AbstractMatrix, Q::SelfAdjoint) =
     selfadjoint(Φ * Σ * adjoint(Φ) + Q)
 
-
 """
     stein(Σ::SelfAdjoint, Φ::AbstractMatrix, Q::SelfAdjoint)
 
@@ -110,7 +108,6 @@ function schur_reduce(Π::SelfAdjoint, C::AbstractMatrix, R::SelfAdjoint)
     Σ = selfadjoint(L * Π * adjoint(L) + K * R * adjoint(K))
     return S, K, Σ
 end
-
 
 """
     schur_reduce(Π::SelfAdjoint, C::AbstractMatrix, R::Real)
