@@ -5,7 +5,7 @@ const SelfAdjoint{T,S} = Union{RSym{T,S},CHerm{T,S}} where {T,S}
 """
     selfadjoint(x::Number)
 
-Computes the seld-adjoint part of the input  (real part). 
+Computes the self-adjoint part of the input  (real part). 
 """
 selfadjoint(x::Number) = real(x)
 
