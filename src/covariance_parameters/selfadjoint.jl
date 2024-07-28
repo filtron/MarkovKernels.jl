@@ -1,6 +1,6 @@
-const RSym{T,S} = Symmetric{T,S} where {T<:Real,S}
-const CHerm{T,S} = Hermitian{T,S} where {T<:Complex,S}
-const SelfAdjoint{T,S} = Union{RSym{T,S},CHerm{T,S}} where {T,S}
+const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
+const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
+const SelfAdjoint{T,S} = Union{RealSymmmetric{T,S},ComplexHermitian{T,S}} where {T,S}
 
 """
     selfadjoint(x::Number)
