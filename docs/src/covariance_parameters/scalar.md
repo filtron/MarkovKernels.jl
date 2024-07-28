@@ -1,5 +1,8 @@
 # Scalar 
 
+```@meta
+CurrentModule = MarkovKernels
+```
 
 ## Methods 
 

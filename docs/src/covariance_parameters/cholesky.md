@@ -1,5 +1,8 @@
 # Cholesky 
 
+```@meta
+CurrentModule = MarkovKernels
+```
 
 
 ## Methods 

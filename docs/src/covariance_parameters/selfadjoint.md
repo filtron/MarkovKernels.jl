@@ -1,5 +1,9 @@
 # SelfAdjoint 
 
+```@meta
+CurrentModule = MarkovKernels
+```
+
 Self-adjoint matrices are subtypes of the following union: 
 
 ```julia
