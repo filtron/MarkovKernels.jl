@@ -1,10 +1,10 @@
 """
-    fix_sign!(A::AbstractMatrix)
+    utrisqrt2utrichol!(A::AbstractMatrix)
 
 Applies an in-place orthogonal transform to the upper triangular matrix A, such that
-the diagonal entries are real and positive.  
+the diagonal entries are real and positive, i.e. the resulting matrix is a valid Cholesky factor.   
 """
-function fix_sign!(A::AbstractMatrix)
+function utrisqrt2utrichol!(A::AbstractMatrix)
     T = eltype(A)
     LinearAlgebra.require_one_based_indexing(A)
     for row in axes(A, 1)
@@ -30,13 +30,6 @@ function positive_qrwoq!(A::AbstractMatrix)
     qr!(A)
     Av = view(A, 1:min(m, n), 1:n)
     triu!(Av)
-    Av = fix_sign!(Av)
+    Av = utrisqrt2utrichol!(Av)
     return Av
 end
-
-"""
-    utrichol(U)
-
-Equivalent to Cholesky(UpperTriangular(U)). 
-"""
-utrichol(U) = Cholesky(UpperTriangular(U))

@@ -26,7 +26,7 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix)
 
     mul!(work_arr, rsqrt(Σ), adjoint(Φ))
     U = positive_qrwoq!(work_arr)
-    Π = utrichol(copy(U))
+    Π = Cholesky(UpperTriangular(copy(U)))
     return Π
 end
 
@@ -64,7 +64,7 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky)
     view(work_arr, n+1:n+m, 1:m) .= rsqrt(Q)
 
     U = positive_qrwoq!(work_arr)
-    Π = utrichol(copy(U))
+    Π = Cholesky(UpperTriangular(copy(U)))
     return Π
 end
 
@@ -109,8 +109,8 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix)
     positive_qrwoq!(view(work_arr, 1:n, 1:n+m))
 
     yidx, xidx = 1:m, m+1:n+m
-    S = @inbounds utrichol(work_arr[yidx, yidx])
-    Σ = @inbounds utrichol(work_arr[xidx, xidx])
+    S = @inbounds Cholesky(UpperTriangular(work_arr[yidx, yidx]))
+    Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
     Kadj = @inbounds view(work_arr, yidx, xidx)
     K = @inbounds view(work_arr, xidx, yidx)
@@ -142,7 +142,7 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector})
 
     yidx, xidx = 1:m, m+1:n+m
     Ssqrt = @inbounds work_arr[1, 1]
-    Σ = @inbounds utrichol(work_arr[xidx, xidx])
+    Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
     Kadj = @inbounds view(work_arr, yidx, xidx)
     K = @inbounds view(work_arr, xidx, yidx)
@@ -175,8 +175,8 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
     positive_qrwoq!(work_arr)
 
     yidx, xidx = 1:m, m+1:n+m
-    S = @inbounds utrichol(work_arr[yidx, yidx])
-    Σ = @inbounds utrichol(work_arr[xidx, xidx])
+    S = @inbounds Cholesky(UpperTriangular(work_arr[yidx, yidx]))
+    Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
     Kadj = @inbounds view(work_arr, yidx, xidx)
     K = @inbounds view(work_arr, xidx, yidx)
@@ -209,7 +209,7 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Nu
 
     yidx, xidx = 1:m, m+1:n+m
     Ssqrt = @inbounds work_arr[1, 1]
-    Σ = @inbounds utrichol(work_arr[xidx, xidx])
+    Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
     Kadj = @inbounds view(work_arr, yidx, xidx)
     K = @inbounds view(work_arr, xidx, yidx)
