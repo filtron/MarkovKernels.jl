@@ -4,7 +4,7 @@
 CurrentModule = MarkovKernels
 ```
 
-MarkovKernels.jl supports covariance matrices of the following represenration:
+MarkovKernels.jl currently implements functionality for covariance matrices of the following representation:
 
 ```julia
 const RSym{T,S} = Symmetric{T,S} where {T<:Real,S}
