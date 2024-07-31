@@ -5,7 +5,7 @@ _make_vector(v::AbstractVector, ::Type{Matrix}) = Vector(v)
 _make_matrix(A::AbstractMatrix, ::Type{Matrix}) = Matrix(A)
 #_make_matrix(A::AbstractMatrix, ::Type{SMatrix}) = SMatrix{size(A)...}(A)
 
-_make_covp(A::AbstractMatrix{T}, ::Type{HermOrSym}) where {T} =
+_make_covp(A::AbstractMatrix{T}, ::Type{LinearAlgebra.HermOrSym}) where {T} =
     T <: Complex ? Hermitian(A) : Symmetric(A)
 _make_covp(A::AbstractMatrix, ::Type{Cholesky}) = cholesky(A)
 
@@ -17,21 +17,15 @@ function _ofsametype(Ain::AbstractMatrix, Aout::AbstractMatrix)
     typeof(Aout) <: typeof(Ain)
 end
 
-function _ofsametype(Ain::AbstractMatrix, Aout::HermOrSym)
+function _ofsametype(Ain::AbstractMatrix, Aout::LinearAlgebra.HermOrSym)
     typeof(parent(Aout)) <: typeof(Ain)
 end
 
-function _ofsametype(Ain::Diagonal, Aout::HermOrSym)
+function _ofsametype(Ain::Diagonal, Aout::LinearAlgebra.HermOrSym)
     typeof(parent(Aout)) <: typeof(diagm(parent(Ain)))
 end
 
 _ofsametype(Ain::AbstractMatrix, Aout::Cholesky) = _ofsametype(Ain, Aout.factors)
-
-_subarray_type(SA::SubArray{T,2,U,S,false}) where {T,U,S} = U
-
-function _ofsametype(Ain::AbstractMatrix, Aout::SubArray)
-    _subarray_type(Aout) <: typeof(Ain)
-end
 
 _symmetrise(T, Σ) = Σ
 _symmetrise(::Type{T}, Σ::AbstractMatrix{T}) where {T<:Real} = Symmetric(Σ)

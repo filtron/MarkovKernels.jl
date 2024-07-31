@@ -17,7 +17,13 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Affine maps" => "affinemap.md",
-        "Covariance parametrizations" => "covariance_parameter.md",
+        "Covariance Parameters" => [
+            "General" => "covariance_parameters/general.md",
+            "Self-adjoint" => "covariance_parameters/selfadjoint.md",
+            "Cholesky" => "covariance_parameters/cholesky.md",
+            "Scalar" => "covariance_parameters/scalar.md",
+            "Internal" => "covariance_parameters/internal.md",
+        ],
         "Distributions" => [
             "General" => "distributions/general.md",
             "Normal" => "distributions/normal.md",

@@ -73,40 +73,29 @@ function Base.similar(K::AffineNormalKernel{T,<:AbstractAffineMap{T},<:Cholesky}
 end
 
 """
-    NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
+    NormalKernel(F::AbstractAffineMap{<:Real}, Σ::Symmetric{<:Real})
 
 Creates a NormalKernel with conditional mean function F and a constant conditional covariance function parameterised by Σ.
 """
-function NormalKernel(F::AbstractAffineMap, Σ::CovarianceParameter)
+function NormalKernel(F::AbstractAffineMap{<:Real}, Σ::Symmetric{<:Real})
     T = promote_type(eltype(F), eltype(Σ))
     F = convert(AbstractAffineMap{T}, F)
-    Σ = convert(CovarianceParameter{T}, Σ)
+    Σ = convert(AbstractMatrix{T}, Σ)
     return NormalKernel{typeof(F),typeof(Σ)}(F, Σ)
 end
 
-function NormalKernel(F::AbstractAffineMap, Σ::Symmetric)
+function NormalKernel(F::AbstractAffineMap{<:Complex}, Σ::Hermitian{<:Complex})
     T = promote_type(eltype(F), eltype(Σ))
-    T <: Complex && throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
     F = convert(AbstractAffineMap{T}, F)
-    Σ = convert(CovarianceParameter{T}, Σ)
+    Σ = convert(AbstractMatrix{T}, Σ)
     return NormalKernel{typeof(F),typeof(Σ)}(F, Σ)
 end
 
-"""
-    NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
-
-Creates a NormalKernel with conditional mean function F and a constant conditional covariance function Σ
-if Σ is Symmetric / Hermitian. Throws domain error otherwise.
-"""
-function NormalKernel(F::AbstractAffineMap, Σ::AbstractMatrix)
+function NormalKernel(F::AbstractAffineMap, Σ::Factorization)
     T = promote_type(eltype(F), eltype(Σ))
-    if T <: Real
-        issymmetric(Σ) && return NormalKernel(F, Symmetric(Σ))
-        throw(DomainError(Σ, "Real valued covariance must be symmetric"))
-    elseif T <: Complex
-        ishermitian(Σ) && return NormalKernel(F, Hermitian(Σ))
-        throw(DomainError(Σ, "Complex valued covariance must be Hermitian"))
-    end
+    F = convert(AbstractAffineMap{T}, F)
+    Σ = convert(Factorization{T}, Σ)
+    return NormalKernel{typeof(F),typeof(Σ)}(F, Σ)
 end
 
 """

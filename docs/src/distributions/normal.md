@@ -29,8 +29,10 @@ Normal{T}
 ### Constructors
 
 ```@docs
-Normal(μ::AbstractVector, Σ::CovarianceParameter)
-Normal{T}(N::Normal{U,V,W}) where {T,U,V<:AbstractVector,W<:CovarianceParameter}
+Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
+Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
+Normal(μ::AbstractVector, Σ::Cholesky)
+Normal(μ::Number, Σ::Real)
 ```
 
 ### Basics
