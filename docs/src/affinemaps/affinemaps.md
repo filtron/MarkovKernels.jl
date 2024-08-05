@@ -37,5 +37,5 @@ AffineCorrector(A::AbstractMatrix, b::AbstractVector, c::AbstractVector)
 slope(F::AffineMap)
 intercept(F::AffineMap)
 compose(F2::AbstractAffineMap, F1::AbstractAffineMap)
-*(F2::AbstractAffineMap, F1::AbstractAffineMap)
+∘(F2::AbstractAffineMap, F1::AbstractAffineMap)
 ```
