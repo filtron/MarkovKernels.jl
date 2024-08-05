@@ -41,7 +41,7 @@ import Random: rand, rand!, GLOBAL_RNG
 
 include("utils.jl") # helper functions
 
-include("affinemap.jl") # define affine maps to use as conditional means
+include("affinemaps/affinemaps.jl")
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
 
 include("covariance_parameters/covariance_parameters.jl")
