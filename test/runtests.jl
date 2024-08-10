@@ -13,7 +13,6 @@ include("distributions/dirac_test.jl")
 #include("distributions/normal_plotting_test.jl")
 include("distributions/particle_system_test.jl")
 
-include("affinemap_test.jl")
 include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
 
@@ -34,6 +33,7 @@ cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
     include("covariance_parameters/covariance_parameter_test.jl")
+    include("affinemaps/affinemaps_test.jl")
 
     @testset "Distributions" begin
         include("distributions/normal_test.jl")
@@ -42,12 +42,6 @@ cov_types = (HermOrSym, Cholesky)
             particle_system_test()
         end
         #normal_plotting_test()
-    end
-
-    @testset "AffineMaps" begin
-        for T in etypes
-            affinemap_test(T, n, affine_types, matrix_types)
-        end
     end
 
     @testset "Kernels" begin

@@ -16,7 +16,7 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Affine maps" => "affinemap.md",
+        "Affine maps" => "affinemaps/affinemaps.md",
         "Covariance Parameters" => [
             "General" => "covariance_parameters/general.md",
             "Self-adjoint" => "covariance_parameters/selfadjoint.md",

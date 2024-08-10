@@ -19,14 +19,14 @@ eltype_sample(D::AbstractDistribution) = eltype(typeof_sample(D))
 """
     logpdf(D::AbstractDistribution, x)
 
-Computes the logarithm of the probabilidty density of D, evaluated at x. 
+Computes the logarithm of the probabilidty density of D, evaluated at x.
 """
 function logpdf(::AbstractDistribution, x) end
 
 """
     rand([rng], D::AbstractDistribution)
 
-Draws one sample from D. 
+Draws one sample from D.
 """
 function Random.rand(::AbstractRNG, ::AbstractDistribution) end
 
@@ -36,8 +36,7 @@ abstract type AbstractMarkovKernel end
 
 abstract type AbstractLikelihood end
 
-for T in
-    (:AbstractAffineMap, :AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)
+for T in (:AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)
     for func in (:(==), :isequal, :isapprox)
         @eval function Base.$func(P1::U, P2::V; kwargs...) where {U<:$T,V<:$T}
             nameof(U) === nameof(V) || return false
