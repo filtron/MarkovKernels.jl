@@ -1,7 +1,6 @@
 using MarkovKernels
 using Test, Aqua, JET
 using LinearAlgebra
-#using StaticArrays
 #using Plots
 import RecursiveArrayTools: recursivecopy, recursivecopy!
 
@@ -9,9 +8,7 @@ import LinearAlgebra: HermOrSym
 
 include("matrix_test_utils.jl")
 
-include("distributions/dirac_test.jl")
 #include("distributions/normal_plotting_test.jl")
-include("distributions/particle_system_test.jl")
 
 include("kernels/normalkernel_test.jl")
 include("kernels/dirackernel_test.jl")
@@ -28,7 +25,6 @@ m = 2
 etypes = (Float64, Complex{Float64})
 
 matrix_types = (Matrix,)
-affine_types = (LinearMap, AffineMap, AffineCorrector)
 cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
@@ -36,11 +32,9 @@ cov_types = (HermOrSym, Cholesky)
     include("affinemaps/affinemaps_test.jl")
 
     @testset "Distributions" begin
+        include("distributions/dirac_test.jl")
         include("distributions/normal_test.jl")
-        for T in etypes
-            dirac_test(T, n)
-            particle_system_test()
-        end
+        include("distributions/particle_system_test.jl")
         #normal_plotting_test()
     end
 

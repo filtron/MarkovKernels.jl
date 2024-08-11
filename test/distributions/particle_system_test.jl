@@ -1,4 +1,4 @@
-function particle_system_test()
+@testset "ParticleSystem" begin
     k = 10
     d = 2
 
