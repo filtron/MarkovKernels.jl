@@ -80,6 +80,8 @@ include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 export AbstractNormalKernel,
     NormalKernel,
+    HomoskedasticNormalKernel,
+    AffineHomoskedasticNormalKernel,
     AffineNormalKernel,
     condition,
     AbstractDiracKernel,

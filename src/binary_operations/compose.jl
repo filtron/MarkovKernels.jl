@@ -24,9 +24,9 @@ compose(K2::AffineDiracKernel{T}, K1::AffineNormalKernel{T}) where {T} =
 
 compose(K2::AbstractMarkovKernel, ::IdentityKernel) = K2
 compose(::IdentityKernel, K1::AbstractMarkovKernel) = K1
-compose(K2::IdentityKernel, ::IdentityKernel) = K2 # tie-breaker
+compose(K2::IdentityKernel, ::IdentityKernel) = K2
 
-""" 
+"""
     ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 
 Computes K3, the composition of K2 ∘ K1 i.e.,

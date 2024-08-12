@@ -15,62 +15,87 @@ struct NormalKernel{U,V} <: AbstractNormalKernel
     Σ::V
 end
 
-"""
-    NormalKernel(Φ::AbstractMatrix, Σ)
+struct HomoskedasticNormalKernel{A,B} <: AbstractNormalKernel
+    μ::A
+    Σ::B
+end
 
-Creates a NormalKernel with a linear conditional mean function given by
+function HomoskedasticNormalKernel(F::AbstractAffineMap, Σ)
+    T = promote_type(eltype(F), eltype(Σ))
+    F = convert(AbstractAffineMap{T}, F)
+    Σ = selfadjoint(T, Σ)
+    return HomoskedasticNormalKernel{typeof(F),typeof(Σ)}(F, Σ)
+end
 
-    x ↦ Φ * x,
-
-and conditional covariance function parameter Σ.
-Σ is assumed to be callable and be of compatible eltype with Φ.
-"""
-NormalKernel(Φ::AbstractMatrix, Σ) = NormalKernel(LinearMap(Φ), Σ)
-
-"""
-    NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ)
-
-Creates a NormalKernel with an affine conditional mean function given by
-
-    x ↦ b + Φ * x,
-
-and conditional covariance function parameter Σ.
-Σ is assumed to be callable and be of compatible eltype with Φ, b.
-"""
-NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ) = NormalKernel(AffineMap(Φ, b), Σ)
-
-"""
-    NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ)
-
-Creates a NormalKernel with an affine corrector conditional mean function given by
-
-    x ↦ b + Φ * (x - c),
-
-and conditional covariance function parameter Σ.
-Σ is assumed to be callable and be of compatible eltype with Φ, b, c.
-"""
-NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ) =
-    NormalKernel(AffineCorrector(Φ, b, c), Σ)
+const AffineHomoskedasticNormalKernel{A,B} = NormalKernel{A,B} where {A<:AbstractAffineMap}
 
 const AffineNormalKernel{T} =
     NormalKernel{<:AbstractAffineMap{T},<:CovarianceParameter{T}} where {T}
+
+"""
+    mean(K::AbstractNormalKernel)
+
+Computes the conditonal mean function of the Normal kernel K.
+That is, the output is callable.
+"""
+mean(K::NormalKernel) = K.μ
+mean(K::HomoskedasticNormalKernel) = K.μ
+
+"""
+    covp(K::AbstractNormalKernel)
+
+Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
+For computing the actual conditional covariance matrix, use cov.
+"""
+covp(K::NormalKernel) = K.Σ
+covp(K::HomoskedasticNormalKernel) = K.Σ
+
+"""
+    cov(K::AbstractNormalKernel)
+
+Computes the conditonal covariance matrix function of the Normal kernel K.
+That is, the output is callable.
+"""
+cov(K::NormalKernel) = K.Σ
+cov(K::HomoskedasticNormalKernel) = x -> covp(K)
+cov(K::AffineNormalKernel) = x -> covp(K)
+
+function Base.copy!(
+    Kdst::HomoskedasticNormalKernel{A,<:Cholesky},
+    Ksrc::HomoskedasticNormalKernel{B,<:Cholesky},
+) where {A,B}
+    copy!(mean(Kdst), mean(Ksrc))
+    if covp(Kdst).uplo == covp(Ksrc).uplo
+        copy!(covp(Kdst).factors, covp(Ksrc).factors)
+    else
+        copy!(covp(Kdst).factors, adjoint(covp(Ksrc).factors))
+    end
+    return Kdst
+end
 
 function Base.copy!(
     Kdst::A,
     Ksrc::A,
 ) where {T,V<:Cholesky,A<:AffineNormalKernel{T,<:AbstractAffineMap{T},V}}
     copy!(mean(Kdst), mean(Ksrc))
-    covp(Kdst).uplo !== covp(Ksrc).uplo &&
-        throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
-    # should throw on different info as well?
-    copy!(covp(Kdst).factors, covp(Ksrc).factors)
+    if covp(Kdst).uplo == covp(Ksrc).uplo
+        copy!(covp(Kdst).factors, covp(Ksrc).factors)
+    else
+        copy!(covp(Kdst).factors, adjoint(covp(Ksrc).factors))
+    end
     return Kdst
 end
-# similar not implemented for Cholesky, argh...
-function Base.similar(K::AffineNormalKernel{T,<:AbstractAffineMap{T},<:Cholesky}) where {T}
-    C = covp(K)
-    return NormalKernel(similar(mean(K)), Cholesky(similar(C.factors), C.uplo, C.info))
-end
+
+Base.similar(K::HomoskedasticNormalKernel{A,<:Cholesky}) where {A} =
+    HomoskedasticNormalKernel(
+        similar(mean(K)),
+        Cholesky(similar(covp(K).factors), covp(K).uplo, covp(K).info),
+    )
+Base.similar(K::AffineNormalKernel{T,<:AbstractAffineMap{T},<:Cholesky}) where {T} =
+    NormalKernel(
+        similar(mean(K)),
+        Cholesky(similar(covp(K).factors), covp(K).uplo, covp(K).info),
+    )
 
 """
     NormalKernel(F::AbstractAffineMap{<:Real}, Σ::Symmetric{<:Real})
@@ -99,36 +124,12 @@ function NormalKernel(F::AbstractAffineMap, Σ::Factorization)
 end
 
 """
-    mean(K::AbstractNormalKernel)
-
-Computes the conditonal mean function of the Normal kernel K.
-That is, the output is callable.
-"""
-mean(K::NormalKernel) = K.μ
-
-"""
-    mean(K::AbstractNormalKernel)
-
-Computes the conditonal covariance matrix function of the Normal kernel K.
-That is, the output is callable.
-"""
-cov(K::NormalKernel) = K.Σ
-cov(K::AffineNormalKernel) = x -> K.Σ
-
-"""
-    covp(K::AbstractNormalKernel)
-
-Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
-For computing the actual conditional covariance matrix, use cov.
-"""
-covp(K::NormalKernel) = K.Σ
-
-"""
     condition(K::AbstractNormalKernel, x)
 
 Returns a Normal distribution corresponding to K evaluated at x.
 """
 condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
+condition(K::HomoskedasticNormalKernel, x) = Normal(mean(K)(x), covp(K))
 condition(K::AffineNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
 """
@@ -147,10 +148,10 @@ using the random number generator Random.GLOBAL_RNG.
 """
 rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
 
-function Base.show(io::IO, N::NormalKernel)
-    println(io, summary(N))
+function Base.show(io::IO, K::AbstractNormalKernel)
+    println(io, summary(K))
     println(io, "μ = ")
-    show(io, N.μ)
+    show(io, mean(K))
     println(io, "\nΣ = ")
-    show(io, N.Σ)
+    show(io, covp(K))
 end

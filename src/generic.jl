@@ -34,6 +34,9 @@ Random.rand(D::AbstractDistribution) = rand(Random.default_rng(), D)
 
 abstract type AbstractMarkovKernel end
 
+#Random.rand(K::AbstractMarkovKernel, x) = rand(Random.default_rng(), K, x)
+# this is ambiguous w.r.t methods defined in Random.jl ...
+
 abstract type AbstractLikelihood end
 
 for T in (:AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)

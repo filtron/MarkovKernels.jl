@@ -14,15 +14,15 @@ function compose_test(T, n, cov_types, matrix_types)
         Σ2 = _make_matrix(V2p, matrix_t)
         x = _make_vector(xp, matrix_t)
 
-        NK1 = NormalKernel(A1, _make_covp(Σ1, cov_t))
-        NK2 = NormalKernel(A2, _make_covp(Σ2, cov_t))
+        F1 = LinearMap(A1)
+        F2 = LinearMap(A2)
+        NK1 = NormalKernel(F1, _make_covp(Σ1, cov_t))
+        NK2 = NormalKernel(F2, _make_covp(Σ2, cov_t))
 
-        DK1 = DiracKernel(A1)
-        DK2 = DiracKernel(A2)
+        DK1 = DiracKernel(F1)
+        DK2 = DiracKernel(F2)
 
         IK = IdentityKernel()
-
-        kernel_pairs = ((NK1, NK2), (NK1, DK2), (DK1, NK2), (DK1, DK2))
 
         kernels = (NK1, NK2, DK1, DK2, IK)
 
@@ -62,10 +62,10 @@ function _test_pair_compose(K2::NormalKernel{<:AbstractAffineMap}, K1::AffineDir
     A1, b1 = slope(mean(K1)), intercept(mean(K1))
     K3 = compose(K2, K1)
     @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-        @test K3 == K2 ∘ K1 
-        @test slope(mean(K3)) ≈ A2 * A1 
-        @test intercept(mean(K3)) ≈ A2 * b1 + b2 
-        @test covp(K3) == Σ2 
+        @test K3 == K2 ∘ K1
+        @test slope(mean(K3)) ≈ A2 * A1
+        @test intercept(mean(K3)) ≈ A2 * b1 + b2
+        @test covp(K3) == Σ2
     end
 end
 =#

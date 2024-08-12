@@ -14,15 +14,16 @@ function invert_test(T, n, m, cov_types, matrix_types)
         A = _make_matrix(Ap, matrix_t)
         R = _make_matrix(Rp, matrix_t)
         y = _make_vector(yp, matrix_t)
+        FA = LinearMap(A)
 
         N = Normal(μ, _make_covp(Σ, cov_t))
-        NK = NormalKernel(A, _make_covp(R, cov_t))
-        DK = DiracKernel(A)
+        NK = NormalKernel(FA, _make_covp(R, cov_t))
+        DK = DiracKernel(FA)
         IK = IdentityKernel()
 
         S, G, Π = _schur(Σ, A, R)
         Ngt = Normal(A * μ, S)
-        Kgt = NormalKernel(G, μ, A * μ, Π)
+        Kgt = NormalKernel(AffineCorrector(G, μ, A * μ), Π)
 
         NC, KC = invert(N, NK)
 
@@ -38,7 +39,7 @@ function invert_test(T, n, m, cov_types, matrix_types)
 
         S, G, Π = _schur(Σ, A)
         Ngt = Normal(A * μ, S)
-        Kgt = NormalKernel(G, μ, A * μ, Π)
+        Kgt = NormalKernel(AffineCorrector(G, μ, A * μ), Π)
 
         NC, KC = invert(N, DK)
 
