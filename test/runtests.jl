@@ -10,9 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("kernels/normalkernel_test.jl")
-include("kernels/dirackernel_test.jl")
-
 include("likelihood_test.jl")
 include("binary_operations/compose_test.jl")
 include("binary_operations/marginalize_test.jl")
@@ -39,11 +36,8 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "Kernels" begin
-        for T in etypes
-            normalkernel_test(T)
-            affine_normalkernel_test(T, n, cov_types, matrix_types)
-            dirackernel_test(T, n, matrix_types)
-        end
+        include("kernels/normalkernels/normalkernels_test.jl")
+        include("kernels/dirackernels/dirackernels_test.jl")
     end
 
     @testset "Likelihood" begin

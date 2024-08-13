@@ -37,7 +37,7 @@ import LinearAlgebra:
     norm_sqr
 
 import Statistics: mean, cov, var, std
-import Random: rand, rand!, GLOBAL_RNG
+import Random: rand, rand!
 
 include("utils.jl") # helper functions
 
@@ -76,18 +76,16 @@ export AbstractNormal,
     particles,
     nparticles
 
-include("kernels/normalkernel.jl") # defines normal kernels
-include("kernels/dirackernel.jl") # defines dirac kernels
+include("kernels/normalkernels/normalkernels.jl")
+export condition
 export AbstractNormalKernel,
     NormalKernel,
-    HomoskedasticNormalKernel,
-    AffineHomoskedasticNormalKernel,
     AffineNormalKernel,
-    condition,
-    AbstractDiracKernel,
-    DiracKernel,
-    AffineDiracKernel,
-    IdentityKernel
+    HomoskedasticNormalKernel,
+    AffineHomoskedasticNormalKernel
+
+include("kernels/dirackernels/dirackernels.jl")
+export AbstractDiracKernel, DiracKernel, AffineDiracKernel, IdentityKernel
 
 include("likelihoods.jl") # defines observation likelihoods
 export FlatLikelihood, Likelihood, measurement_model, measurement

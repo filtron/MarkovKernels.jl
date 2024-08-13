@@ -7,16 +7,30 @@ K3(y,x) = ∫ K2(y,z) K1(z,x) dz.
 
 See also [`∘`](@ref)
 """
+function compose(::AbstractMarkovKernel, ::AbstractMarkovKernel) end
+
+compose(K2::AffineHomoskedasticNormalKernel, K1::AffineHomoskedasticNormalKernel) =
+    HomoskedasticNormalKernel(
+        compose(mean(K2), mean(K1)),
+        stein(covp(K1), mean(K2), covp(K2)),
+    )
+
+compose(K2::AffineHomoskedasticNormalKernel, K1::AffineDiracKernel) =
+    NormalKernel(compose(mean(K2), mean(K1)), covp(K2))
+
+# remove these
 compose(K2::AffineNormalKernel{T}, K1::AffineNormalKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), stein(covp(K1), mean(K2), covp(K2)))
 
 compose(K2::AffineNormalKernel{T}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), covp(K2))
+#
 
+# type alias here i.e. const AffineNormalKernel
 compose(K2::NormalKernel{<:AbstractAffineMap{T}}, K1::AffineDiracKernel{T}) where {T} =
     NormalKernel(compose(mean(K2), mean(K1)), covp(K2) ∘ mean(K1))
 
-compose(K2::AffineDiracKernel{T}, K1::AffineDiracKernel{T}) where {T} =
+compose(K2::AffineDiracKernel, K1::AffineDiracKernel) =
     DiracKernel(compose(mean(K2), mean(K1)))
 
 compose(K2::AffineDiracKernel{T}, K1::AffineNormalKernel{T}) where {T} =
