@@ -8,6 +8,7 @@ _make_matrix(A::AbstractMatrix, ::Type{Matrix}) = Matrix(A)
 _make_covp(A::AbstractMatrix{T}, ::Type{LinearAlgebra.HermOrSym}) where {T} =
     T <: Complex ? Hermitian(A) : Symmetric(A)
 _make_covp(A::AbstractMatrix, ::Type{Cholesky}) = cholesky(A)
+_make_covp(A::AbstractMatrix, ::Type{SelfAdjoint}) = selfadjoint(A)
 
 function _ofsametype(Ain::AbstractVector, Aout::AbstractVector)
     typeof(Aout) <: typeof(Ain)
@@ -19,10 +20,6 @@ end
 
 function _ofsametype(Ain::AbstractMatrix, Aout::LinearAlgebra.HermOrSym)
     typeof(parent(Aout)) <: typeof(Ain)
-end
-
-function _ofsametype(Ain::Diagonal, Aout::LinearAlgebra.HermOrSym)
-    typeof(parent(Aout)) <: typeof(diagm(parent(Ain)))
 end
 
 _ofsametype(Ain::AbstractMatrix, Aout::Cholesky) = _ofsametype(Ain, Aout.factors)

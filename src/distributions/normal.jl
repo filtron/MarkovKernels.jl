@@ -17,55 +17,21 @@ end
 
 Normal{T}(μ, Σ) where {T} = Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
 
-"""
-    Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
-
-Creates a Normal distribution with mean vector μ and covariance matrix Σ.
-"""
-function Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
+function Normal(μ::AbstractVector, Σ)
     T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
+    return Normal{T}(convert(AbstractVector{T}, μ), selfadjoint(T, Σ))
 end
 
-"""
-    Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
-
-Creates a Normal distribution with mean vector μ and covariance matrix Σ.
-"""
-function Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
-    T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(convert(AbstractVector{T}, μ), convert(AbstractMatrix{T}, Σ))
-end
-
-"""
-    Normal(μ::AbstractVector, Σ::Cholesky)
-
-Creates a Normal distribution with mean vector μ and covariance matrix parametrized by Σ.
-"""
-function Normal(μ::AbstractVector, Σ::Cholesky)
-    T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(convert(AbstractVector{T}, μ), convert(Factorization{T}, Σ))
-end
-
-"""
-    Normal(μ::Number, Σ::Real)
-
-Creates a univariate Normal distribution with mean μ and variance Σ. 
-"""
-function Normal(μ::Number, Σ::Real)
-    T = promote_type(typeof(μ), typeof(Σ))
-    return Normal{T}(convert(T, μ), convert(real(T), Σ))
+function Normal(μ::Number, Σ::Number)
+    T = promote_type(typeof(μ), eltype(Σ))
+    return Normal{T}(convert(T, μ), selfadjoint(T, Σ))
 end
 
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
-Normal{T}(N::Normal{U,V,<:Symmetric}) where {T,U,V} =
-    Normal(convert(AbstractVector{T}, mean(N)), convert(AbstractMatrix{T}, covp(N)))
-Normal{T}(N::Normal{U,V,<:Hermitian}) where {T,U,V} =
-    Normal(convert(AbstractVector{T}, mean(N)), convert(AbstractMatrix{T}, covp(N)))
-Normal{T}(N::Normal{U,V,<:Factorization}) where {T,U,V} =
-    Normal(convert(AbstractVector{T}, mean(N)), convert(Factorization{T}, covp(N)))
-Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), convert(real(T), covp(N)))
+Normal{T}(N::Normal{A,<:AbstractVector}) where {T,A} =
+    Normal(convert(AbstractVector{T}, mean(N)), selfadjoint(T, covp(N)))
+Normal{T}(N::UvNormal) where {T} = Normal(convert(T, mean(N)), selfadjoint(T, covp(N)))
 
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
@@ -75,29 +41,19 @@ typeof_sample(N::Normal) = typeof(mean(N))
 
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
     copy!(mean(Ndst), mean(Nsrc))
-    covp(Ndst).uplo !== covp(Nsrc).uplo &&
-        throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
-    # should throw on different info as well?
-    copy!(covp(Ndst).factors, covp(Nsrc).factors)
+    if covp(Ndst).uplo == covp(Nsrc).uplo
+        copy!(covp(Ndst).factors, covp(Nsrc).factors)
+    else
+        copy!(covp(Ndst).factors, adjoint(covp(Nsrc).factors))
+    end
     return Ndst
 end
-# similar not implemented for Cholesky, argh...
-function Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky}
-    C = covp(N)
-    return Normal(similar(mean(N)), Cholesky(similar(C.factors), C.uplo, C.info))
-end
-# isapprox not implemented for cholesky...
-function Base.isapprox(
-    N1::Normal{T,U,V},
-    N2::Normal{T,U,V},
-    kwargs...,
-) where {T,U,V<:Cholesky}
-    C1, C2 = covp(N1), covp(N2)
-    C1.uplo !== C2.uplo &&
-        throw(ArgumentError("Both arguments need to have Cholesy factors with same uplo"))
-    return isapprox(mean(N1), mean(N2); kwargs...) &&
-           isapprox(C1.factors, C2.factors; kwargs...)
-end
+
+Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky} =
+    Normal(similar(mean(N)), Cholesky(similar(covp(N).factors), covp(N).uplo, covp(N).info))
+Base.isapprox(N1::Normal{T,U,V}, N2::Normal{T,U,V}, kwargs...) where {T,U,V<:Cholesky} =
+    isapprox(mean(N1), mean(N2); kwargs...) &&
+    isapprox(rsqrt(covp(N1)), rsqrt(covp(N2)); kwargs...)
 
 """
     dim(N::AbstractNormal)
@@ -114,21 +70,21 @@ Computes the mean vector of the Normal distribution N.
 mean(N::Normal) = N.μ
 
 """
-    cov(N::AbstractNormal)
-
-Computes the covariance matrix of the Normal distribution N.
-"""
-cov(N::Normal) = AbstractMatrix(N.Σ)
-cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = N.Σ
-cov(N::UvNormal) = N.Σ
-
-"""
     covp(N::AbstractNormal)
 
 Returns the internal representation of the covariance matrix of the Normal distribution N.
 For computing the actual covariance matrix, use cov.
 """
 covp(N::Normal) = N.Σ
+
+"""
+    cov(N::AbstractNormal)
+
+Computes the covariance matrix of the Normal distribution N.
+"""
+cov(N::Normal) = AbstractMatrix(covp(N))
+cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = covp(N)
+cov(N::UvNormal) = covp(N)
 
 """
     var(N::AbstractNormal)
@@ -198,10 +154,10 @@ rand(rng::AbstractRNG, N::AbstractNormal) =
 
 rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N))
 
-function Base.show(io::IO, N::Normal)
+function Base.show(io::IO, N::AbstractNormal)
     println(io, summary(N))
     print(io, "μ = ")
-    show(io, (N.μ))
+    show(io, mean(N))
     print(io, "\nΣ = ")
-    show(io, N.Σ)
+    show(io, covp(N))
 end

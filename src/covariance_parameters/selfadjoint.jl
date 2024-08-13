@@ -2,38 +2,26 @@ const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
 const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const SelfAdjoint{T,S} = Union{RealSymmetric{T,S},ComplexHermitian{T,S}} where {T,S}
 
-"""
-    selfadjoint(x::Number)
-
-Computes the self-adjoint part of the input  (real part). 
-"""
-selfadjoint(x::Number) = real(x)
-
-"""
-    selfadjoint(A::AbstractMatrix{<:Real})
-
-Wraps the input in Symmetric. 
-"""
-selfadjoint(A::AbstractMatrix{<:Real}) = Symmetric(A)
+selfadjoint(::Type{T}, x::Number) where {T} = real(T)(real(x))
+selfadjoint(::Type{T}, A::AbstractMatrix{<:Number}) where {T<:Real} =
+    Symmetric(convert(AbstractMatrix{T}, A))
+selfadjoint(::Type{T}, A::AbstractMatrix{<:Number}) where {T<:Complex} =
+    Hermitian(convert(AbstractMatrix{T}, A))
+selfadjoint(::Type{T}, F::Factorization) where {T} = convert(Factorization{T}, F)
+selfadjoint(A) = selfadjoint(eltype(A), A)
+selfadjoint(x::Number) = selfadjoint(real(eltype(x)), x)
 
 """
-    selfadjoint(A::AbstractMatrix{<:Complex})
+    rsqrt(A::SelfAdjoint)
 
-Wraps the input in Hermitian. 
-"""
-selfadjoint(A::AbstractMatrix{<:Complex}) = Hermitian(A)
-
-"""
-    rsqrt(A::SelfAdjoint) 
-
-Computes the rigtht square-root of A. 
+Computes the rigtht square-root of A.
 """
 rsqrt(A::SelfAdjoint) = cholesky(A).U
 
 """
-    lsqrt(A::SelfAdjoint) 
+    lsqrt(A::SelfAdjoint)
 
-Computes the left square-root of A. 
+Computes the left square-root of A.
 """
 lsqrt(A::SelfAdjoint) = adjoint(rsqrt(A))
 

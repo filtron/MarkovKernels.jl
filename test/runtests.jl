@@ -10,9 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("kernels/normalkernel_test.jl")
-include("kernels/dirackernel_test.jl")
-
 include("likelihood_test.jl")
 include("binary_operations/compose_test.jl")
 include("binary_operations/marginalize_test.jl")
@@ -39,11 +36,8 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "Kernels" begin
-        for T in etypes
-            normalkernel_test(T)
-            affine_normalkernel_test(T, n, cov_types, matrix_types)
-            dirackernel_test(T, n, matrix_types)
-        end
+        include("kernels/normalkernels/normalkernels_test.jl")
+        include("kernels/dirackernels/dirackernels_test.jl")
     end
 
     @testset "Likelihood" begin
@@ -54,9 +48,10 @@ cov_types = (HermOrSym, Cholesky)
 
     @testset "compose" begin
         C = [1.0 -1.0]
-        K1 = DiracKernel(C)
+        FC = LinearMap(C)
+        K1 = DiracKernel(FC)
         variance(x) = fill(exp.(x)[1], 1, 1)
-        K2 = NormalKernel(zeros(1, 1), variance)
+        K2 = NormalKernel(LinearMap(zeros(1, 1)), variance)
 
         @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
             m_kernel = compose(K2, K1)
