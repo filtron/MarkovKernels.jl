@@ -7,11 +7,12 @@ function likelihood_test(T, n, m, cov_types, matrix_types)
 
     for cov_t in cov_types, matrix_t in matrix_types
         C = _make_matrix(Cp, matrix_t)
+        FC = LinearMap(C)
         x = _make_vector(xp, matrix_t)
         y = _make_vector(yp, matrix_t)
         R = _make_covp(_make_matrix(Rp, matrix_t), cov_t)
 
-        K = NormalKernel(C, R)
+        K = NormalKernel(FC, R)
         L = Likelihood(K, y)
         @testset "Likelihood | AffineNormal | {$(T),$(cov_t),$(matrix_t)}" begin
             @test L == Likelihood(K, y)

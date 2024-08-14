@@ -1,7 +1,8 @@
 function normalkernel_test(T)
     A = ones(T, 1, 1)
+    F = LinearMap(A)
     Σ = x -> _symmetrise(eltype(x), T.(diagm(exp.(abs.(x)))))
-    K = NormalKernel(A, Σ)
+    K = NormalKernel(F, Σ)
     x = randn(T, 1)
 
     @testset "NormalKernel | Unary | $(T)" begin
@@ -23,12 +24,13 @@ function affine_normalkernel_test(T, n, cov_types, matrix_types)
 
     for cov_t in cov_types, matrix_t in matrix_types
         A = _make_matrix(Ap, matrix_t)
+        F = LinearMap(A)
         μ = _make_vector(μp, matrix_t)
         Σ = _make_covp(_make_matrix(Vp, matrix_t), cov_t)
         x = _make_vector(xp, matrix_t)
-        K = NormalKernel(A, Σ)
+        K = NormalKernel(F, Σ)
 
-        @testset "AffineNormalKernel | Unary | $(T) | $(cov_t) | $(matrix_t)" begin
+        @testset "AffineHomoskedasticNormalKernel | Unary | $(T) | $(cov_t) | $(matrix_t)" begin
             @test_nowarn repr(K)
 
             @test !(copy(K) === K)
@@ -36,8 +38,7 @@ function affine_normalkernel_test(T, n, cov_types, matrix_types)
             @test typeof(similar(K)) === typeof(K)
             @test copy!(similar(K), K) == K
 
-            @test typeof(K) <: AffineNormalKernel
-            @test K == NormalKernel(mean(K)..., Σ)
+            @test typeof(K) <: AffineHomoskedasticNormalKernel
             @test mean(K)(x) == A * x
             @test _ofsametype(x, A * x)
             @test cov(K)(x) == Σ

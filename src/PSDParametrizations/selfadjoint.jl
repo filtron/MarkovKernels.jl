@@ -2,38 +2,45 @@ const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
 const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const SelfAdjoint{T,S} = Union{RealSymmetric{T,S},ComplexHermitian{T,S}} where {T,S}
 
+ispsdparametrization(::SelfAdjoint) = IsPSDParametrization()
+
+psdparametrization(::Type{T}, A::AbstractMatrix) where {T<:Complex} =
+    Hermitian(convert(AbstractMatrix{T}, A))
+psdparametrization(::Type{T}, A::AbstractMatrix) where {T<:Real} =
+    Symmetric(convert(AbstractMatrix{T}, A))
+
 """
     selfadjoint(x::Number)
 
-Computes the self-adjoint part of the input  (real part). 
+Computes the self-adjoint part of the input  (real part).
 """
 selfadjoint(x::Number) = real(x)
 
 """
     selfadjoint(A::AbstractMatrix{<:Real})
 
-Wraps the input in Symmetric. 
+Wraps the input in Symmetric.
 """
 selfadjoint(A::AbstractMatrix{<:Real}) = Symmetric(A)
 
 """
     selfadjoint(A::AbstractMatrix{<:Complex})
 
-Wraps the input in Hermitian. 
+Wraps the input in Hermitian.
 """
 selfadjoint(A::AbstractMatrix{<:Complex}) = Hermitian(A)
 
 """
-    rsqrt(A::SelfAdjoint) 
+    rsqrt(A::SelfAdjoint)
 
-Computes the rigtht square-root of A. 
+Computes the rigtht square-root of A.
 """
 rsqrt(A::SelfAdjoint) = cholesky(A).U
 
 """
-    lsqrt(A::SelfAdjoint) 
+    lsqrt(A::SelfAdjoint)
 
-Computes the left square-root of A. 
+Computes the left square-root of A.
 """
 lsqrt(A::SelfAdjoint) = adjoint(rsqrt(A))
 

@@ -44,8 +44,19 @@ include("utils.jl") # helper functions
 include("affinemaps/affinemaps.jl")
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
 
-include("covariance_parameters/covariance_parameters.jl")
-export CovarianceParameter, SelfAdjoint, selfadjoint, rsqrt, lsqrt, stein, schur_reduce
+include("PSDParametrizations/PSDParametrizations.jl")
+export PSDTrait,
+    IsPSDParametrization,
+    IsNotPSDParametrization,
+    ispsdparametrization,
+    psdparametrization,
+    CovarianceParameter,
+    SelfAdjoint,
+    selfadjoint,
+    rsqrt,
+    lsqrt,
+    stein,
+    schur_reduce
 
 include("generic.jl")
 export AbstractDistribution,
@@ -80,7 +91,10 @@ include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
 export AbstractNormalKernel,
     NormalKernel,
-    AffineNormalKernel,
+    HomoskedasticNormalKernel,
+    AffineHomoskedasticNormalKernel,
+    AffineHeteroskedasticNormalKernel,
+    NonlinearNormalKernel,
     condition,
     AbstractDiracKernel,
     DiracKernel,

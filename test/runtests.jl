@@ -54,9 +54,10 @@ cov_types = (HermOrSym, Cholesky)
 
     @testset "compose" begin
         C = [1.0 -1.0]
-        K1 = DiracKernel(C)
+        FC = LinearMap(C)
+        K1 = DiracKernel(FC)
         variance(x) = fill(exp.(x)[1], 1, 1)
-        K2 = NormalKernel(zeros(1, 1), variance)
+        K2 = NormalKernel(LinearMap(zeros(1, 1)), variance)
 
         @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
             m_kernel = compose(K2, K1)
