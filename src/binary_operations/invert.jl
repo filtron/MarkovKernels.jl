@@ -3,7 +3,7 @@ invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 
 Computes D2, K2, such that D(x)K(y, x) = D2(y)K2(x, y), i.e., an inverted factorisation of D, K.
 """
-function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
+function invert(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
     pred = mean(K)(mean(N))
     S, G, Σ = schur_reduce(covp(N), mean(K), covp(K))
     Nout = Normal(pred, S)
@@ -11,7 +11,7 @@ function invert(N::AbstractNormal{T}, K::AffineNormalKernel{T}) where {T}
     return Nout, Kout
 end
 
-function invert(N::AbstractNormal{T}, K::AffineDiracKernel{T}) where {T}
+function invert(N::AbstractNormal, K::AffineDiracKernel)
     pred = mean(K)(mean(N))
     S, G, Σ = schur_reduce(covp(N), mean(K))
     Nout = Normal(pred, S)

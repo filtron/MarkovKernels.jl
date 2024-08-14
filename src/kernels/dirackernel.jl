@@ -14,34 +14,6 @@ struct DiracKernel{L} <: AbstractDiracKernel
     μ::L
 end
 
-"""
-    DiracKernel(Φ::AbstractMatrix, Σ)
-
-Creates a DiracKernel with a linear conditional mean function given by
-
-    x ↦ Φ * x.
-"""
-DiracKernel(Φ::AbstractMatrix) = DiracKernel(LinearMap(Φ))
-
-"""
-    DiracKernel(Φ::AbstractMatrix, b::AbstractVector, Σ)
-
-Creates a DiracKernel with an affine conditional mean function given by
-
-    x ↦ b + Φ * x.
-"""
-DiracKernel(Φ::AbstractMatrix, b::AbstractVector) = DiracKernel(AffineMap(Φ, b))
-
-"""
-    DiracKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ)
-
-Creates a DiracKernel with an affine corrector conditional mean function given by
-
-    x ↦ b + Φ * (x - c).
-"""
-DiracKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector) =
-    DiracKernel(AffineCorrector(Φ, b, c))
-
 const AffineDiracKernel{T} = DiracKernel{<:AbstractAffineMap{T}} where {T}
 
 """
@@ -86,5 +58,5 @@ rand(K::AbstractDiracKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
 function Base.show(io::IO, D::DiracKernel)
     println(io, summary(D))
     println(io, "μ = ")
-    show(io, D.μ)
+    show(io, mean(D))
 end

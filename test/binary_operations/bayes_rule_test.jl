@@ -9,6 +9,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
 
     for cov_t in cov_types, matrix_t in matrix_types
         C = _make_matrix(Cp, matrix_t)
+        FC = LinearMap(C)
         y = _make_vector(yp, matrix_t)
         R = _make_covp(_make_matrix(Rp, matrix_t), cov_t)
 
@@ -16,7 +17,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
         Σ = _make_covp(_make_matrix(Vp, matrix_t), cov_t)
         N = Normal(μ, Σ)
 
-        K = NormalKernel(C, R)
+        K = NormalKernel(FC, R)
         L = Likelihood(K, y)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
@@ -30,7 +31,7 @@ function bayes_rule_test(T, n, m, cov_types, matrix_types)
             @test NC2 ≈ NC
         end
 
-        K = DiracKernel(C)
+        K = DiracKernel(FC)
         L = Likelihood(K, y)
         @testset "bayes_rule | $(nameof(typeof(N))) | $(nameof(typeof(L)))" begin
             M, KC = invert(N, K)
@@ -67,7 +68,8 @@ function _test_bayes_rule_particle_system(T, n, m)
     P2 = ParticleSystem(copy(logws), copy.(X))
 
     C = randn(T, m, n)
-    K = NormalKernel(C, _symmetrise(T, diagm(ones(T, m))))
+    FC = LinearMap(C)
+    K = NormalKernel(FC, _symmetrise(T, diagm(ones(T, m))))
     y = randn(T, m)
     L = Likelihood(K, y)
     loglike_gt = _loglike(logws, [log(L, X[i]) for i in eachindex(X)])

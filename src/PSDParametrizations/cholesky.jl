@@ -1,15 +1,19 @@
 
+ispsdparametrization(::Cholesky) = IsPSDParametrization()
+
+psdparametrization(::Type{T}, C::Cholesky) where {T} = convert(Factorization{T}, C)
+
 """
     rsqrt(C::Cholesky)
 
-Computes the right-square root of C. 
+Computes the right-square root of C.
 """
 rsqrt(C::Cholesky) = C.uplo == 'U' ? C.U : adjoint(C.L)
 
 """
     lsqrt(C::Cholesky)
 
-Computes the left-square root of C. 
+Computes the left-square root of C.
 """
 lsqrt(C::Cholesky) = adjoint(rsqrt(C))
 
@@ -37,7 +41,7 @@ Computes the output of the stein  operator
 
     Σ ↦ Φ * Σ * Φ'.
 
-The return type is a subtype of Real. 
+The return type is a subtype of Real.
 """
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
     m, n = size(Φ)
@@ -75,7 +79,7 @@ Computes the output of the stein  operator
 
     Σ ↦ Φ * Σ * Φ' + Q.
 
-The return type is a subtype of Real. 
+The return type is a subtype of Real.
 """
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     m, n = size(Φ)
