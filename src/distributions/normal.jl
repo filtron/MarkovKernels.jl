@@ -15,15 +15,15 @@ struct Normal{T,U,V} <: AbstractNormal{T}
     Σ::V
 end
 
-function Normal{T}(μ::AbstractVector, Σ, ::IsPSDParametrization) where {T}
+function Normal{T}(μ::AbstractVector, Σ, ::IsPSD) where {T}
     μ = convert(AbstractVector{T}, μ)
-    Σ = psdparametrization(T, Σ)
+    Σ = convert_psd_eltype(T, Σ)
     return Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
-function Normal{T}(μ::Number, Σ, ::IsPSDParametrization) where {T}
+function Normal{T}(μ::Number, Σ, ::IsPSD) where {T}
     μ = convert(T, μ)
-    Σ = psdparametrization(T, Σ)
+    Σ = convert_psd_eltype(T, Σ)
     return Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
 end
 
@@ -34,7 +34,7 @@ Creates a Normal distribution with mean μ and covariance Σ.
 """
 function Normal(μ, Σ)
     T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(μ, Σ, ispsdparametrization(Σ))
+    return Normal{T}(μ, Σ, psdcheck(Σ))
 end
 
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
@@ -110,9 +110,9 @@ Computes the vector of marginal standard deviations of the Normal distribution N
 std(N::AbstractNormal) = sqrt.(var(N))
 
 Normal{T}(N::Normal{A,<:AbstractVector}) where {T,A} =
-    Normal(convert(AbstractVector{T}, mean(N)), psdparametrization(T, covp(N)))
+    Normal(convert(AbstractVector{T}, mean(N)), convert_psd_eltype(T, covp(N)))
 Normal{T}(N::Normal{A,<:Number}) where {T,A} =
-    Normal(convert(T, mean(N)), psdparametrization(T, covp(N)))
+    Normal(convert(T, mean(N)), convert_psd_eltype(T, covp(N)))
 AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
 AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
 AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)

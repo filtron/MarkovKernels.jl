@@ -1,6 +1,6 @@
-ispsdparametrization(::Real) = IsPSDParametrization()
-psdparametrization(::Type{T}, x::Number) where {T} = convert(real(T), real(x))
-psdparametrization(x::Number) = psdparametrization(eltype(x), x)
+psdcheck(::Real) = IsPSD()
+convert_psd_eltype(::Type{T}, x::Number) where {T} = convert(real(T), real(x))
+convert_psd_eltype(x::Number) = convert_psd_eltype(eltype(x), x)
 
 """
     rsqrt(x::Real)

@@ -46,10 +46,10 @@ export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercep
 
 include("PSDParametrizations/PSDParametrizations.jl")
 export PSDTrait,
-    IsPSDParametrization,
-    IsNotPSDParametrization,
-    ispsdparametrization,
-    psdparametrization,
+    IsPSD,
+    IsNotPSD,
+    psdcheck,
+    convert_psd_eltype,
     CovarianceParameter,
     SelfAdjoint,
     selfadjoint,
@@ -89,7 +89,11 @@ export AbstractNormal,
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
-export AbstractNormalKernel,
+export Skedasticity,
+    Homoskedastic,
+    Heteroskedastic,
+    skedasticity,
+    AbstractNormalKernel,
     NormalKernel,
     HomoskedasticNormalKernel,
     AffineHomoskedasticNormalKernel,

@@ -2,33 +2,28 @@ const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
 const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const SelfAdjoint{T,S} = Union{RealSymmetric{T,S},ComplexHermitian{T,S}} where {T,S}
 
-ispsdparametrization(::SelfAdjoint) = IsPSDParametrization()
+psdcheck(::SelfAdjoint) = IsPSD()
 
-psdparametrization(::Type{T}, A::AbstractMatrix) where {T<:Complex} =
-    Hermitian(convert(AbstractMatrix{T}, A))
-psdparametrization(::Type{T}, A::AbstractMatrix) where {T<:Real} =
-    Symmetric(convert(AbstractMatrix{T}, A))
-
-"""
-    selfadjoint(x::Number)
-
-Computes the self-adjoint part of the input  (real part).
-"""
-selfadjoint(x::Number) = real(x)
+convert_psd_eltype(::Type{T}, A::ComplexHermitian) where {T<:Complex} =
+    convert(AbstractMatrix{T}, A)
+convert_psd_eltype(::Type{T}, A::RealSymmetric) where {T<:Real} =
+    convert(AbstractMatrix{T}, A)
 
 """
-    selfadjoint(A::AbstractMatrix{<:Real})
+    selfadjoint!(A)
 
-Wraps the input in Symmetric.
+Computes the self-adjoint part of A, in-place, and wraps it in an appropriate self-adjoitn wrapper type (i.e. Symemtric / Hermitian).
 """
-selfadjoint(A::AbstractMatrix{<:Real}) = Symmetric(A)
+selfadjoint!(x::Number) = real(x)
+selfadjoint!(A::AbstractMatrix{<:Real}) = Symmetric(hermitianpart!(A))
+selfadjoint!(A::AbstractMatrix{<:Complex}) = Hermitian(hermitianpart!(A))
 
 """
-    selfadjoint(A::AbstractMatrix{<:Complex})
+    selfadjoint(A)
 
-Wraps the input in Hermitian.
+Computes the self-adjoint part of A and wraps it in an appropriate self-adjoitn wrapper type (i.e. Symemtric / Hermitian).
 """
-selfadjoint(A::AbstractMatrix{<:Complex}) = Hermitian(A)
+selfadjoint(A) = selfadjoint!(copy(A))
 
 """
     rsqrt(A::SelfAdjoint)
@@ -51,7 +46,7 @@ Computes the output of the stein  operator
 
     Σ ↦ Φ * Σ * Φ'.
 """
-stein(Σ::SelfAdjoint, Φ::AbstractMatrix) = selfadjoint(Φ * Σ * adjoint(Φ))
+stein(Σ::SelfAdjoint, Φ::AbstractMatrix) = selfadjoint!(Φ * Σ * adjoint(Φ))
 
 """
     stein(Σ::SelfAdjoint, Φ::AbstractMatrix, Q::SelfAdjoint)
@@ -64,7 +59,7 @@ Both Σ and Q need to be of the same CovarianceParameter type, e.g. both SymOrHe
 The type of the CovarianceParameter is preserved at the output.
 """
 stein(Σ::SelfAdjoint, Φ::AbstractMatrix, Q::SelfAdjoint) =
-    selfadjoint(Φ * Σ * adjoint(Φ) + Q)
+    selfadjoint!(Φ * Σ * adjoint(Φ) + Q)
 
 """
     stein(Σ::SelfAdjoint, Φ::AbstractMatrix, Q::SelfAdjoint)
@@ -93,7 +88,7 @@ function schur_reduce(Π::SelfAdjoint, C::AbstractMatrix)
     S = selfadjoint(C * K)
     K = K / S
     L = (I - K * C)
-    Σ = selfadjoint(L * Π * adjoint(L))
+    Σ = selfadjoint!(L * Π * adjoint(L))
     return S, K, Σ
 end
 
@@ -109,10 +104,10 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 """
 function schur_reduce(Π::SelfAdjoint, C::AbstractMatrix, R::SelfAdjoint)
     K = Π * adjoint(C)
-    S = selfadjoint(C * K + R)
+    S = selfadjoint!(C * K + R)
     K = K / S
     L = (I - K * C)
-    Σ = selfadjoint(L * Π * adjoint(L) + K * R * adjoint(K))
+    Σ = selfadjoint!(L * Π * adjoint(L) + K * R * adjoint(K))
     return S, K, Σ
 end
 
@@ -128,9 +123,9 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 """
 function schur_reduce(Π::SelfAdjoint, C::AbstractMatrix, R::Real)
     K = Π * adjoint(C)
-    S = selfadjoint(C * K + R)
+    S = selfadjoint!(C * K + R)
     K = K / S
     L = (I - K * C)
-    Σ = selfadjoint(L * Π * adjoint(L) + K * R * adjoint(K))
+    Σ = selfadjoint!(L * Π * adjoint(L) + K * R * adjoint(K))
     return S, K, Σ
 end

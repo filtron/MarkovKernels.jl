@@ -1,7 +1,7 @@
 
-ispsdparametrization(::Cholesky) = IsPSDParametrization()
+psdcheck(::Cholesky) = IsPSD()
 
-psdparametrization(::Type{T}, C::Cholesky) where {T} = convert(Factorization{T}, C)
+convert_psd_eltype(::Type{T}, C::Cholesky) where {T} = convert(Factorization{T}, C)
 
 """
     rsqrt(C::Cholesky)

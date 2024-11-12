@@ -1,5 +1,5 @@
 using MarkovKernels
-using Test, Aqua, JET
+using Test, Aqua, JET, JuliaFormatter
 using LinearAlgebra
 #using Plots
 import RecursiveArrayTools: recursivecopy, recursivecopy!
@@ -101,5 +101,9 @@ cov_types = (HermOrSym, Cholesky)
 
     @testset "Code linting (JET.jl)" begin
         JET.test_package(MarkovKernels; target_defined_modules = true)
+    end
+
+    @testset "Formatting (JuliaFormatter.jl)" begin
+        @test JuliaFormatter.format(MarkovKernels; verbose = false, overwrite = false)
     end
 end

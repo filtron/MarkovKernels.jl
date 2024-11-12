@@ -1,3 +1,13 @@
+abstract type Skedasticity end
+struct Homoskedastic <: Skedasticity end
+struct Heteroskedastic <: Skedasticity end
+
+# do stuff here
+_skedasticity(::IsPSD) = Homoskedastic()
+_skedasticity(::IsNotPSD) = Heteroskedastic()
+
+skedasticity(Σ) = _skedasticity(psdcheck(Σ))
+
 """
     AbstractNormalKernel
 
@@ -10,36 +20,34 @@ abstract type AbstractNormalKernel <: AbstractMarkovKernel end
 
 Standard mean vector / covariance matrix parametrisation of Normal kernels.
 """
-struct NormalKernel{T<:PSDTrait,TM,TC} <: AbstractNormalKernel
+struct NormalKernel{T<:Skedasticity,TM,TC} <: AbstractNormalKernel
     μ::TM
     Σ::TC
 end
 
-NormalKernel(μ, Σ, psdness::PSDTrait) =
-    NormalKernel{typeof(psdness),typeof(μ),typeof(Σ)}(μ, Σ)
-
-function NormalKernel(μ::AbstractAffineMap, Σ, psdness::IsPSDParametrization)
-    T = promote_type(eltype(μ), eltype(Σ))
-    μ = convert(AbstractAffineMap{T}, μ)
-    Σ = psdparametrization(T, Σ)
-    return NormalKernel{typeof(psdness),typeof(μ),typeof(Σ)}(μ, Σ)
-end
+NormalKernel(μ, Σ, sked::Skedasticity) =
+    NormalKernel{typeof(sked),typeof(μ),typeof(Σ)}(μ, Σ)
 
 """
     Normal(μ, Σ)
 
 Creates a Normal kernel with conditional mean and covariance parameters μ and  Σ, respectively.
 """
-NormalKernel(μ, Σ) = NormalKernel(μ, Σ, ispsdparametrization(Σ))
+NormalKernel(μ, Σ) = NormalKernel(μ, Σ, skedasticity(Σ))
 
-const HomoskedasticNormalKernel{TM,TC} =
-    NormalKernel{<:IsPSDParametrization,TM,TC} where {TM,TC} # constant conditional covariance
+function NormalKernel(μ::AbstractAffineMap, Σ, ::Homoskedastic)
+    T = promote_type(eltype(μ), eltype(Σ))
+    μ = convert(AbstractAffineMap{T}, μ)
+    Σ = convert_psd_eltype(T, Σ)
+    return NormalKernel{Homoskedastic,typeof(μ),typeof(Σ)}(μ, Σ)
+end
+
+const HomoskedasticNormalKernel{TM,TC} = NormalKernel{<:Homoskedastic,TM,TC} where {TM,TC} # constant conditional covariance
 const AffineHomoskedasticNormalKernel{TM,TC} =
-    NormalKernel{<:IsPSDParametrization,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, constant conditional covariance
+    NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, constant conditional covariance
 const AffineHeteroskedasticNormalKernel{TM,TC} =
-    NormalKernel{<:IsNotPSDParametrization,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, non-constant covariance
-const NonlinearNormalKernel{TM,TC} =
-    NormalKernel{<:IsNotPSDParametrization,TM,TC} where {TM,TC} # the general, nonlinear case
+    NormalKernel{<:Heteroskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, non-constant covariance
+const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where {TM,TC} # the general, nonlinear case
 
 """
     mean(K::AbstractNormalKernel)
