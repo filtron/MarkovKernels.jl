@@ -24,7 +24,6 @@ Computes the output of the stein  operator
     Σ ↦ Φ * Σ * Φ'.
 """
 stein(Σ::Real, Φ::Number) = abs2(Φ) * Σ
-
 """
     stein(Σ::Real, Φ::Number, Q::Real)
 
