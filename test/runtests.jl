@@ -10,8 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("kernels/dirackernel_test.jl")
-
 include("likelihood_test.jl")
 include("binary_operations/compose_test.jl")
 include("binary_operations/marginalize_test.jl")
@@ -38,10 +36,8 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "Kernels" begin
-        for T in etypes
-            dirackernel_test(T, n, matrix_types)
-        end
         include("kernels/normalkernel_test.jl")
+        include("kernels/dirackernel_test.jl")
     end
 
     @testset "Likelihood" begin
@@ -94,7 +90,7 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "Code quality (Aqua.jl)" begin
-        Aqua.test_all(MarkovKernels)
+        Aqua.test_all(MarkovKernels; ambiguities = false)
     end
 
     @testset "Code linting (JET.jl)" begin

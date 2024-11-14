@@ -40,20 +40,13 @@ Returns a Dirac distribution corresponding to the Dirac kernel K evaluated at x.
 condition(K::AbstractDiracKernel, x) = Dirac(mean(K)(x))
 
 """
-    rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector)
+    rand([rng::AbstractRNG], K::AbstractDiracKernel, x::AbstractVector)
 
 Computes a random vector conditionally on x with respect the the Dirac kernel K
 using the random number generator RNG. Equivalent to mean(K)(x).
 """
-rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector) = mean(condition(K, x))
-
-"""
-    rand(K::AbstractDiracKernel, x::AbstractVector)
-
-Computes a random vector conditionally on x with respect the the Dirac kernel K
-using the random number generator Random.GLOBAL_RNG. Equivalent to mean(K)(x).
-"""
-rand(K::AbstractDiracKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
+rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractNumOrVec) = mean(condition(K, x))
+rand(K::AbstractDiracKernel, x::AbstractNumOrVec) = rand(Random.default_rng(), K, x)
 
 function Base.show(io::IO, D::DiracKernel)
     println(io, summary(D))

@@ -101,20 +101,14 @@ function Base.similar(K::HomoskedasticNormalKernel{TM,<:Cholesky}) where {TM}
 end
 
 """
-    rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector)
+    rand([rng::AbstractRNG], K::AbstractNormalKernel, x::AbstractVector)
 
 Computes a random vector conditionally on x with respect the the Normal kernel K
-using the random number generator RNG.
+using the random number generator rng.
 """
-rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector) =
-    rand(RNG, condition(K, x))
-
-"""
-    rand(K::AbstractNormalKernel, x::AbstractVector)
-Computes a random vector conditionally on x with respect the the Normal kernel K
-using the random number generator Random.GLOBAL_RNG.
-"""
-rand(K::AbstractNormalKernel, x::AbstractVector) = rand(GLOBAL_RNG, K, x)
+rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec) =
+    rand(rng, condition(K, x))
+rand(K::AbstractNormalKernel, x) = rand(Random.default_rng(), K, x)
 
 function Base.show(io::IO, N::NormalKernel)
     println(io, summary(N))
