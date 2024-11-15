@@ -1,104 +1,91 @@
-function marginalize_test(T, n, m, cov_types, matrix_types)
-    μp = randn(T, n)
-    Σp = randn(T, n, n)
-    Σp = Σp * Σp'
-    Ap = randn(T, n, n)
-    Qp = randn(T, n, n)
-    Qp = Qp * Qp'
+@testset "marginalize" begin
+    include("marginalize_test_utils.jl")
 
-    vp = randn(T, n)
-    Cp = randn(T, n, n)
+    m = 2
+    etys = (Float64, ComplexF64)
 
-    for cov_t in cov_types, matrix_t in matrix_types
-        μ = _make_vector(μp, matrix_t)
-        Σ = _make_matrix(Σp, matrix_t)
-        A = _make_matrix(Ap, matrix_t)
-        FA = LinearMap(A)
-        Q = _make_matrix(Qp, matrix_t)
+    for T in etys
+        @testset "marginalize | multivariate" begin
+            μ1 = randn(T, m)
+            V1 = Cholesky(UpperTriangular(ones(T, m, m)))
 
-        N = Normal(μ, _make_covp(Σ, cov_t))
-        D = Dirac(μ)
-        NK = NormalKernel(FA, _make_covp(Q, cov_t))
-        DK = DiracKernel(FA)
-        IK = IdentityKernel()
+            N = Normal(μ1, V1)
+            D = Dirac(μ1)
 
-        # marginalize
-        for distribution in (N, D), kernel in (NK, DK, IK)
-            _test_pair_marginalize(distribution, kernel)
+            # MIMO
+            μ2 = LinearMap(randn(T, m, m))
+            V2 = Cholesky(UpperTriangular(ones(T, m, m)))
+
+            NK2 = NormalKernel(μ2, V2)
+            DK2 = DiracKernel(μ2)
+
+            # MISO
+            μ3 = LinearMap(adjoint(randn(T, m)))
+            V3 = one(real(T))
+
+            NK3 = NormalKernel(μ3, V3)
+            DK3 = DiracKernel(μ3)
+
+            # Any
+            IK = IdentityKernel()
+
+            # marginalize
+            for dist in (N, D), kernel in (NK2, DK2, IK)
+                _test_pair_marginalize(dist, kernel)
+            end
+
+            # plus / minus
+            v = randn(T, m)
+            for dist in (N, D)
+                @test mean(dist + v) == mean(v + dist) == mean(dist) + v
+                @test mean(dist - v) == mean(dist) - v
+                @test mean(v - dist) == v - mean(dist)
+            end
+
+            # multiplication
+            C = randn(T, m, m)
+            F = LinearMap(C)
+            for dist in (N, D)
+                @test C * dist == marginalize(dist, DiracKernel(F))
+            end
         end
 
-        # plus / minus
-        v = _make_vector(vp, matrix_t)
-        for distribution in (N, D)
-            @test mean(distribution + v) == mean(v + distribution) == mean(distribution) + v
-            @test mean(distribution - v) == mean(distribution) - v
-            @test mean(v - distribution) == v - mean(distribution)
+        @testset "marginalize | univariate" begin
+            μ1 = randn(T)
+            V1 = one(real(T))
+
+            N = Normal(μ1, V1)
+            D = Dirac(μ1)
+
+            # SISO
+            μ2 = LinearMap(randn(T))
+            V2 = one(real(T))
+
+            NK2 = NormalKernel(μ2, V2)
+            DK2 = DiracKernel(μ2)
+
+            # Any
+            IK = IdentityKernel()
+
+            # marginalize
+            for dist in (N, D), kernel in (NK2, DK2, IK)
+                _test_pair_marginalize(dist, kernel)
+            end
+
+            # plus / minus
+            v = randn(T)
+            for dist in (N, D)
+                @test mean(dist + v) == mean(v + dist) == mean(dist) + v
+                @test mean(dist - v) == mean(dist) - v
+                @test mean(v - dist) == v - mean(dist)
+            end
+
+            # multiplication
+            C = randn(T)
+            F = LinearMap(C)
+            for dist in (N, D)
+                @test C * dist == marginalize(dist, DiracKernel(F))
+            end
         end
-
-        # multiplication
-        C = _make_matrix(Cp, matrix_t)
-        FC = LinearMap(C)
-        for distribution in (N, D)
-            @test C * distribution == marginalize(distribution, DiracKernel(FC))
-        end
-    end
-end
-
-function _test_pair_marginalize(D::Normal, K::AffineHomoskedasticNormalKernel)
-    μ, Σ = mean(D), Matrix(covp(D))
-    A, Q = slope(mean(K)), Matrix(covp(K))
-    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test mean(marginalize(D, K)) ≈ A * μ
-        @test cov(marginalize(D, K)) ≈ A * Σ * A' + Q
-    end
-end
-
-function _test_pair_marginalize(D::Normal, K::AffineDiracKernel)
-    μ, Σ = mean(D), Matrix(covp(D))
-    A = slope(mean(K))
-    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test mean(marginalize(D, K)) ≈ A * μ
-        @test cov(marginalize(D, K)) ≈ A * Σ * A'
-    end
-end
-
-function _test_pair_marginalize(D::Dirac, K::AffineHomoskedasticNormalKernel)
-    μ = mean(D)
-    A, Q = slope(mean(K)), Matrix(covp(K))
-    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test mean(marginalize(D, K)) ≈ A * μ
-        @test cov(marginalize(D, K)) ≈ Q
-    end
-end
-
-function _test_pair_marginalize(D::Dirac, K::AffineDiracKernel)
-    μ = mean(D)
-    A, b = slope(mean(K)), intercept(mean(K))
-    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test mean(marginalize(D, K)) ≈ A * μ + b
-    end
-end
-
-function _test_pair_marginalize(D::AbstractDistribution, K::IdentityKernel)
-    @testset "marginalize | $(nameof(typeof(D))) | $(nameof(typeof(K)))" begin
-        @test D === marginalize(D, K)
-    end
-end
-
-function _test_marginalze_particle_system(T, n, m)
-    k = 10
-
-    X = [randn(T, n) for i in 1:k]
-    logws = randn(real(T), k)
-    P = ParticleSystem(logws, X)
-
-    C = randn(T, m, n)
-    FC = LinearMap(C)
-    K = DiracKernel(FC)
-
-    @testset "marginalize | $(typeof(P)) | $(typeof(K))" begin
-        @test dim(marginalize(P, K)) == m
-        @test logweights(marginalize(P, K)) == logweights(P)
-        @test particles(marginalize(P, K)) ≈ [C * X[i] for i in eachindex(X)]
     end
 end

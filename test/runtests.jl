@@ -10,7 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("binary_operations/marginalize_test.jl")
 include("binary_operations/invert_test.jl")
 include("binary_operations/bayes_rule_test.jl")
 
@@ -23,7 +22,7 @@ matrix_types = (Matrix,)
 cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
-    include("covariance_parameters/covariance_parameter_test.jl")
+    include("psdparametrizations/psdparametrizations_test.jl")
     include("affinemaps/affinemaps_test.jl")
 
     @testset "Distributions" begin
@@ -47,10 +46,7 @@ cov_types = (HermOrSym, Cholesky)
     end
 
     @testset "marginalize" begin
-        for T in etypes
-            marginalize_test(T, n, m, cov_types, matrix_types)
-            _test_marginalze_particle_system(T, n, m)
-        end
+        include("binary_operations/marginalize_test.jl")
     end
 
     @testset "invert" begin

@@ -32,9 +32,8 @@ Equivalent to +(D, -v).
 -(D::AbstractDistribution, v::AbstractNumOrVec) = +(D, -v)
 
 """
-    *(C::AbstractMatrix{T}, D::AbstractDistribution{T})
+    *(C, D::AbstractDistribution)
 
-Equivalent to marginalize(D, DiracKernel(C)).
+Equivalent to marginalize(D, DiracKernel(LinearMap(C))).
 """
-*(C::AbstractMatrix{T}, D::AbstractDistribution{T}) where {T} =
-    marginalize(D, DiracKernel(LinearMap(C)))
+*(C, D::AbstractDistribution) = marginalize(D, DiracKernel(LinearMap(C)))
