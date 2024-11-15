@@ -30,6 +30,13 @@ function AffineCorrector{T}(A::Adjoint, b::Number, c::AbstractVector) where {T}
     AffineCorrector{T,typeof(A),typeof(b),typeof(c)}(A, b, c)
 end
 
+function AffineCorrector{T}(A::AbstractVector, b::AbstractVector, c::Number) where {T}
+    A = convert(AbstractVector{T}, A)
+    b = convert(AbstractVector{T}, b)
+    c = convert(T, c)
+    AffineCorrector{T,typeof(A),typeof(b),typeof(c)}(A, b, c)
+end
+
 function AffineCorrector{T}(A::Number, b::Number, c::Number) where {T}
     A = convert(T, A)
     b = convert(T, b)

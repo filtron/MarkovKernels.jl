@@ -22,15 +22,18 @@ NormalKernel
 #### Type aliases
 
 ```julia
-const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
+const HomoskedasticNormalKernel{TM,TC} = NormalKernel{<:Homoskedastic,TM,TC} where {TM,TC} # constant conditional covariance
+const AffineHomoskedasticNormalKernel{TM,TC} =
+    NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, constant conditional covariance
+const AffineHeteroskedasticNormalKernel{TM,TC} =
+    NormalKernel{<:Heteroskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, non-constant covariance
+const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where {TM,TC} # the general, nonlinear case
 ```
 
 ### Constructors
 
 ```@docs
-NormalKernel(Φ::AbstractMatrix, Σ)
-NormalKernel(Φ::AbstractMatrix, b::AbstractVector, Σ)
-NormalKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector, Σ)
+NormalKernel(μ, Σ)
 ```
 
 ### Basics
@@ -45,6 +48,5 @@ covp(K::NormalKernel)
 
 ```@docs
 condition(K::AbstractNormalKernel, x)
-rand(RNG::AbstractRNG, K::AbstractNormalKernel, x::AbstractVector)
-rand(K::AbstractNormalKernel, x::AbstractVector)
+rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec)
 ```

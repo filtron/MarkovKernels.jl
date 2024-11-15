@@ -20,7 +20,7 @@ include("selfadjoint.jl")
 include("cholesky.jl")
 include("scalar.jl")
 
-const CovarianceParameter{T} = Union{SelfAdjoint{T},Factorization{T}}
+const CovarianceParameter{T} = Union{MarkovKernels.SelfAdjoint{T},Factorization{T}}
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)

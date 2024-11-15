@@ -40,6 +40,7 @@ import Statistics: mean, cov, var, std
 import Random: rand, rand!, GLOBAL_RNG
 
 include("utils.jl") # helper functions
+export AbstractNumOrVec
 
 include("affinemaps/affinemaps.jl")
 export AbstractAffineMap, AffineMap, LinearMap, AffineCorrector, slope, intercept, compose
@@ -104,6 +105,8 @@ export Skedasticity,
     DiracKernel,
     AffineDiracKernel,
     IdentityKernel
+
+const AffineNormalKernel = AffineHomoskedasticNormalKernel
 
 include("likelihoods.jl") # defines observation likelihoods
 export FlatLikelihood, Likelihood, measurement_model, measurement

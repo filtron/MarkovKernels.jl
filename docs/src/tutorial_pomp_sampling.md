@@ -41,8 +41,9 @@ dt = T / (m - 1)
 
 # transtion kernel
 λ = 2.0
-Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
-Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
+Φ = LinearMap(exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0])
+Q = Symmetric(I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2])
+
 fw_kernel = NormalKernel(Φ, Symmetric(Q))
 
 # initial distribution
@@ -65,10 +66,10 @@ state_plt = plot(
 
 ```@example 1
 # output kernel and measurement kernel
-C = 1.0 / sqrt(2) * [1.0 -1.0]
+C = LinearMap([1.0 -1.0] / sqrt(2))
 output_kernel = DiracKernel(C)
-R = fill(0.1, 1, 1)
-m_kernel = compose(NormalKernel(1.0I(1), Symmetric(R)), output_kernel)
+R = 0.1
+m_kernel = compose(NormalKernel(LinearMap(1.0), R), output_kernel)
 
 # sample output and its measurements
 outs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
