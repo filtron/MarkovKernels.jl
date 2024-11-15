@@ -144,13 +144,12 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector})
     view(work_arr, n+1:n+m, 1:n+m) .= zero(eltype(work_arr))
     positive_qrwoq!(view(work_arr, 1:n, 1:n+m))
 
-    yidx, xidx = 1:m, m+1:n+m
+    yidx, xidx = 1, m+1:n+m # yidx = 1:m = 1:1 but set to 1 so relevant SubArrays become vectors
+
     Ssqrt = @inbounds work_arr[1, 1]
     Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
-    Kadj = @inbounds view(work_arr, yidx, xidx)
-    K = @inbounds view(work_arr, xidx, yidx)
-    K .= adjoint(Kadj)
+    K = @inbounds conj.(view(work_arr, yidx, xidx))
     K = rdiv!(K, Ssqrt)
     S = abs2(Ssqrt)
     K = copy(K) # copy because we dont want to return SubArray
@@ -202,7 +201,7 @@ In terms of Kalman filtering, Π is the predictive covariance, C the measurement
 then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
 """
 function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Number)
-    m, n = size(C)
+    m, n = size(C) # m = 1
     work_arr = similar(C, n + m, n + m)
 
     view(work_arr, 1:m, 1:m) .= rsqrt(R)
@@ -211,13 +210,12 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Nu
     view(work_arr, m+1:n+m, m+1:n+m) .= rsqrt(Π)
     positive_qrwoq!(work_arr)
 
-    yidx, xidx = 1:m, m+1:n+m
+    yidx, xidx = 1, m+1:n+m # yidx = 1:m = 1:1 but set to 1 so relevant SubArrays become vectors
+
     Ssqrt = @inbounds work_arr[1, 1]
     Σ = @inbounds Cholesky(UpperTriangular(work_arr[xidx, xidx]))
 
-    Kadj = @inbounds view(work_arr, yidx, xidx)
-    K = @inbounds view(work_arr, xidx, yidx)
-    K .= adjoint(Kadj)
+    K = @inbounds conj.(view(work_arr, yidx, xidx))
     K = rdiv!(K, Ssqrt)
     S = abs2(Ssqrt)
     K = copy(K) # copy because we dont want to return SubArray

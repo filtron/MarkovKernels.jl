@@ -46,9 +46,8 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 function schur_reduce(Π::Real, C::Number)
     # this probably breaks if iszero(C) returns true
     S = abs2(C) * Π
-    K = Π * adjoint(C) / S
-    L = (I - K * C)
-    Σ = abs2(L) * Π
+    K = adjoint(C) / abs2(C)
+    Σ = zero(Π)
     return S, K, Σ
 end
 

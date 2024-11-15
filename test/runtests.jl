@@ -10,7 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("binary_operations/invert_test.jl")
 include("binary_operations/bayes_rule_test.jl")
 
 n = 1
@@ -41,18 +40,10 @@ cov_types = (HermOrSym, Cholesky)
         include("likelihood_test.jl")
     end
 
-    @testset "compose" begin
+    @testset "Binary Operations" begin
         include("binary_operations/compose_test.jl")
-    end
-
-    @testset "marginalize" begin
         include("binary_operations/marginalize_test.jl")
-    end
-
-    @testset "invert" begin
-        for T in etypes
-            invert_test(T, n, m, cov_types, matrix_types)
-        end
+        include("binary_operations/invert_test.jl")
     end
 
     @testset "bayes_rule" begin
