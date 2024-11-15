@@ -16,7 +16,6 @@ using Plots
 
 rng = MersenneTwister(1991)
 
-
 function sample(rng, init, K, nstep)
     it = Iterators.take(iterated(z -> rand(rng, K, z), rand(rng, init)), nstep + 1)
     return mapreduce(permutedims, vcat, collect(it))
@@ -85,7 +84,7 @@ end
 
 ## run Kalman filter and plot the results
 
-filter_distributions= kalman_filter(ys, init, fw_kernel, m_kernel)
+filter_distributions = kalman_filter(ys, init, fw_kernel, m_kernel)
 
 state_filter_plt = plot(
     ts,
