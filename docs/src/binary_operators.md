@@ -21,7 +21,7 @@ compose(K2::AffineHomoskedasticNormalKernel, K1::AffineHomoskedasticNormalKernel
 +(D::AbstractDistribution, v::AbstractNumOrVec)
 -(N::Normal)
 -(v::AbstractNumOrVec, D::AbstractDistribution)
-*(C::AbstractMatrix{T}, D::AbstractDistribution{T}) where {T}
+*(C, D::AbstractDistribution)
 ```
 
 
