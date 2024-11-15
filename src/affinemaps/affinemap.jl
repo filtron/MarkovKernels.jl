@@ -21,6 +21,12 @@ function AffineMap{T}(A::Adjoint{<:Number,<:AbstractVector}, b::Number) where {T
     AffineMap{T,typeof(A),typeof(b)}(A, b)
 end
 
+function AffineMap{T}(A::AbstractVector, b::AbstractVector) where {T}
+    A = convert(AbstractVector{T}, A)
+    b = convert(AbstractVector{T}, b)
+    AffineMap{T,typeof(A),typeof(b)}(A, b)
+end
+
 function AffineMap{T}(A::Number, b::Number) where {T}
     A = convert(T, A)
     b = convert(T, b)
