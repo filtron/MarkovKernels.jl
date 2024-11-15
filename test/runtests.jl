@@ -10,8 +10,6 @@ include("matrix_test_utils.jl")
 
 #include("distributions/normal_plotting_test.jl")
 
-include("likelihood_test.jl")
-include("binary_operations/compose_test.jl")
 include("binary_operations/marginalize_test.jl")
 include("binary_operations/invert_test.jl")
 include("binary_operations/bayes_rule_test.jl")
@@ -40,30 +38,12 @@ cov_types = (HermOrSym, Cholesky)
         include("kernels/dirackernel_test.jl")
     end
 
-    @testset "Likelihood" begin
-        for T in etypes
-            likelihood_test(T, n, m, cov_types, matrix_types)
-        end
+    @testset "Likelihoods" begin
+        include("likelihood_test.jl")
     end
 
     @testset "compose" begin
-        C = [1.0 -1.0]
-        FC = LinearMap(C)
-        K1 = DiracKernel(FC)
-        variance(x) = fill(exp.(x)[1], 1, 1)
-        K2 = NormalKernel(LinearMap(zeros(1, 1)), variance)
-
-        @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-            m_kernel = compose(K2, K1)
-            x = randn(2)
-
-            @test mean(m_kernel)(x) ≈ zeros(1)
-            @test cov(m_kernel)(x) ≈ variance(C * x)
-        end
-
-        for T in etypes
-            compose_test(T, n, cov_types, matrix_types)
-        end
+        include("binary_operations/compose_test.jl")
     end
 
     @testset "marginalize" begin
