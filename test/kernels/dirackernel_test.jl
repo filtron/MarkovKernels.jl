@@ -1,4 +1,5 @@
-@testset "DiracKernel" begin
+@safetestset "DiracKernel" begin
+    using MarkovKernels, LinearAlgebra
     etys = (Float64, ComplexF64)
     m, n = 2, 3
 

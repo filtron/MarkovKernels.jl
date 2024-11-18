@@ -1,4 +1,5 @@
-@testset "marginalize" begin
+@safetestset "marginalize" begin
+    using MarkovKernels, LinearAlgebra
     include("marginalize_test_utils.jl")
 
     m = 2

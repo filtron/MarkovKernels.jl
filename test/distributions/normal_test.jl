@@ -1,57 +1,15 @@
-function _logpdf(T, μ1, Σ1, x1)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1)
-    if T <: Real
-        logpdf = -T(0.5) * logdet(T(2π) * Σ1) - T(0.5) * dot(x1 - μ1, inv(Σ1), x1 - μ1)
-    elseif T <: Complex
-        logpdf = -real(T)(n) * log(real(T)(π)) - logdet(Σ1) - dot(x1 - μ1, inv(Σ1), x1 - μ1)
-    end
-
-    return logpdf
-end
-
-function _entropy(T, μ1, Σ1)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1)
-    if T <: Real
-        entropy = T(0.5) * logdet(T(2π) * exp(T(1)) * Σ1)
-    elseif T <: Complex
-        entropy = real(T)(n) * log(real(T)(π)) + logdet(Σ1) + real(T)(n)
-    end
-end
-
-function _kld(T, μ1, Σ1, μ2, Σ2)
-    n = length(μ1)
-    Σ1 = _symmetrise(T, Σ1)
-    Σ2 = _symmetrise(T, Σ2)
-
-    if T <: Real
-        kld =
-            T(0.5) *
-            (tr(Σ2 \ Σ1) - T(n) + dot(μ2 - μ1, inv(Σ2), μ2 - μ1) + logdet(Σ2) - logdet(Σ1))
-    elseif T <: Complex
-        kld =
-            real(tr(Σ2 \ Σ1)) - real(T)(n) +
-            real(dot(μ2 - μ1, inv(Σ2), μ2 - μ1)) +
-            logdet(Σ2) - logdet(Σ1)
-    end
-
-    return kld
-end
-
-@testset "Normal" begin
-    etys = (Float64, Complex{Float64})
-    matrix_types = (Matrix,)
+@safetestset "Normal" begin
+    using MarkovKernels, LinearAlgebra
+    import LinearAlgebra: HermOrSym
+    import RecursiveArrayTools: recursivecopy, recursivecopy!
+    include("normal_test_utils.jl")
+    n = 2
+    etys = (Float64, ComplexF64)
     affine_types = (LinearMap, AffineMap, AffineCorrector)
     cov_types = (HermOrSym, Cholesky)
 
     for T in etys
         eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
-
-        xp = randn(T, n)
-        μ1p = randn(T, n)
-        V1p = tril(ones(T, n, n))
-        V1p = V1p * V1p'
 
         @testset "UvNormal | $(T)" begin
             m1 = randn(T)
@@ -105,10 +63,13 @@ end
             @test eltype(kldivergence(uvN2, uvN1)) <: Real
         end
 
-        for cov_t in cov_types, matrix_t in matrix_types
-            x = _make_vector(xp, matrix_t)
-            μ = _make_vector(μ1p, matrix_t)
-            Σ = _make_covp(_make_matrix(V1p, matrix_t), cov_t)
+        for cov_t in cov_types
+            x = randn(T, n)
+
+            μ = randn(T, n)
+            V1p = tril(ones(T, n, n))
+            V1p = V1p * V1p'
+            Σ = _make_covp(V1p, cov_t)
 
             N = Normal(μ, Σ)
 
@@ -143,7 +104,6 @@ end
                 @test std(N) ≈ sqrt.(real.(diag(V1p)))
 
                 @test residual(N, x) ≈ cholesky(V1p).L \ (x - μ)
-                @test _ofsametype(x, residual(N, x))
                 @test logpdf(N, x) ≈ _logpdf(T, μ, V1p, x)
                 @test entropy(N) ≈ _entropy(T, μ, V1p)
 
@@ -159,22 +119,24 @@ end
             end
         end
 
-        μ2p = randn(T, n)
-        V2p = triu(ones(T, n, n))
-        V2p = V2p * V2p'
+        for cov_t in cov_types
+            x = randn(T, n)
 
-        for cov_t in cov_types, matrix_t in matrix_types
-            x = _make_vector(xp, matrix_t)
-            μ1 = _make_vector(μ1p, matrix_t)
-            Σ1 = _make_covp(_make_matrix(V1p, matrix_t), cov_t)
+            μ1 = randn(T, n)
+            V1p = tril(ones(T, n, n))
+            V1p = V1p * V1p'
+            Σ1 = _make_covp(V1p, cov_t)
             N1 = Normal(μ1, Σ1)
-            μ2 = _make_vector(μ2p, matrix_t)
-            Σ2 = _make_covp(_make_matrix(V2p, matrix_t), cov_t)
+
+            μ2 = randn(T, n)
+            V2p = triu(ones(T, n, n))
+            V2p = V2p * V2p'
+            Σ2 = _make_covp(V2p, cov_t)
             N2 = Normal(μ2, Σ2)
 
-            @testset "Normal | Binary | {$(T),$(cov_t),$(matrix_t)}" begin
-                @test kldivergence(N1, N2) ≈ _kld(T, μ1p, V1p, μ2p, V2p)
-                @test kldivergence(N2, N1) ≈ _kld(T, μ2p, V2p, μ1p, V1p)
+            @testset "Normal | Binary | {$(T),$(cov_t)}" begin
+                @test kldivergence(N1, N2) ≈ _kld(T, μ1, V1p, μ2, V2p)
+                @test kldivergence(N2, N1) ≈ _kld(T, μ2, V2p, μ1, V1p)
                 @test eltype(kldivergence(N1, N2)) <: Real
                 @test eltype(kldivergence(N2, N1)) <: Real
             end

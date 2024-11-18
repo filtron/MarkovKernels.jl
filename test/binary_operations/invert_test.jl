@@ -1,4 +1,5 @@
-@testset "invert" begin
+@safetestset "invert" begin
+    using MarkovKernels, LinearAlgebra
     include("invert_test_utils.jl")
 
     m, n = 2, 3

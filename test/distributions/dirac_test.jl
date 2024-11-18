@@ -1,4 +1,5 @@
-@testset "Dirac" begin
+@safetestset "Dirac" begin
+    using MarkovKernels, LinearAlgebra
     etys = (Float64, Complex{Float64})
     n = 2
 

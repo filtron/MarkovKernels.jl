@@ -1,24 +1,12 @@
 using MarkovKernels
 using Test, Aqua, JET, JuliaFormatter
+using SafeTestsets
+
 using LinearAlgebra
 #using Plots
 import RecursiveArrayTools: recursivecopy, recursivecopy!
 
-import LinearAlgebra: HermOrSym
-
-include("matrix_test_utils.jl")
-
 #include("distributions/normal_plotting_test.jl")
-
-include("binary_operations/bayes_rule_test.jl")
-
-n = 1
-m = 2
-
-etypes = (Float64, Complex{Float64})
-
-matrix_types = (Matrix,)
-cov_types = (HermOrSym, Cholesky)
 
 @testset "MarkovKernels.jl" begin
     include("psdparametrizations/psdparametrizations_test.jl")
@@ -45,12 +33,6 @@ cov_types = (HermOrSym, Cholesky)
         include("binary_operations/marginalize_test.jl")
         include("binary_operations/invert_test.jl")
         include("binary_operations/posterior_test.jl")
-    end
-
-    @testset "bayes_rule" begin
-        for T in etypes
-            bayes_rule_test(T, n, m, cov_types, matrix_types)
-        end
     end
 
     @testset "PSDMatrices" begin

@@ -1,4 +1,5 @@
-@testset "compose" begin
+@safetestset "compose" begin
+    using MarkovKernels, LinearAlgebra
     include("compose_test_utils.jl")
 
     m = 2

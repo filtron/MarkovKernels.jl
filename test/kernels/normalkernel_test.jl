@@ -1,4 +1,5 @@
-@testset "NormalKernel" begin
+@safetestset "NormalKernel" begin
+    using MarkovKernels, LinearAlgebra
     etys = (Float64, ComplexF64)
     m, n = 2, 3
 

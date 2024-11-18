@@ -1,4 +1,5 @@
-@testset "posterior" begin
+@safetestset "posterior" begin
+    using MarkovKernels, LinearAlgebra
     include("invert_test_utils.jl")
 
     m, n = 2, 3
@@ -76,7 +77,8 @@
                 P2 = posterior(N, L)
 
                 @test mean(P1) ≈ mean(P2) ≈ mean(N) + G * (y - mean(K)(mean(N)))
-                @test cov(P1) ≈ cov(P2) ≈ Π
+                @test isapprox(cov(P1), Π, atol = 10 * eps(real(T))) &&
+                      isapprox(cov(P2), Π, atol = 10 * eps(real(T)))
             end
 
             L = FlatLikelihood()
