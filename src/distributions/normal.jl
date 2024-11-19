@@ -98,7 +98,7 @@ cov(N::UvNormal) = covp(N)
 Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(covp(N)))
-var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachrow(lsqrt(covp(N))))
+var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachcol(rsqrt(covp(N))))
 var(N::UvNormal) = cov(N)
 
 """
