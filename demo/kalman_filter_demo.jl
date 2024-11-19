@@ -1,5 +1,16 @@
+import Pkg
+Base.active_project() != joinpath(@__DIR__, "Project.toml") && Pkg.activate(@__DIR__)
+haskey(Pkg.project().dependencies, "MarkovKernels") ||
+    Pkg.develop(path = joinpath(@__DIR__, "../"))
+isfile(joinpath(@__DIR__, "Manifest.toml")) && Pkg.resolve()
+Pkg.instantiate()
+
 using MarkovKernels
-using LinearAlgebra, Plots, Random, IterTools
+using LinearAlgebra, Random
+
+using IterTools
+
+using Plots
 
 ## sample a partially observed Gauss-Markov process
 
@@ -18,21 +29,23 @@ dt = T / (m - 1)
 
 # define transtion kernel
 λ = 2.0
-Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
-Q = 1.0I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1.0+(2*λ*dt)^2]
+Φ = LinearMap(exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0])
+Q = Symmetric(1.0I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1.0+(2*λ*dt)^2])
 fw_kernel = NormalKernel(Φ, Q)
 
 # initial distribution
-init = Normal(zeros(2), diagm(ones(2)))
+μ0 = zeros(2)
+Σ0 = Symmetric(diagm(ones(2)))
+init = Normal(μ0, Σ0)
 
 # sample state
 xs = sample(rng, init, fw_kernel, m - 1)
 
 # output kernel and measurement kernel
-C = 1.0 / sqrt(2) * [1.0 -1.0]
+C = LinearMap(1.0 / sqrt(2) * adjoint([1.0, -1.0]))
 output_kernel = DiracKernel(C)
-R = fill(0.1, 1, 1)
-m_kernel = compose(NormalKernel(1.0I(1), R), output_kernel)
+R = 0.1
+m_kernel = compose(NormalKernel(LinearMap(1.0), R), output_kernel)
 
 # sample output and its measurements
 zs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
@@ -52,29 +65,26 @@ function kalman_filter(
     filter_distributions = typeof(init)[]
 
     # initial measurement update
-    likelihood = Likelihood(m_kernel, ys[1, :])
-    filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
+    likelihood = Likelihood(m_kernel, ys[1])
+    filter_distribution = posterior(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
-    loglike = loglike_increment
 
     for m in 2:size(ys, 1)
-
         # predict
         filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
-        likelihood = Likelihood(m_kernel, ys[m, :])
-        filter_distribution, loglike_increment = bayes_rule(filter_distribution, likelihood)
+        likelihood = Likelihood(m_kernel, ys[m])
+        filter_distribution = posterior(filter_distribution, likelihood)
         push!(filter_distributions, filter_distribution)
-        loglike = loglike + loglike_increment
     end
 
-    return filter_distributions, loglike
+    return filter_distributions
 end
 
 ## run Kalman filter and plot the results
 
-filter_distributions, loglike = kalman_filter(ys, init, fw_kernel, m_kernel)
+filter_distributions = kalman_filter(ys, init, fw_kernel, m_kernel)
 
 state_filter_plt = plot(
     ts,

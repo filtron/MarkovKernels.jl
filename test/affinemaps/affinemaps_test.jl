@@ -1,4 +1,5 @@
-@testset "AffineMaps" begin
+@safetestset "AffineMaps" begin
+    using MarkovKernels, LinearAlgebra
     include("test_utils.jl")
 
     include("linearmap_test.jl")

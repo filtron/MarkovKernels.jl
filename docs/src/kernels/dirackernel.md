@@ -24,14 +24,6 @@ IdentityKernel
 const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
 ```
 
-### Constructors
-
-```@docs
-DiracKernel(Φ::AbstractMatrix)
-DiracKernel(Φ::AbstractMatrix, b::AbstractVector)
-DiracKernel(Φ::AbstractMatrix, b::AbstractVector, c::AbstractVector)
-```
-
 ### Basics
 
 ```@docs
@@ -42,6 +34,5 @@ mean(K::DiracKernel)
 
 ```@docs
 condition(K::AbstractDiracKernel, x)
-rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractVector)
-rand(K::AbstractDiracKernel, x::AbstractVector)
+rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractNumOrVec)
 ```

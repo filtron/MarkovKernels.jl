@@ -1,4 +1,4 @@
-@testset "CovarianceParameter | SelfAdjoint" begin
+@testset "PSDParametrizations | SelfAdjoint" begin
     etys = (Float64, ComplexF64)
 
     for T in etys

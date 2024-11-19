@@ -1,4 +1,4 @@
-@testset "CovarianceParameter | Real" begin
+@testset "PSDParametrizations | Scalar" begin
     etys = (Float64, ComplexF64)
 
     for T in etys

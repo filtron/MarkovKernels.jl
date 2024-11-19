@@ -1,11 +1,11 @@
-# Cholesky 
+# Cholesky
 
 ```@meta
 CurrentModule = MarkovKernels
 ```
 
 
-## Methods 
+## Methods
 
 ```@docs
 rsqrt(C::Cholesky)

@@ -37,9 +37,9 @@ dt = T / (m - 1)
 
 # define transtion kernel
 λ = 2.0
-Φ = exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0]
-Q = I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2]
-fw_kernel = NormalKernel(Φ, Symmetric(Q))
+Φ = LinearMap( exp(-λ * dt) .* [1.0 0.0; -2*λ*dt 1.0] )
+Q = Symmetric(I - exp(-2 * λ * dt) .* [1.0 -2*λ*dt; -2*λ*dt 1+(2*λ*dt)^2])
+fw_kernel = NormalKernel(Φ, Q)
 
 # initial distribution
 init = Normal(zeros(2), Symmetric(diagm(ones(2))))
@@ -48,10 +48,10 @@ init = Normal(zeros(2), Symmetric(diagm(ones(2))))
 xs = sample(rng, init, fw_kernel, m - 1)
 
 # output kernel and measurement kernel
-C = 1.0 / sqrt(2) * [1.0 -1.0]
+C = LinearMap( adjoint([1.0, -1.0]) / sqrt(2))
 output_kernel = DiracKernel(C)
-R = fill(0.1, 1, 1)
-m_kernel = compose(NormalKernel(1.0I(1), Symmetric(R)), output_kernel)
+R = 0.1
+m_kernel = compose(NormalKernel(LinearMap(1.0), R), output_kernel)
 
 # sample output and its measurements
 zs = mapreduce(z -> rand(rng, output_kernel, xs[z, :]), vcat, 1:m)
@@ -65,7 +65,7 @@ scatter!(ts, ys, label = "measurement", color = "black")
 
 ```@example 2
 function kalman_filter(
-    ys::AbstractVecOrMat,
+    ys::AbstractVector,
     init::AbstractNormal,
     fw_kernel::AbstractNormalKernel,
     m_kernel::AbstractNormalKernel,
@@ -76,7 +76,7 @@ function kalman_filter(
     filter_distributions = typeof(init)[]
 
     # initial measurement update
-    likelihood = Likelihood(m_kernel, ys[1, :])
+    likelihood = Likelihood(m_kernel, ys[1])
     filter_distribution, loglike_increment = posterior_and_loglike(filter_distribution, likelihood)
     push!(filter_distributions, filter_distribution)
     loglike = loglike_increment
@@ -87,7 +87,7 @@ function kalman_filter(
         filter_distribution = marginalize(filter_distribution, fw_kernel)
 
         # measurement update
-        likelihood = Likelihood(m_kernel, ys[m, :])
+        likelihood = Likelihood(m_kernel, ys[m])
         filter_distribution, loglike_increment = posterior_and_loglike(filter_distribution, likelihood)
         push!(filter_distributions, filter_distribution)
         loglike = loglike + loglike_increment

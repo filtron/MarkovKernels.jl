@@ -34,6 +34,13 @@ Random.rand(D::AbstractDistribution) = rand(Random.default_rng(), D)
 
 abstract type AbstractMarkovKernel end
 
+"""
+    condition(K::AbstractMarkovKernel, x)
+
+Computes the distribution retrieved from evaluating K at x.
+"""
+function condition(::AbstractMarkovKernel, ::Any) end
+
 abstract type AbstractLikelihood end
 
 for T in (:AbstractDistribution, :AbstractMarkovKernel, :AbstractLikelihood)

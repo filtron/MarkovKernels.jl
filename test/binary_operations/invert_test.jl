@@ -1,59 +1,74 @@
-function invert_test(T, n, m, cov_types, matrix_types)
-    μp = randn(T, m)
-    Σp = randn(T, m, m)
-    Σp = Σp * Σp'
-    Ap = randn(T, n, m)
-    Rp = randn(T, n, n)
-    Rp = Rp * Rp'
+@safetestset "invert" begin
+    using MarkovKernels, LinearAlgebra
+    include("invert_test_utils.jl")
 
-    yp = randn(T, n)
+    m, n = 2, 3
+    etys = (Float64, ComplexF64)
 
-    for cov_t in cov_types, matrix_t in matrix_types
-        μ = _make_vector(μp, matrix_t)
-        Σ = _make_matrix(Σp, matrix_t)
-        A = _make_matrix(Ap, matrix_t)
-        R = _make_matrix(Rp, matrix_t)
-        y = _make_vector(yp, matrix_t)
+    for T in etys
+        @testset "invert | multivariate" begin
+            μ = randn(T, n)
+            V = Cholesky(UpperTriangular(ones(T, n, n)))
 
-        N = Normal(μ, _make_covp(Σ, cov_t))
-        NK = NormalKernel(A, _make_covp(R, cov_t))
-        DK = DiracKernel(A)
-        IK = IdentityKernel()
+            N = Normal(μ, V)
 
-        S, G, Π = _schur(Σ, A, R)
-        Ngt = Normal(A * μ, S)
-        Kgt = NormalKernel(G, μ, A * μ, Π)
+            C1 = LinearMap(randn(T, m, n))
+            R1 = Cholesky(UpperTriangular(ones(T, m, m)))
 
-        NC, KC = invert(N, NK)
+            NK1 = NormalKernel(C1, R1)
+            DK1 = DiracKernel(C1)
 
-        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(NK)))" begin
-            @test mean(NC) ≈ mean(Ngt)
-            @test cov(NC) ≈ cov(Ngt)
+            C2 = LinearMap(adjoint(randn(T, n)))
+            R2 = one(real(T))
 
-            @test slope(mean(KC)) ≈ slope(mean(Kgt))
-            @test intercept(mean(KC)) ≈ intercept(mean(Kgt))
-            @test cov(condition(KC, y)) ≈ cov(condition(Kgt, y))
-            @test mean(condition(KC, y)) ≈ mean(condition(Kgt, y))
+            NK2 = NormalKernel(C2, R2)
+            DK2 = DiracKernel(C2)
+
+            for K in (NK1, NK2, DK1, DK2)
+                S, G, Π = _schur(_mat_or_num(V), slope(mean(K)), _cov(K))
+                NC, KC = invert(N, K)
+
+                @test cov(NC) ≈ S
+                @test mean(NC) ≈ mean(K)(mean(N))
+                @test _cov(KC) ≈ Π
+                @test slope(mean(KC)) ≈ G
+                @test intercept(mean(KC)) ≈ mean(N) - G * mean(K)(mean(N))
+            end
+
+            IK = IdentityKernel()
+            NC, KC = invert(N, IK)
+
+            @test N == NC
+            @test IK == KC
         end
 
-        S, G, Π = _schur(Σ, A)
-        Ngt = Normal(A * μ, S)
-        Kgt = NormalKernel(G, μ, A * μ, Π)
+        @testset "invert | univariate" begin
+            μ = randn(T)
+            V = one(real(T))
 
-        NC, KC = invert(N, DK)
+            N = Normal(μ, V)
 
-        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(DK)))" begin
-            @test mean(NC) ≈ mean(Ngt)
-            @test cov(NC) ≈ cov(Ngt)
+            C1 = LinearMap(randn(T))
+            R1 = one(real(T))
 
-            @test slope(mean(KC)) ≈ slope(mean(Kgt))
-            @test intercept(mean(KC)) ≈ intercept(mean(Kgt))
-            @test cov(condition(KC, y)) ≈ cov(condition(Kgt, y))
-            @test mean(condition(KC, y)) ≈ mean(condition(Kgt, y))
-        end
+            NK1 = NormalKernel(C1, R1)
+            DK1 = DiracKernel(C1)
 
-        NC, KC = invert(N, IK)
-        @testset "invert | $(nameof(typeof(N))) | $(nameof(typeof(IK)))" begin
+            for K in (NK1, DK1)
+                S, G, Π = _schur(_mat_or_num(V), slope(mean(K)), _cov(K))
+                NC, KC = invert(N, K)
+
+                @test cov(NC) ≈ S
+                @test mean(NC) ≈ mean(K)(mean(N))
+                @test abs(_cov(KC) - Π) ≤ 10 * eps(real(T))
+                @test abs(slope(mean(KC)) - G) ≤ 10 * eps(real(T))
+                @test abs(intercept(mean(KC)) - mean(N) + G * mean(K)(mean(N))) ≤
+                      10 * eps(real(T))
+            end
+
+            IK = IdentityKernel()
+            NC, KC = invert(N, IK)
+
             @test N == NC
             @test IK == KC
         end

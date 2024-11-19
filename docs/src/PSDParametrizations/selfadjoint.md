@@ -1,10 +1,10 @@
-# SelfAdjoint 
+# SelfAdjoint
 
 ```@meta
 CurrentModule = MarkovKernels
 ```
 
-Self-adjoint matrices are subtypes of the following union: 
+Self-adjoint matrices are subtypes of the following union:
 
 ```julia
 const RSym{T,S} = Symmetric{T,S} where {T<:Real,S}
@@ -12,9 +12,11 @@ const CHerm{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const SelfAdjoint{T,S} = Union{RSym{T,S},CHerm{T,S}} where {T,S}
 ```
 
-## Methods 
+## Methods
 
 ```@docs
+selfadjoint!(x::Number)
+
 selfadjoint(x::Number)
 selfadjoint(A::AbstractMatrix{<:Real})
 selfadjoint(A::AbstractMatrix{<:Complex})

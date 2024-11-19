@@ -1,4 +1,4 @@
-@testset "CovarianceParameter | Cholesky" begin
+@testset "PSDParametrizations | Cholesky" begin
     etys = (Float64, ComplexF64)
 
     for T in etys
@@ -17,7 +17,7 @@
         LR2 = randn(real(T))
         R2 = abs2(LR2)
 
-        @testset "CovarianceParamater | Cholesky | $(T)" begin
+        @testset "PSDParametrizations | Cholesky | $(T)" begin
             @test rsqrt(CΣ) ≈ cholesky(Σ).U
             @test lsqrt(CΣ) ≈ cholesky(Σ).L
             @test lsqrt(CΣ) == adjoint(rsqrt(CΣ))

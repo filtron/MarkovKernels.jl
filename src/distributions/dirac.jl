@@ -22,6 +22,13 @@ Creates a Dirac distribution with mean μ.
 Dirac(μ) = Dirac{eltype(μ),typeof(μ)}(μ)
 
 """
+    mean(D::AbstractDirac)
+
+Computes the mean vector of the Dirac distribution D.
+"""
+mean(D::Dirac) = D.μ
+
+"""
     Dirac{T}(D::Dirac)
 
 Computes a Dirac distribution of sample_eltype T from the Dirac distribution D.
@@ -34,21 +41,14 @@ AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
 
-typeof_sample(D::Dirac) = typeof(D.μ)
+typeof_sample(D::Dirac) = typeof(mean(D))
 
 """
     dim(D::AbstractDirac)
 
 Returns the dimension of the Dirac distribution D.
 """
-dim(D::Dirac) = length(D.μ)
-
-"""
-    mean(D::AbstractDirac)
-
-Computes the mean vector of the Dirac distribution D.
-"""
-mean(D::Dirac) = D.μ
+dim(D::Dirac) = length(mean(D))
 
 """
     rand(RNG::AbstractRNG, D::AbstractDirac)
@@ -61,5 +61,5 @@ rand(::AbstractRNG, D::AbstractDirac) = mean(D)
 function Base.show(io::IO, D::Dirac)
     println(io, summary(D))
     print(io, "μ = ")
-    show(io, D.μ)
+    show(io, mean(D))
 end
