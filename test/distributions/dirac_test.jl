@@ -29,8 +29,8 @@
 
             @test mean(D) == μ
             @test rand(D) == mean(D)
-            @test typeof(rand(D)) == typeof_sample(D)
-            @test eltype(rand(D)) == eltype_sample(D)
+            @test typeof(rand(D)) == sample_type(D)
+            @test eltype(rand(D)) == sample_eltype(D)
         end
 
         @testset "Dirac | $(T) " begin
@@ -57,8 +57,8 @@
             end
             @test mean(D) == μ
             @test rand(D) == mean(D)
-            @test typeof(rand(D)) == typeof_sample(D)
-            @test eltype(rand(D)) == eltype_sample(D)
+            @test typeof(rand(D)) == sample_type(D)
+            @test eltype(rand(D)) == sample_eltype(D)
         end
     end
 end

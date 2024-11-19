@@ -36,8 +36,8 @@
                 @test cov(K)(x) == Σ(x)
                 @test condition(K, x) == Normal(μ(x), Σ(x))
 
-                @test typeof_sample(condition(K, x)) == typeof(rand(K, x))
-                @test eltype_sample(condition(K, x)) == eltype(rand(K, x))
+                @test sample_type(condition(K, x)) == typeof(rand(K, x))
+                @test sample_eltype(condition(K, x)) == eltype(rand(K, x))
             end
         end
     end
@@ -115,8 +115,8 @@
                 @test mean(K)(x) == μ(x)
                 @test cov(K)(x) == Σ
                 @test condition(K, x) == Normal(μ(x), Σ)
-                @test typeof_sample(condition(K, x)) == typeof(rand(K, x))
-                @test eltype_sample(condition(K, x)) == eltype(rand(K, x))
+                @test sample_type(condition(K, x)) == typeof(rand(K, x))
+                @test sample_eltype(condition(K, x)) == eltype(rand(K, x))
             end
         end
     end
@@ -162,8 +162,8 @@
                 @test mean(K)(x) == μ(x)
                 @test cov(K)(x) == Σ
                 @test condition(K, x) == Normal(μ(x), Σ)
-                @test typeof_sample(condition(K, x)) == typeof(rand(K, x))
-                @test eltype_sample(condition(K, x)) == eltype(rand(K, x))
+                @test sample_type(condition(K, x)) == typeof(rand(K, x))
+                @test sample_eltype(condition(K, x)) == eltype(rand(K, x))
             end
         end
     end

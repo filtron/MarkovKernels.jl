@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
+using LinearAlgebra, ArrayInterface, Statistics, Random, AliasTables, RecipesBase
 
 import Base:
     *,
@@ -61,13 +61,17 @@ export PSDTrait,
 
 include("generic.jl")
 export AbstractDistribution,
-    AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
+    AbstractMarkovKernel, AbstractLikelihood, sample_type, sample_eltype
 
-include("distributions/normal.jl")
+include("distributions/categorical.jl")
 include("distributions/dirac.jl")
+include("distributions/normal.jl")
 include("distributions/particle_system.jl")
 include("distributions/plotting.jl")
-export AbstractNormal,
+export AbstractCategorical,
+    Categorical,
+    probability_vector,
+    AbstractNormal,
     Normal,
     dim,
     mean,

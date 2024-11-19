@@ -39,8 +39,6 @@ end
 
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
-typeof_sample(N::Normal) = typeof(mean(N))
-
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
     copy!(mean(Ndst), mean(Nsrc))
     if covp(Ndst).uplo == covp(Nsrc).uplo
@@ -109,6 +107,14 @@ Computes the vector of marginal standard deviations of the Normal distribution N
 """
 std(N::AbstractNormal) = sqrt.(var(N))
 
+function sample_type(N::AbstractNormal)
+    T = promote_type(eltype(mean(N)), eltype(covp(N)))
+    T = float(T)
+    ST = Base.promote_op(convert, Type{AbstractVector{T}}, typeof(mean(N)))
+    return ST
+end
+sample_type(N::UvNormal) = float(promote_type(typeof(mean(N)), typeof(covp(N))))
+
 Normal{T}(N::Normal{A,<:AbstractVector}) where {T,A} =
     Normal(convert(AbstractVector{T}, mean(N)), convert_psd_eltype(T, covp(N)))
 Normal{T}(N::Normal{A,<:Number}) where {T,A} =
@@ -127,32 +133,37 @@ residual(N::AbstractNormal, x) = lsqrt(covp(N)) \ (x - mean(N))
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
 
-_piconst(T::Type{<:Real}) = T(2π)
-_piconst(T::Type{<:Complex}) = real(T)(π)
+_logpiconst(T::Type{<:Real}) = log(T(2π))
+_logpiconst(T::Type{<:Complex}) = log(real(T)(π))
 
 """
     logpdf(N::AbstractNormal,x)
 
 Computes the logarithm of the probability density function of the Normal distribution N evaluated at x.
 """
-logpdf(N::AbstractNormal{T}, x) where {T} =
-    -_nscale(T) *
-    (dim(N) * log(_piconst(T)) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
+function logpdf(N::AbstractNormal, x)
+    T = sample_eltype(N)
+    return -_nscale(T) *
+           (dim(N) * _logpiconst(T) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
+end
 
 """
     entropy(N::AbstractNormal)
 
 Computes the entropy of the Normal distribution N.
 """
-entropy(N::AbstractNormal{T}) where {T} =
-    _nscale(T) * (dim(N) * (log(_piconst(T)) + one(real(T))) + real(logdet(covp(N))))
+function entropy(N::AbstractNormal)
+    T = sample_eltype(N)
+    _nscale(T) * (dim(N) * (_logpiconst(T) + one(real(T))) + real(logdet(covp(N))))
+end
 
 """
     kldivergence(N1::AbstractNormal, N2::AbstractNormal)
 
 Computes the Kullback-Leibler divergence between the Normal distributions N1 and N2.
 """
-function kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
+function kldivergence(N1::AbstractNormal, N2::AbstractNormal)
+    T = promote_type(sample_eltype(N1), sample_eltype(N2))
     root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
     _nscale(T) * (
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
@@ -166,10 +177,13 @@ end
 Computes a random vector distributed according to the Normal distribution N
 using the random number generator RNG.
 """
-rand(rng::AbstractRNG, N::AbstractNormal) =
-    mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N), dim(N))
+function rand(rng::AbstractRNG, N::AbstractNormal)
+    T = sample_eltype(N)
+    x = mean(N) + lsqrt(covp(N)) * randn(rng, T, dim(N))
+    return sample_type(N)(x)
+end
 
-rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, eltype(N))
+rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, sample_type(N))
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))

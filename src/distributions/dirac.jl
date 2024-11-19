@@ -28,6 +28,8 @@ Computes the mean vector of the Dirac distribution D.
 """
 mean(D::Dirac) = D.μ
 
+sample_type(D::AbstractDirac) = typeof(mean(D))
+
 """
     Dirac{T}(D::Dirac)
 
@@ -40,8 +42,6 @@ Dirac{T}(D::Dirac{U,<:AbstractVector}) where {T,U} =
 AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
 AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
 AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
-
-typeof_sample(D::Dirac) = typeof(mean(D))
 
 """
     dim(D::AbstractDirac)
