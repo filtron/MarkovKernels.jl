@@ -9,7 +9,7 @@ end
 
 Categorical(p::AbstractVector) = Categorical{eltype(eachindex(p)),typeof(p)}(p)
 
-probability_vector(C::Categorical) = C.p
+probability_vector(C::Categorical) = C.p / sum(C.p)
 
 dim(C::Categorical) = 1
 
@@ -23,6 +23,33 @@ end
 Base.similar(C::Categorical) = Categorical(similar(probability_vector(C)))
 Base.isapprox(C1::Categorical, C2::Categorical, kwargs...) =
     isapprox(probability_vector(C1), probability_vector(C2), kwargs...)
+
+function logpdf(C::Categorical, x)
+    p = probability_vector(C)
+    return log(p[x])
+end
+
+function entropy(C::Categorical)
+    p = probability_vector(C)
+    e = zero(float(eltype(p)))
+    for i in eachindex(p)
+        pi = p[i]
+        e = e - log(pi) * pi
+    end
+    return e
+end
+
+function kldivergence(C1::Categorical, C2::Categorical)
+    p1 = probability_vector(C1)
+    p2 = probability_vector(C2)
+    eachindex(p1) != eachindex(p2) && return Inf
+    kld = zero(float(eltype(p1)))
+    for i in eachindex(p1)
+        logratio = log(p1[i]) - log(p2[i])
+        kld = kld + logratio * p1[i]
+    end
+    return kld
+end
 
 function rand(::AbstractRNG, C::AbstractCategorical)
     p = probability_vector(C)
