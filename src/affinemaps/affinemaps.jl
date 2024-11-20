@@ -22,6 +22,8 @@ Evaluates the affine map F at x.
     compose(F2::AbstractAffineMap, F1::AbstractAffineMap)
 
 Computes the affine map F3 resulting from the composition F2 ∘ F1.
+
+See also [`∘`](@ref)
 """
 compose(F2::AbstractAffineMap, F1::AbstractAffineMap) =
     AffineMap(slope(F2) * slope(F1), slope(F2) * intercept(F1) + intercept(F2))
@@ -30,6 +32,8 @@ compose(F2::AbstractAffineMap, F1::AbstractAffineMap) =
     ∘(F2::AbstractAffineMap, F1::AbstractAffineMap)
 
 Equivalent to compose(F2::AbstractAffineMap, F1::AbstractAffineMap).
+
+See also [`compose`](@ref)
 """
 ∘(F2::AbstractAffineMap, F1::AbstractAffineMap) = compose(F2, F1)
 
