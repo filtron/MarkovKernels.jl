@@ -30,9 +30,13 @@ _normalize_vector!(v::AbstractVector) = ldiv!(sum(v), v)
 
 Constructs a categorical distribution from the vector of probabilities p. 
 """
-Categorical(p::AbstractVector) = Categorical{eltype(eachindex(p)),typeof(p)}(p)
+function Categorical(p::AbstractVector)
+    π = copy(p)
+    _normalize_vector!(π)
+    return Categorical{eltype(eachindex(π)),typeof(π)}(π)
+end
 
-probability_vector(C::Categorical) = C.p / sum(C.p)
+probability_vector(C::Categorical) = C.p
 
 dim(C::Categorical) = 1
 

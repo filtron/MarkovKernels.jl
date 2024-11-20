@@ -103,7 +103,7 @@ end
 """
     rand([rng::AbstractRNG], K::AbstractNormalKernel, x::AbstractVector)
 
-Computes a random vector conditionally on x with respect the the Normal kernel K
+Samples a random vector conditionally on x with respect the the Normal kernel K
 using the random number generator rng.
 """
 rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec) =

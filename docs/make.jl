@@ -30,7 +30,11 @@ makedocs(;
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
         ],
-        "Kernels" => ["kernels/normalkernel.md", "kernels/dirackernel.md"],
+        "Kernels" => [
+            "kernels/normalkernel.md",
+            "kernels/dirackernel.md",
+            "kernels/stochasticmatrix.md",
+        ],
         "Likelihoods" => "likelihoods.md",
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
