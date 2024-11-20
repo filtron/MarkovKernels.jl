@@ -38,7 +38,6 @@
                     @test AbstractDistribution{T2}(uvN1) ==
                           AbstractNormal{T2}(uvN1) ==
                           Normal{T2}(uvN1)
-                    @test eltype(AbstractNormal{T2}(uvN1)) == T2
                 end
             end
 
@@ -75,7 +74,8 @@
 
             @testset "Normal | Unary | $(T) | " begin
                 @test_nowarn repr(N)
-                @test eltype(N) == T
+
+                @test sample_type(N) == typeof(mean(N))
 
                 @test !(copy(N) === N)
                 @test copy(N) == N
@@ -94,7 +94,6 @@
 
                 for U in eltypes
                     @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
-                    @test eltype(AbstractNormal{U}(N)) == U
                 end
                 @test N == N
                 @test mean(N) == μ

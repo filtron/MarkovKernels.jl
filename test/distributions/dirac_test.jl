@@ -12,14 +12,15 @@
             D = Dirac(μ)
 
             @test_nowarn repr(D)
-            @test eltype(D) == T
+
+            @test sample_type(D) == typeof(μ)
+            @test sample_eltype(D) == eltype(μ)
 
             @test typeof(copy(D)) === typeof(D)
             @test dim(D) == 1
 
             for U in compatible_eltypes
                 @test AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)
-                @test eltype(AbstractDirac{U}(D)) == U
             end
             for U in incompatible_eltypes
                 @test_throws InexactError AbstractDistribution{U}(D)
@@ -38,7 +39,9 @@
             D = Dirac(μ)
 
             @test_nowarn repr(D)
-            @test eltype(D) == T
+
+            @test sample_type(D) == typeof(μ)
+            @test sample_eltype(D) == eltype(μ)
 
             @test !(copy(D) === D)
             @test typeof(copy(D)) === typeof(D)
@@ -48,7 +51,6 @@
             @test dim(D) == n
             for U in compatible_eltypes
                 @test AbstractDistribution{U}(D) == AbstractDirac{U}(D) == Dirac{U}(D)
-                @test eltype(AbstractDirac{U}(D)) == U
             end
             for U in incompatible_eltypes
                 @test_throws InexactError AbstractDistribution{U}(D)

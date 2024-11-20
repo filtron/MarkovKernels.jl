@@ -1,7 +1,5 @@
 abstract type AbstractDistribution{T<:Number} end
 
-eltype(::AbstractDistribution{T}) where {T} = T
-
 """
     rand([rng], D::AbstractDistribution)
 
