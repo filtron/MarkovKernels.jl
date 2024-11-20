@@ -66,7 +66,6 @@ export AbstractDistribution,
 include("distributions/categorical.jl")
 include("distributions/dirac.jl")
 include("distributions/normal.jl")
-include("distributions/particle_system.jl")
 include("distributions/plotting.jl")
 export AbstractCategorical,
     Categorical,
@@ -84,13 +83,7 @@ export AbstractCategorical,
     entropy,
     kldivergence,
     AbstractDirac,
-    Dirac,
-    AbstractParticleSystem,
-    ParticleSystem,
-    logweights,
-    weights,
-    particles,
-    nparticles
+    Dirac
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
@@ -120,10 +113,6 @@ include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
-export compose,
-    marginalize, invert, posterior_and_loglike, posterior, posterior_and_loglike!
-
-# these will be removed
-export bayes_rule_and_loglike, bayes_rule_and_loglike!, bayes_rule
+export compose, marginalize, invert, posterior_and_loglike, posterior
 
 end

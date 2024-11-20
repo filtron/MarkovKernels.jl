@@ -16,7 +16,6 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         include("distributions/categorical_test.jl")
         include("distributions/dirac_test.jl")
         include("distributions/normal_test.jl")
-        #include("distributions/particle_system_test.jl")
         #normal_plotting_test()
     end
 
