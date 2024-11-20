@@ -72,10 +72,10 @@ function kldivergence(C1::Categorical, C2::Categorical)
     return kld
 end
 
-function rand(::AbstractRNG, C::AbstractCategorical)
+function rand(rng::AbstractRNG, C::AbstractCategorical)
     p = probability_vector(C)
     at = AliasTable(p)
-    return rand(at)
+    return rand(rng, at)
 end
 
 function Base.show(io::IO, C::Categorical)
