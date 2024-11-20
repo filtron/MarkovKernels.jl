@@ -26,6 +26,7 @@ makedocs(;
         ],
         "Distributions" => [
             "General" => "distributions/general.md",
+            "Categorical" => "distributions/categorical.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
         ],

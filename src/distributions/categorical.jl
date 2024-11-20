@@ -1,12 +1,33 @@
+"""
+    AbstractCategorical{T}
 
+Abstract type for representing categorical distributions with values T.
+"""
 abstract type AbstractCategorical{T} <: AbstractDistribution{T} end
 
+"""
+    probability_vector(::AbstractCategorical)
+
+
+Computes the vector of probabilities for each category. 
+"""
 function probability_vector(::AbstractCategorical) end
 
+"""
+    Categorical{T,A}
+
+
+Type for representing categorical distributions with sample_eltype T.
+"""
 struct Categorical{T,A} <: AbstractCategorical{T}
     p::A
 end
 
+"""
+    Categorical(p::AbstractVector)
+
+Constructs a categorical distribution from the vector of probabilities p. 
+"""
 Categorical(p::AbstractVector) = Categorical{eltype(eachindex(p)),typeof(p)}(p)
 
 probability_vector(C::Categorical) = C.p / sum(C.p)

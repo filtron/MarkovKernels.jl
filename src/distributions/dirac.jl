@@ -8,7 +8,7 @@ abstract type AbstractDirac{T} <: AbstractDistribution{T} end
 """
     Dirac{T<:Number}
 
-Type for representing Dirac distributions with eltype_sample T.
+Type for representing Dirac distributions with sample_eltype T.
 """
 struct Dirac{T,U} <: AbstractDirac{T}
     μ::U
