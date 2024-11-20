@@ -23,6 +23,8 @@ struct Categorical{T,A} <: AbstractCategorical{T}
     p::A
 end
 
+_normalize_vector!(v::AbstractVector) = ldiv!(sum(v), v)
+
 """
     Categorical(p::AbstractVector)
 

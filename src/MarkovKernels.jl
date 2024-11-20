@@ -85,8 +85,9 @@ export AbstractCategorical,
     AbstractDirac,
     Dirac
 
-include("kernels/normalkernel.jl") # defines normal kernels
-include("kernels/dirackernel.jl") # defines dirac kernels
+include("kernels/normalkernel.jl")
+include("kernels/dirackernel.jl")
+include("kernels/stochasticmatrix.jl")
 export Skedasticity,
     Homoskedastic,
     Heteroskedastic,
@@ -101,11 +102,14 @@ export Skedasticity,
     AbstractDiracKernel,
     DiracKernel,
     AffineDiracKernel,
-    IdentityKernel
+    IdentityKernel,
+    AbstractStochasticMatrix,
+    StochasticMatrix,
+    probability_matrix
 
 const AffineNormalKernel = AffineHomoskedasticNormalKernel
 
-include("likelihoods.jl") # defines observation likelihoods
+include("likelihoods.jl")
 export FlatLikelihood, Likelihood, measurement_model, measurement
 
 include("binary_operations/compose.jl")

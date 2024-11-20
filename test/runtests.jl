@@ -22,6 +22,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     @testset "Kernels" begin
         include("kernels/normalkernel_test.jl")
         include("kernels/dirackernel_test.jl")
+        include("kernels/stochasticmatrix_test.jl")
     end
 
     @testset "Likelihoods" begin
