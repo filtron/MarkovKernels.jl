@@ -15,10 +15,3 @@ marginalize(D::AbstractDirac, K::AbstractMarkovKernel) = condition(K, mean(D))
 
 marginalize(D::AbstractDistribution, ::IdentityKernel) = D
 marginalize(D::AbstractDirac, ::IdentityKernel) = D
-
-function marginalize(
-    P::ParticleSystem{T,U,<:AbstractArray},
-    K::AffineDiracKernel{T},
-) where {T,U}
-    return ParticleSystem(logweights(P), mean(K).(particles(P)))
-end

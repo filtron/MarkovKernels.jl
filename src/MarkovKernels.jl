@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterface, Statistics, Random, RecipesBase
+using LinearAlgebra, ArrayInterface, Statistics, Random, AliasTables, RecipesBase
 
 import Base:
     *,
@@ -61,13 +61,16 @@ export PSDTrait,
 
 include("generic.jl")
 export AbstractDistribution,
-    AbstractMarkovKernel, AbstractLikelihood, typeof_sample, eltype_sample
+    AbstractMarkovKernel, AbstractLikelihood, sample_type, sample_eltype
 
-include("distributions/normal.jl")
+include("distributions/categorical.jl")
 include("distributions/dirac.jl")
-include("distributions/particle_system.jl")
+include("distributions/normal.jl")
 include("distributions/plotting.jl")
-export AbstractNormal,
+export AbstractCategorical,
+    Categorical,
+    probability_vector,
+    AbstractNormal,
     Normal,
     dim,
     mean,
@@ -80,13 +83,7 @@ export AbstractNormal,
     entropy,
     kldivergence,
     AbstractDirac,
-    Dirac,
-    AbstractParticleSystem,
-    ParticleSystem,
-    logweights,
-    weights,
-    particles,
-    nparticles
+    Dirac
 
 include("kernels/normalkernel.jl") # defines normal kernels
 include("kernels/dirackernel.jl") # defines dirac kernels
@@ -116,10 +113,6 @@ include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
-export compose,
-    marginalize, invert, posterior_and_loglike, posterior, posterior_and_loglike!
-
-# these will be removed
-export bayes_rule_and_loglike, bayes_rule_and_loglike!, bayes_rule
+export compose, marginalize, invert, posterior_and_loglike, posterior
 
 end

@@ -30,8 +30,8 @@
 
                 @test mean(K)(x) == μ(x)
                 @test condition(K, x) == Dirac(μ(x))
-                @test typeof_sample(condition(K, x)) == typeof(rand(K, x))
-                @test eltype_sample(condition(K, x)) == eltype(rand(K, x))
+                @test sample_type(condition(K, x)) == typeof(rand(K, x))
+                @test sample_eltype(condition(K, x)) == eltype(rand(K, x))
             end
         end
     end
@@ -72,8 +72,8 @@
                 @test typeof(K) <: AffineDiracKernel
                 @test mean(K)(x) == μ(x)
                 @test condition(K, x) == Dirac(μ(x))
-                @test typeof_sample(condition(K, x)) == typeof(rand(K, x))
-                @test eltype_sample(condition(K, x)) == eltype(rand(K, x))
+                @test sample_type(condition(K, x)) == typeof(rand(K, x))
+                @test sample_eltype(condition(K, x)) == eltype(rand(K, x))
             end
         end
     end

@@ -38,7 +38,6 @@
                     @test AbstractDistribution{T2}(uvN1) ==
                           AbstractNormal{T2}(uvN1) ==
                           Normal{T2}(uvN1)
-                    @test eltype(AbstractNormal{T2}(uvN1)) == T2
                 end
             end
 
@@ -54,8 +53,8 @@
 
             @test length(rand(uvN1)) == dim(uvN1)
             @test eltype(rand(uvN1)) == T
-            @test typeof(rand(uvN1)) == typeof_sample(uvN1)
-            @test eltype(rand(uvN1)) == eltype_sample(uvN1)
+            @test typeof(rand(uvN1)) == sample_type(uvN1)
+            @test eltype(rand(uvN1)) == sample_eltype(uvN1)
 
             @test kldivergence(uvN1, uvN2) ≈ _kld(T, m1, v1, m2, v2)
             @test kldivergence(uvN2, uvN1) ≈ _kld(T, m2, v2, m1, v1)
@@ -75,7 +74,8 @@
 
             @testset "Normal | Unary | $(T) | " begin
                 @test_nowarn repr(N)
-                @test eltype(N) == T
+
+                @test sample_type(N) == typeof(mean(N))
 
                 @test !(copy(N) === N)
                 @test copy(N) == N
@@ -94,7 +94,6 @@
 
                 for U in eltypes
                     @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
-                    @test eltype(AbstractNormal{U}(N)) == U
                 end
                 @test N == N
                 @test mean(N) == μ
@@ -114,8 +113,8 @@
 
                 @test length(rand(N)) == dim(N)
                 @test eltype(rand(N)) == T
-                @test typeof(rand(N)) == typeof_sample(N)
-                @test eltype(rand(N)) == eltype_sample(N)
+                @test typeof(rand(N)) == sample_type(N)
+                @test eltype(rand(N)) == sample_eltype(N)
             end
         end
 

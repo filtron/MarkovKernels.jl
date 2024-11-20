@@ -26,9 +26,9 @@ makedocs(;
         ],
         "Distributions" => [
             "General" => "distributions/general.md",
+            "Categorical" => "distributions/categorical.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
-            "ParticleSystem" => "distributions/particle_system.md",
         ],
         "Kernels" => ["kernels/normalkernel.md", "kernels/dirackernel.md"],
         "Likelihoods" => "likelihoods.md",
