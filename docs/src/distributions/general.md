@@ -7,8 +7,8 @@ CurrentModule = MarkovKernels
 ### Type information 
 
 ```@docs
-typeof_sample(D::AbstractDistribution)
-eltype_sample(D::AbstractDistribution)
+sample_type(D::AbstractDistribution)
+sample_eltype(D::AbstractDistribution)
 ```
 
 ### Probability densities

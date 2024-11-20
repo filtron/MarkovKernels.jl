@@ -50,14 +50,14 @@ std(::AbstractNormal)
 
 ```@docs
 residual(N::AbstractNormal, x::AbstractVector)
-logpdf(N::AbstractNormal{T}, x) where {T}
+logpdf(N::AbstractNormal, x)
 ```
 
 ### Information theory
 
 ```@docs
 entropy(::AbstractNormal)
-kldivergence(N1::AbstractNormal{T}, N2::AbstractNormal{T}) where {T<:Number}
+kldivergence(N1::AbstractNormal, N2::AbstractNormal)
 ```
 
 ### Sampling

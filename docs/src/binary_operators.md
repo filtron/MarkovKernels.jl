@@ -52,7 +52,6 @@ That is, given a measurmeent ``y``, ``m`` evaluated at ``y`` is the marginal lik
 invert(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
 posterior_and_loglike(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
-posterior_and_loglike!(P::ParticleSystem{T,U,<:AbstractVector}, L::AbstractLikelihood) where {T,U}
 posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 posterior(D::AbstractDistribution, L::AbstractLikelihood)
 ```
