@@ -19,4 +19,21 @@ function invert(N::AbstractNormal, K::AffineDiracKernel)
     return Nout, Kout
 end
 
+function invert(C::Categorical, K::AbstractStochasticMatrix)
+    π = probability_vector(C)
+    P = probability_matrix(K)
+
+    πout = similar(π)
+    πout = mul!(πout, P, π)
+    Cout = Categorical(πout)
+
+    Pout = similar(adjoint(P))
+    for i in axes(Pout, 1), j in axes(Pout, 2)
+        Pout[i, j] = P[j, i] * π[i] / πout[j]
+    end
+    Kout = StochasticMatrix(Pout)
+
+    return Cout, Kout
+end
+
 invert(D::AbstractDistribution, K::IdentityKernel) = D, K

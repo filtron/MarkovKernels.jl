@@ -29,11 +29,7 @@ function StochasticMatrix(P::AbstractMatrix)
     return StochasticMatrix{typeof(Π)}(Π)
 end
 
-function probability_matrix(K::StochasticMatrix)
-    P = copy(K.P)
-    foreach(_normalize_vector!, eachcol(P))
-    return P
-end
+probability_matrix(K::StochasticMatrix) = K.P
 
 """
     condition(K::AbstractStochasticMatrix, x)

@@ -13,5 +13,13 @@ marginalize(N::AbstractNormal, K::AffineDiracKernel) =
 
 marginalize(D::AbstractDirac, K::AbstractMarkovKernel) = condition(K, mean(D))
 
+function marginalize(D::Categorical, K::StochasticMatrix)
+    π = probability_vector(D)
+    P = probability_matrix(K)
+    πout = similar(π)
+    mul!(πout, P, π)
+    return Categorical(πout)
+end
+
 marginalize(D::AbstractDistribution, ::IdentityKernel) = D
 marginalize(D::AbstractDirac, ::IdentityKernel) = D
