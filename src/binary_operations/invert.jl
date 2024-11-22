@@ -23,7 +23,7 @@ function invert(C::Categorical, K::AbstractStochasticMatrix)
     π = probability_vector(C)
     P = probability_matrix(K)
 
-    πout = similar(π)
+    πout = similar(π, size(P, 1))
     πout = mul!(πout, P, π)
     Cout = Categorical(πout)
 
