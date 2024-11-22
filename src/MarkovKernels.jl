@@ -109,14 +109,18 @@ export Skedasticity,
 
 const AffineNormalKernel = AffineHomoskedasticNormalKernel
 
-include("likelihoods.jl")
-export FlatLikelihood, Likelihood, measurement_model, measurement
+include("likelihoods/likelihood.jl")
+include("likelihoods/categorical_likelihood.jl")
+include("likelihoods/flatlikelihood.jl")
+export Likelihood,
+    measurement_model, measurement, CategoricalLikelihood, likelihood_vector, FlatLikelihood
 
 include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
-export compose, marginalize, invert, posterior_and_loglike, posterior
+include("binary_operations/htransform.jl")
+export compose, marginalize, invert, posterior_and_loglike, posterior, htransform
 
 end
