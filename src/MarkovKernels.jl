@@ -1,6 +1,6 @@
 module MarkovKernels
 
-using LinearAlgebra, ArrayInterface, Statistics, Random, AliasTables, RecipesBase
+using LinearAlgebra, Statistics, Random, AliasTables, RecipesBase
 
 import Base:
     *,

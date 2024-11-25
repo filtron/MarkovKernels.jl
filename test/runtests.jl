@@ -36,6 +36,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         include("binary_operations/marginalize_test.jl")
         include("binary_operations/invert_test.jl")
         include("binary_operations/posterior_test.jl")
+        include("binary_operations/htransform_test.jl")
     end
 
     @testset "PSDMatrices" begin
