@@ -36,17 +36,11 @@ const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where
 NormalKernel(μ, Σ)
 ```
 
-### Basics
+### Methods
 
 ```@docs
 mean(K::NormalKernel)
 cov(K::NormalKernel)
 covp(K::NormalKernel)
-```
-
-### Conditioning and sampling
-
-```@docs
-condition(K::AbstractNormalKernel, x)
 rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec)
 ```

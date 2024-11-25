@@ -14,8 +14,8 @@ end
 Computes the conditional distribution C associated with the prior distribution D, measurement kernel K, and measurement y.
 """
 function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
-    _, C = invert(D, K)
-    return condition(C, y)
+    C, _ = posterior_and_loglike(D, K, y)
+    return C
 end
 
 """
@@ -23,16 +23,44 @@ end
 
 Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
 """
-posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood) =
-    posterior_and_loglike(D, measurement_model(L), measurement(L))
+function posterior_and_loglike(::AbstractDistribution, ::AbstractLikelihood) end
 
 """
     posterior(D::AbstractDistribution, L::AbstractLikelihood)
 
 Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
 """
-posterior(D::AbstractDistribution, L::AbstractLikelihood) =
-    posterior(D, measurement_model(L), measurement(L))
+function posterior(D::AbstractDistribution, L::AbstractLikelihood)
+    C, _ = posterior_and_loglike(D, L)
+    return C
+end
+
+posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
+    posterior_and_loglike(D, measurement_model(L), measurement(L))
+
+function posterior_and_loglike(C::Categorical, L::CategoricalLikelihood)
+    π = probability_vector(C)
+    ls = likelihood_vector(L)
+
+    my = dot(ls, π)
+    πout = similar(π)
+    πout .= ls .* π ./ my
+    Cout = Categorical(πout)
+
+    return Cout, log(my)
+end
+
+function posterior_and_loglike(C::Categorical, L::Likelihood{<:StochasticMatrix,<:Int})
+    K, y = measurement_model(L), measurement(L)
+    P = probability_matrix(K)
+    ls = view(P, y, :)
+    LC = CategoricalLikelihood(ls)
+    return posterior_and_loglike(C, LC)
+end
 
 posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0
-posterior(D::AbstractDistribution, ::FlatLikelihood) = D
+
+posterior_and_loglike(
+    D::AbstractDistribution,
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+) = posterior_and_loglike(D, FlatLikelihood())

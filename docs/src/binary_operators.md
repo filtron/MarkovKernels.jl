@@ -11,7 +11,7 @@ k_3(y,x) = \int k_2(y,x) k_1(z,x) \mathrm{d} z.
 ```
 
 ```@docs
-compose(K2::AffineHomoskedasticNormalKernel, K1::AffineHomoskedasticNormalKernel)
+compose(::AbstractMarkovKernel, ::AbstractMarkovKernel)
 ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 ```
 
@@ -48,10 +48,20 @@ Given a distribution ``\pi(x)`` and a Markov kernel ``k(y,x)``, invert is a bina
 The related binary operator, Bayes' rule also evalautes the output of invert at some measurement ``y``.
 That is, given a measurmeent ``y``, ``m`` evaluated at ``y`` is the marginal likelihood and ``p`` evaluated at ``y`` is the conditional distribution of ``x`` given ``y``.
 
+
+
 ```@docs
-invert(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
+invert(N::AbstractDistribution, K::AbstractMarkovKernel)
 posterior_and_loglike(D::AbstractDistribution, K::AbstractMarkovKernel, y)
-posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
+posterior_and_loglike(::AbstractDistribution, ::AbstractLikelihood)
 posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 posterior(D::AbstractDistribution, L::AbstractLikelihood)
+```
+
+### Doob's h-transform
+
+Given a Markov kernel ``k(y, x)`` and a likelihood function ``h(y)``, computes a new Markov kernel ``f(y, x)`` and new likelihood function
+
+```@docs
+htransform(::AbstractMarkovKernel, ::AbstractLikelihood)
 ```

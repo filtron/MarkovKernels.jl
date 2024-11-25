@@ -136,11 +136,6 @@ _nscale(T::Type{<:Complex}) = one(real(T))
 _logpiconst(T::Type{<:Real}) = log(T(2π))
 _logpiconst(T::Type{<:Complex}) = log(real(T)(π))
 
-"""
-    logpdf(N::AbstractNormal,x)
-
-Computes the logarithm of the probability density function of the Normal distribution N evaluated at x.
-"""
 function logpdf(N::AbstractNormal, x)
     T = sample_eltype(N)
     return -_nscale(T) *
@@ -171,12 +166,6 @@ function kldivergence(N1::AbstractNormal, N2::AbstractNormal)
     )
 end
 
-"""
-    rand(RNG::AbstractRNG, N::AbstractNormal)
-
-Computes a random vector distributed according to the Normal distribution N
-using the random number generator RNG.
-"""
 function rand(rng::AbstractRNG, N::AbstractNormal)
     T = sample_eltype(N)
     x = mean(N) + lsqrt(covp(N)) * randn(rng, T, dim(N))

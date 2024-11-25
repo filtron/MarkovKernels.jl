@@ -50,4 +50,36 @@
             end
         end
     end
+
+    @testset "compose | StochasticMatrix | StochasticMatrix" begin
+        etys = (Float64,)
+        m, n = 2, 3
+        for T in etys
+            P1 = exp.(randn(T, m, m))
+            P1 = P1 * Diagonal(1 ./ [sum(p) for p in eachcol(P1)])
+            K1 = StochasticMatrix(P1)
+
+            P2 = exp.(randn(T, m, m))
+            P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
+            K2 = StochasticMatrix(P2)
+
+            P3 = exp.(randn(T, n, m))
+            P3 = P3 * Diagonal(1 ./ [sum(p) for p in eachcol(P3)])
+            K3 = StochasticMatrix(P3)
+
+            P4 = exp.(randn(T, m, n))
+            P4 = P4 * Diagonal(1 ./ [sum(p) for p in eachcol(P4)])
+            K4 = StochasticMatrix(P4)
+
+            @test probability_matrix(compose(K2, K1)) ==
+                  probability_matrix(K2 ∘ K1) ≈
+                  P2 * P1
+            @test probability_matrix(compose(K3, K2)) ==
+                  probability_matrix(K3 ∘ K2) ≈
+                  P3 * P2
+            @test probability_matrix(compose(K4, K3)) ==
+                  probability_matrix(K4 ∘ K3) ≈
+                  P4 * P3
+        end
+    end
 end

@@ -25,13 +25,23 @@ makedocs(;
             "Internal" => "PSDParametrizations/internal.md",
         ],
         "Distributions" => [
-            "General" => "distributions/general.md",
+            "General" => "distributions/distribution_general.md",
             "Categorical" => "distributions/categorical.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
         ],
-        "Kernels" => ["kernels/normalkernel.md", "kernels/dirackernel.md"],
-        "Likelihoods" => "likelihoods.md",
+        "Kernels" => [
+            "kernels/kernel_general.md",
+            "kernels/normalkernel.md",
+            "kernels/dirackernel.md",
+            "kernels/stochasticmatrix.md",
+        ],
+        "Likelihoods" => [
+            "likelihoods/likelihood_general.md",
+            "likelihoods/categorical_likelihood.md",
+            "likelihoods/likelihood.md",
+            "likelihoods/flatlikelihood.md",
+        ],
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
             "Sampling from probabilistic state-space models" => "tutorial_pomp_sampling.md"

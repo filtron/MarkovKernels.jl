@@ -22,10 +22,13 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     @testset "Kernels" begin
         include("kernels/normalkernel_test.jl")
         include("kernels/dirackernel_test.jl")
+        include("kernels/stochasticmatrix_test.jl")
     end
 
     @testset "Likelihoods" begin
-        include("likelihood_test.jl")
+        include("likelihoods/categoricallikelihood_test.jl")
+        include("likelihoods/flatlikelihood_test.jl")
+        include("likelihoods/likelihood_test.jl")
     end
 
     @testset "Binary Operations" begin
@@ -33,6 +36,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         include("binary_operations/marginalize_test.jl")
         include("binary_operations/invert_test.jl")
         include("binary_operations/posterior_test.jl")
+        include("binary_operations/htransform_test.jl")
     end
 
     @testset "PSDMatrices" begin
@@ -40,6 +44,11 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Code quality (Aqua.jl)" begin
+        #=
+        There's a bunch of ambiguities with Random.rand for Markovkernels
+        1) remove rand(::AbstractRNG, ::AbstractMarkovKernel, ::Any)
+        2) define sample / drawfrom instead?
+        =#
         Aqua.test_all(MarkovKernels; ambiguities = false)
     end
 

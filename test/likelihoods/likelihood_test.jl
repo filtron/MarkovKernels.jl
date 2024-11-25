@@ -14,6 +14,7 @@
             K = NormalKernel(FC, R)
             L = Likelihood(K, y)
 
+            @test typeof(L) <: Likelihood
             @test L == Likelihood(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
@@ -24,19 +25,26 @@
             K = DiracKernel(C)
             L = Likelihood(K, y)
 
+            @test typeof(L) <: Likelihood
             @test L == Likelihood(K, y)
             @test measurement(L) == y
             @test measurement_model(L) == K
         end
+    end
 
-        @testset "FlatLikelihood" begin
-            L1 = FlatLikelihood()
-            L2 = FlatLikelihood()
-            x = randn(T, 1)
-            @test_nowarn FlatLikelihood()
-            @test L1 === L2
-            @test log(L1, x) == zero(real(eltype(x)))
-            @test typeof(log(L1, x)) == typeof(zero(real(eltype(x))))
-        end
+    etys = (Float64,)
+    m = 2
+    for T in etys
+        P = ones(T, m, m) / m
+        K = StochasticMatrix(P)
+        y = 1
+        L = Likelihood(K, y)
+        xs = 1:m
+
+        @test typeof(L) <: Likelihood
+        @test L == Likelihood(K, y)
+        @test measurement(L) == y
+        @test measurement_model(L) == K
+        @test all(x -> log(L, x) ≈ logpdf(condition(K, x), y), xs)
     end
 end

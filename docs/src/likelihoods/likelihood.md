@@ -5,23 +5,22 @@ CurrentModule = MarkovKernels
 ```
 
 
-### Types
+### Type
 
 ```@docs
-FlatLikelihood
 Likelihood{U,V}
 ```
+
 ### Constructors
 
 ```@docs
 Likelihood(K::AbstractMarkovKernel, y)
 ```
 
-### Basics
+### Methods
 
 ```@docs
 measurement_model(L::Likelihood)
 measurement(L::Likelihood)
-log(L::Likelihood, x) 
 ```
 

@@ -74,11 +74,6 @@ That is, the output is callable.
 cov(K::NormalKernel) = covp(K)
 cov(K::HomoskedasticNormalKernel) = x -> covp(K)
 
-"""
-    condition(K::AbstractNormalKernel, x)
-
-Returns a Normal distribution corresponding to K evaluated at x.
-"""
 condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
 condition(K::HomoskedasticNormalKernel, x) = Normal(mean(K)(x), covp(K))
 
@@ -103,7 +98,7 @@ end
 """
     rand([rng::AbstractRNG], K::AbstractNormalKernel, x::AbstractVector)
 
-Computes a random vector conditionally on x with respect the the Normal kernel K
+Samples a random vector conditionally on x with respect the the Normal kernel K
 using the random number generator rng.
 """
 rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec) =

@@ -29,13 +29,10 @@ Normal{T}
 ### Constructors
 
 ```@docs
-Normal(μ::AbstractVector{<:Real}, Σ::Symmetric{<:Real})
-Normal(μ::AbstractVector{<:Complex}, Σ::Hermitian{<:Complex})
-Normal(μ::AbstractVector, Σ::Cholesky)
-Normal(μ::Number, Σ::Real)
+Normal(μ, Σ)
 ```
 
-### Basics
+### Methods
 
 ```@docs
 dim(::Normal)
@@ -44,24 +41,7 @@ cov(::Normal)
 covp(::Normal)
 var(::AbstractNormal)
 std(::AbstractNormal)
-```
-
-### Probability density function
-
-```@docs
 residual(N::AbstractNormal, x::AbstractVector)
-logpdf(N::AbstractNormal, x)
-```
-
-### Information theory
-
-```@docs
 entropy(::AbstractNormal)
 kldivergence(N1::AbstractNormal, N2::AbstractNormal)
-```
-
-### Sampling
-
-```@docs
-rand(rng::AbstractRNG, N::AbstractNormal) 
 ```
