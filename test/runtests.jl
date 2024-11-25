@@ -26,7 +26,9 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Likelihoods" begin
-        include("likelihood_test.jl")
+        include("likelihoods/categoricallikelihood_test.jl")
+        include("likelihoods/flatlikelihood_test.jl")
+        include("likelihoods/likelihood_test.jl")
     end
 
     @testset "Binary Operations" begin
@@ -41,6 +43,11 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Code quality (Aqua.jl)" begin
+        #=
+        There's a bunch of ambiguities with Random.rand for Markovkernels
+        1) remove rand(::AbstractRNG, ::AbstractMarkovKernel, ::Any)
+        2) define sample / drawfrom instead?
+        =#
         Aqua.test_all(MarkovKernels; ambiguities = false)
     end
 

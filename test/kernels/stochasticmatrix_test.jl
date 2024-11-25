@@ -6,7 +6,6 @@
     for T in etys
         P = ones(T, m, m) / m
         K = StochasticMatrix(P)
-
         xs = 1:m
 
         @test AbstractStochasticMatrix <: AbstractMarkovKernel

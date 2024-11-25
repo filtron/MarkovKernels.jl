@@ -107,8 +107,6 @@ export Skedasticity,
     StochasticMatrix,
     probability_matrix
 
-const AffineNormalKernel = AffineHomoskedasticNormalKernel
-
 include("likelihoods/likelihood.jl")
 include("likelihoods/categorical_likelihood.jl")
 include("likelihoods/flatlikelihood.jl")
