@@ -6,7 +6,7 @@
     etys = (Float64, ComplexF64)
 
     for T in etys
-        @testset "posterior | multivariate" begin
+        @testset "posterior | Multivariate Dirac/Normal" begin
             μ = randn(T, n)
             V = Cholesky(UpperTriangular(ones(T, n, n)))
 
@@ -52,7 +52,7 @@
             @test iszero(ll)
         end
 
-        @testset "posterior | univariate" begin
+        @testset "posterior | Univariate Dirac/Normal" begin
             μ = randn(T)
             V = one(real(T))
 
@@ -87,6 +87,58 @@
 
             @test P1 == P2 == N
             @test iszero(ll)
+        end
+    end
+
+    m, n = 2, 3
+    etys = (Float64,)
+
+    for T in etys
+        @testset "StochasticMatrix / CategoricalLikelihood" begin
+            π1 = exp.(randn(T, m))
+            π1 = π1 / sum(π1)
+            C1 = Categorical(π1)
+
+            P1 = exp.(randn(T, m, m))
+            P1 = P1 * Diagonal(1 ./ [sum(p) for p in eachcol(P1)])
+            K1 = StochasticMatrix(P1)
+
+            π2 = exp.(randn(T, n))
+            π2 = π2 / sum(π2)
+            C2 = Categorical(π2)
+
+            P2 = exp.(randn(T, m, n))
+            P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
+            K2 = StochasticMatrix(P2)
+
+            y = rand(1:m)
+            L1 = Likelihood(K1, y)
+            L2 = Likelihood(K2, y)
+
+            for (C, L) in zip((C1, C2), (L1, L2))
+                π = probability_vector(C)
+                K, y = measurement_model(L), measurement(L)
+                P = probability_matrix(K)
+
+                ls = P[y, :]
+                my = dot(ls, π)
+                πgt = π .* ls / my
+                llgt = log(my)
+
+                CL = CategoricalLikelihood(L)
+
+                CC1, ll1 = posterior_and_loglike(C, L)
+                CC2 = posterior(C, L)
+                CC3, ll2 = posterior_and_loglike(C, CL)
+                CC4 = posterior(C, CL)
+
+                @test ll1 ≈ ll2 ≈ llgt
+                @test probability_vector(CC1) ≈
+                      probability_vector(CC2) ≈
+                      probability_vector(CC3) ≈
+                      probability_vector(CC4) ≈
+                      πgt
+            end
         end
     end
 end
