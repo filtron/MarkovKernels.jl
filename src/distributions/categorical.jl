@@ -9,7 +9,7 @@ abstract type AbstractCategorical{T} <: AbstractDistribution{T} end
     probability_vector(::AbstractCategorical)
 
 
-Computes the vector of probabilities for each category. 
+Computes the vector of probabilities for each category.
 """
 function probability_vector(::AbstractCategorical) end
 
@@ -28,7 +28,7 @@ _normalize_vector!(v::AbstractVector) = ldiv!(sum(v), v)
 """
     Categorical(p::AbstractVector)
 
-Constructs a categorical distribution from the vector of probabilities p. 
+Constructs a categorical distribution from the vector of probabilities p.
 """
 function Categorical(p::AbstractVector)
     π = copy(p)
@@ -56,7 +56,12 @@ function logpdf(C::Categorical, x)
     return log(p[x])
 end
 
-function entropy(C::Categorical)
+"""
+    entropy(C::AbstractCategorical)
+
+Computes the entropy of the categorical distribution C.
+"""
+function entropy(C::AbstractCategorical)
     p = probability_vector(C)
     e = zero(float(eltype(p)))
     for i in eachindex(p)
@@ -66,7 +71,12 @@ function entropy(C::Categorical)
     return e
 end
 
-function kldivergence(C1::Categorical, C2::Categorical)
+"""
+    kldivergence(C1::AbstractCategorical, C2::AbstractCategorical)
+
+Computes the Kullback-Leibler divergence between the categorical distributions C1 and C2.
+"""
+function kldivergence(C1::AbstractCategorical, C2::AbstractCategorical)
     p1 = probability_vector(C1)
     p2 = probability_vector(C2)
     eachindex(p1) != eachindex(p2) && return Inf

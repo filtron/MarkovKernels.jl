@@ -1,10 +1,17 @@
-# General 
+# General
 
 ```@meta
 CurrentModule = MarkovKernels
 ```
 
-### Type information 
+### Type
+
+```@docs
+AbstractDistribution{T<:Number}
+```
+
+
+### Type information
 
 ```@docs
 sample_type(D::AbstractDistribution)
@@ -13,12 +20,12 @@ sample_eltype(D::AbstractDistribution)
 
 ### Probability densities
 
-```@docs 
-logpdf(D::AbstractDistribution, x) 
+```@docs
+logpdf(D::AbstractDistribution, x)
 ```
 
-### Sampling 
+### Sampling
 
-```@docs 
+```@docs
 Base.rand(rng::AbstractRNG, D::AbstractDistribution)
 ```

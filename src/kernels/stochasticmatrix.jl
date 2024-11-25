@@ -6,6 +6,14 @@ Abstract type for representing stochastic matrices.
 abstract type AbstractStochasticMatrix <: AbstractMarkovKernel end
 
 """
+    probability_vector(::AbstractCategorical)
+
+
+Computes the matrix of transition probabilities.
+"""
+function probability_matrix(::AbstractStochasticMatrix) end
+
+"""
     StochasticMatrix
 
 Type for representing stochastic matrices.
@@ -19,9 +27,9 @@ function _normalize_matrix!(P::AbstractMatrix)
 end
 
 """
-StochasticMatrix(P::AbstractMatrix) 
+StochasticMatrix(P::AbstractMatrix)
 
-Constructs a stochastic matrix from the matrix of transition probabilities P. 
+Constructs a stochastic matrix from the matrix of transition probabilities P.
 """
 function StochasticMatrix(P::AbstractMatrix)
     Π = copy(P)
@@ -31,11 +39,6 @@ end
 
 probability_matrix(K::StochasticMatrix) = K.P
 
-"""
-    condition(K::AbstractStochasticMatrix, x)
-
-Returns a Dirac distribution corresponding to the Dirac kernel K evaluated at x.
-"""
 condition(K::AbstractStochasticMatrix, x) = Categorical(K.P[:, x])
 
 """

@@ -51,7 +51,6 @@ export PSDTrait,
     IsNotPSD,
     psdcheck,
     convert_psd_eltype,
-    CovarianceParameter,
     SelfAdjoint,
     selfadjoint,
     rsqrt,
@@ -59,9 +58,14 @@ export PSDTrait,
     stein,
     schur_reduce
 
-include("generic.jl")
-export AbstractDistribution,
-    AbstractMarkovKernel, AbstractLikelihood, sample_type, sample_eltype
+include("distributions/distribution_generic.jl")
+export AbstractDistribution, sample_type, sample_eltype
+
+include("kernels/kernel_generic.jl")
+export AbstractMarkovKernel, condition
+
+include("likelihoods/likelihood_generic.jl")
+export AbstractLikelihood, log
 
 include("distributions/categorical.jl")
 include("distributions/dirac.jl")

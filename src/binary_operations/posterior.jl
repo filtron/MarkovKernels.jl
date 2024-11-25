@@ -19,10 +19,22 @@ function posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 end
 
 """
-    posterior_and_loglike(D::AbstractDistribution, L::Likelihood)
+    posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
 
 Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
 """
+function posterior_and_loglike(::AbstractDistribution, ::AbstractLikelihood) end
+
+"""
+    posterior(D::AbstractDistribution, L::AbstractLikelihood)
+
+Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
+"""
+function posterior(D::AbstractDistribution, L::AbstractLikelihood)
+    C, _ = posterior_and_loglike(D, L)
+    return C
+end
+
 posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
 
@@ -44,16 +56,6 @@ function posterior_and_loglike(C::Categorical, L::Likelihood{<:StochasticMatrix,
     ls = view(P, y, :)
     LC = CategoricalLikelihood(ls)
     return posterior_and_loglike(C, LC)
-end
-
-"""
-    posterior(D::AbstractDistribution, L::AbstractLikelihood)
-
-Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
-"""
-function posterior(D::AbstractDistribution, L::AbstractLikelihood)
-    C, _ = posterior_and_loglike(D, L)
-    return C
 end
 
 posterior_and_loglike(D::AbstractDistribution, ::FlatLikelihood) = D, 0

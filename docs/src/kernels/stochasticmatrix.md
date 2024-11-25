@@ -1,4 +1,4 @@
-# StochasticMatrix 
+# StochasticMatrix
 
 ```@meta
 CurrentModule = MarkovKernels
@@ -12,17 +12,17 @@ AbstractStochasticMatrix
 StochasticMatrix
 ```
 
-## Constructor 
+## Constructor
 
 ```@docs
 StochasticMatrix(P::AbstractMatrix)
 ```
 
 
-## Methods 
+## Methods
 
 ```@docs
-condition(K::AbstractStochasticMatrix, x)
+probability_matrix(::AbstractStochasticMatrix)
 rand(rng::AbstractRNG, K::AbstractStochasticMatrix, x::Int)
 ```
 

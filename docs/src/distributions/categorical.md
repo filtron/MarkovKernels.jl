@@ -13,9 +13,11 @@ Categorical(p::AbstractVector)
 ```
 
 
-## Basics 
+## Methods
 ```@docs
 probability_vector(::AbstractCategorical)
+entropy(C::AbstractCategorical)
+kldivergence(C1::AbstractCategorical, C2::AbstractCategorical)
 ```
 
 

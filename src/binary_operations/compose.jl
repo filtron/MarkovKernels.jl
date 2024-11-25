@@ -7,6 +7,8 @@ K3(y,x) = ∫ K2(y,z) K1(z,x) dz.
 
 See also [`∘`](@ref)
 """
+function compose(::AbstractMarkovKernel, ::AbstractMarkovKernel) end
+
 compose(K2::AffineHomoskedasticNormalKernel, K1::AffineHomoskedasticNormalKernel) =
     NormalKernel(compose(mean(K2), mean(K1)), stein(covp(K1), mean(K2), covp(K2)))
 

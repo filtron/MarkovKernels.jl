@@ -32,11 +32,6 @@ That is, the output is callable.
 mean(K::DiracKernel) = K.μ
 mean(::IdentityKernel) = identity
 
-"""
-    condition(K::AbstractDiracKernel, x)
-
-Returns a Dirac distribution corresponding to the Dirac kernel K evaluated at x.
-"""
 condition(K::AbstractDiracKernel, x) = Dirac(mean(K)(x))
 
 """

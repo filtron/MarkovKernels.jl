@@ -24,15 +24,9 @@ IdentityKernel
 const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
 ```
 
-### Basics
+### Methods
 
 ```@docs
 mean(K::DiracKernel)
-```
-
-### Conditioning and sampling
-
-```@docs
-condition(K::AbstractDiracKernel, x)
 rand(::AbstractRNG, K::AbstractDiracKernel, x::AbstractNumOrVec)
 ```

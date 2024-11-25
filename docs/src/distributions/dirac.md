@@ -19,18 +19,11 @@ Dirac{T}
 ### Constructors
 ```@docs
 Dirac(μ::AbstractVector)
-Dirac{T}(D::Dirac{U,V}) where {T,U,V<:AbstractVector}
 ```
 
-### Basics
+### Methods
 
 ```@docs
 dim(::Dirac)
 mean(::Dirac)
-```
-
-### Sampling
-
-```@docs
-rand(::AbstractRNG, ::AbstractDirac)
 ```

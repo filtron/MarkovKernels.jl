@@ -1,8 +1,12 @@
 """
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 
-Computes D2, K2, such that D(x)K(y, x) = D2(y)K2(x, y), i.e., an inverted factorisation of D, K.
+Computes a new distribution and Markov kernel such that
+
+Dout(y) = ∫ K(y, x) D(x) dx, and Kout(x, y) = K(y, x) * D(x) / Dout(y)
 """
+function invert(::AbstractDistribution, ::AbstractMarkovKernel) end
+
 function invert(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
     pred = mean(K)(mean(N))
     S, G, Σ = schur_reduce(covp(N), mean(K), covp(K))
