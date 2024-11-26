@@ -3,8 +3,7 @@
 
 Computes a right square-root of Σ.
 """
-function  rsqrt(Σ) end
-
+function rsqrt(Σ) end
 
 """
     lsqrt(Σ)
@@ -12,7 +11,6 @@ function  rsqrt(Σ) end
 Computes a left square-root of Σ.
 """
 lsqrt(Σ) = adjoint(rsqrt(Σ))
-
 
 """
     stein(Σ, Φ, [Q])
@@ -23,7 +21,6 @@ Computes the output of the stein  operator
 """
 function stein(Σ, Φ, Q) end
 function stein(Σ, Φ) end
-
 
 """
     schur_reduce(Π, C, [R])
@@ -37,8 +34,3 @@ then S is the marginal measurement covariance, K is the Kalman gain, and Σ is t
 """
 function schur_reduce(Π, C, R) end
 function schur_reduce(Π, C) end
-
-
-
-
-
