@@ -16,11 +16,11 @@ function convert_psd_eltype(::Type{T}, P) where {T} end
 convert_psd_eltype(P) = convert_psd_eltype(eltype(P), P)
 
 include("utils.jl")
+include("interface.jl")
 include("selfadjoint.jl")
 include("cholesky.jl")
 include("scalar.jl")
-
-const CovarianceParameter{T} = Union{MarkovKernels.SelfAdjoint{T},Factorization{T}}
+include("diagonal.jl")
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
