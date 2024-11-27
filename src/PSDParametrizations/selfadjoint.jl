@@ -1,6 +1,8 @@
 const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
 const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
-const SelfAdjoint{T,S} = Union{RealSymmetric{T,S},ComplexHermitian{T,S}} where {T,S}
+const RealDiagonal{T,S} = Diagonal{T,S} where {T<:Real,S}
+const SelfAdjoint{T,S} =
+    Union{RealSymmetric{T,S},ComplexHermitian{T,S},RealDiagonal{T,S}} where {T,S}
 
 psdcheck(::SelfAdjoint) = IsPSD()
 
@@ -18,12 +20,22 @@ selfadjoint!(x::Number) = real(x)
 selfadjoint!(A::AbstractMatrix{<:Real}) = Symmetric(hermitianpart!(A))
 selfadjoint!(A::AbstractMatrix{<:Complex}) = Hermitian(hermitianpart!(A))
 
+# this should probably be selfadjoint!(D::RealDiagonal) = D
+function selfadjoint!(D::Diagonal)
+    d = D.diag
+    for m in eachindex(d)
+        d[m] = real(d[m])
+    end
+    return D
+end
+
 """
     selfadjoint(A)
 
 Computes the self-adjoint part of A and wraps it in an appropriate self-adjoitn wrapper type (i.e. Symemtric / Hermitian).
 """
 selfadjoint(A) = selfadjoint!(copy(A))
+selfadjoint(D::Diagonal) = real.(D)
 
 """
     rsqrt(A::SelfAdjoint)

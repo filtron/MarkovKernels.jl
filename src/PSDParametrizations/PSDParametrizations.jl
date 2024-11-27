@@ -17,10 +17,10 @@ convert_psd_eltype(P) = convert_psd_eltype(eltype(P), P)
 
 include("utils.jl")
 include("interface.jl")
-include("selfadjoint.jl")
-include("cholesky.jl")
 include("scalar.jl")
 include("diagonal.jl")
+include("selfadjoint.jl")
+include("cholesky.jl")
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)
