@@ -10,7 +10,7 @@
         LR = randn(real(T))
         R = abs2(LR)
 
-        @testset "CovarianceParamater | Real | $(T)" begin
+        @testset "PSDParametrizations | Real | $(T)" begin
             @test lsqrt(Σ) == rsqrt(Σ) == sqrt(Σ)
             @test Σ ≈ abs2(rsqrt(Σ)) ≈ abs2(lsqrt(Σ))
             @test lsqrt(Σ) == adjoint(rsqrt(Σ))
