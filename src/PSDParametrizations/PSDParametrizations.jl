@@ -3,18 +3,6 @@ abstract type PSDTrait end
 struct IsPSD <: PSDTrait end
 struct IsNotPSD <: PSDTrait end
 
-psdcheck(::Any) = IsNotPSD()
-
-"""
-    convert_psd_eltype(::Type{T}, P)
-
-Wraps P in a psd paramtrization of eltype T.
-If P is already a type of psd paramtrization, then just the eltype is converted.
-"""
-function convert_psd_eltype(::Type{T}, P) where {T} end
-
-convert_psd_eltype(P) = convert_psd_eltype(eltype(P), P)
-
 include("utils.jl")
 include("interface.jl")
 include("scalar.jl")

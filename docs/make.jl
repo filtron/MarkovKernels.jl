@@ -19,9 +19,6 @@ makedocs(;
         "Affine maps" => "affinemaps/affinemaps.md",
         "PSDParametrizations" => [
             "General" => "PSDParametrizations/general.md",
-            "Self-adjoint" => "PSDParametrizations/selfadjoint.md",
-            "Cholesky" => "PSDParametrizations/cholesky.md",
-            "Scalar" => "PSDParametrizations/scalar.md",
             "Internal" => "PSDParametrizations/internal.md",
         ],
         "Distributions" => [
