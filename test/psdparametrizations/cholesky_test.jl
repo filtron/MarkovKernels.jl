@@ -36,5 +36,14 @@
                 isapprox.(_to_matrix.(schur_reduce(CΣ, C2, R2)), _schur_reduce(Σ, C2, R2)),
             )
         end
+
+        RD = Diagonal(abs2.(randn(real(T), m)))
+
+        @testset "PSDParametrizations | Cholesky | Diagonal | $(T)" begin
+            @test _to_matrix(stein(CΣ, C, RD)) ≈ _stein(Σ, C, RD)
+            @test all(
+                isapprox.(_to_matrix.(schur_reduce(CΣ, C, RD)), _schur_reduce(Σ, C, RD)),
+            )
+        end
     end
 end

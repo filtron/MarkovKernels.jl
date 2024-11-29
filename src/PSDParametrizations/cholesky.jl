@@ -3,27 +3,8 @@ psdcheck(::Cholesky) = IsPSD()
 
 convert_psd_eltype(::Type{T}, C::Cholesky) where {T} = convert(Factorization{T}, C)
 
-"""
-    rsqrt(C::Cholesky)
-
-Computes the right-square root of C.
-"""
 rsqrt(C::Cholesky) = C.uplo == 'U' ? C.U : adjoint(C.L)
 
-"""
-    lsqrt(C::Cholesky)
-
-Computes the left-square root of C.
-"""
-lsqrt(C::Cholesky) = adjoint(rsqrt(C))
-
-"""
-    stein(Σ::Cholesky, Φ::AbstractMatrix)
-
-Computes the output of the stein  operator
-
-    Σ ↦ Φ * Σ * Φ'.
-"""
 function stein(Σ::Cholesky, Φ::AbstractMatrix)
     m, n = size(Φ)
     work_arr = similar(Φ, n, m)
@@ -34,15 +15,6 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix)
     return Π
 end
 
-"""
-    stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
-
-Computes the output of the stein  operator
-
-    Σ ↦ Φ * Σ * Φ'.
-
-The return type is a subtype of Real.
-"""
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
     m, n = size(Φ)
     work_arr = similar(Φ, n, m)
@@ -53,14 +25,7 @@ function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
     return Π
 end
 
-"""
-    stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky)
-
-Computes the output of the stein  operator
-
-    Σ ↦ Φ * Σ * Φ' + Q.
-"""
-function stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky)
+function stein(Σ::Cholesky, Φ::AbstractMatrix, Q)
     m, n = size(Φ)
     work_arr = similar(Φ, n + m, m)
 
@@ -72,15 +37,6 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix, Q::Cholesky)
     return Π
 end
 
-"""
-    stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
-
-Computes the output of the stein  operator
-
-    Σ ↦ Φ * Σ * Φ' + Q.
-
-The return type is a subtype of Real.
-"""
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     m, n = size(Φ)
     work_arr = similar(Φ, n + m, m)
@@ -93,16 +49,6 @@ function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     return Π
 end
 
-"""
-    schur_reduce(Π::Cholesky, C::AbstractMatrix)
-
-Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
-
-    [C*Π*C' C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C')*[I; K]'
-
-In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
-then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-"""
 function schur_reduce(Π::Cholesky, C::AbstractMatrix)
     m, n = size(C)
     work_arr = similar(C, n + m, n + m)
@@ -125,16 +71,6 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix)
     return S, K, Σ
 end
 
-"""
-    schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector})
-
-Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
-
-    [C*Π*C' C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C')*[I; K]'
-
-In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
-then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-"""
 function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector})
     m, n = size(C)
     work_arr = similar(C, n + m, n + m)
@@ -157,17 +93,7 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector})
     return S, K, Σ
 end
 
-"""
-    schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
-
-Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
-
-    [C*Π*C'+R C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C' + R)*[I; K]'
-
-In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
-then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-"""
-function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
+function schur_reduce(Π::Cholesky, C::AbstractMatrix, R)
     m, n = size(C)
     work_arr = similar(C, n + m, n + m)
 
@@ -190,16 +116,6 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix, R::Cholesky)
     return S, K, Σ
 end
 
-"""
-    schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Number)
-
-Returns the tuple (S, K, Σ) associated with the following (block) Schur reduction:
-
-    [C*Π*C'+R C*Π; Π*C' Π] = [0 0; 0 Σ] + [I; K]*(C*Π*C' + R)*[I; K]'
-
-In terms of Kalman filtering, Π is the predictive covariance, C the measurement matrix, and R the measurement covariance,
-then S is the marginal measurement covariance, K is the Kalman gain, and Σ is the filtering covariance.
-"""
 function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Number)
     m, n = size(C) # m = 1
     work_arr = similar(C, n + m, n + m)
