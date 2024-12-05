@@ -1,9 +1,9 @@
 """
-AbstractDistribution
+AbstractDistribution{ST}
 
-Abstract type for representing distributions.
+Abstract type for representing distributions with samples of type ST.
 """
-abstract type AbstractDistribution{T<:Number} end
+abstract type AbstractDistribution{ST} end
 
 """
     rand([rng], D::AbstractDistribution)
@@ -19,10 +19,10 @@ Random.rand(D::AbstractDistribution) = rand(Random.default_rng(), D)
 
 Computes the type of samples from D, e.g. same as typeof(rand(D)).
 """
-function sample_type(::AbstractDistribution) end
+sample_type(::AbstractDistribution{ST}) where {ST} = ST
 
 """
-eltype_sample(D::AbstractDistribution)
+sample_eltype(D::AbstractDistribution)
 
 Computes the eltype of samples from D, e.g. same as eltype(rand(D)).
 """

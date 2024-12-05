@@ -1,9 +1,9 @@
 """
-    AbstractCategorical{T}
+    AbstractCategorical{ST}
 
-Abstract type for representing categorical distributions with values T.
+Abstract type for representing categorical distributions with values ST.
 """
-abstract type AbstractCategorical{T} <: AbstractDistribution{T} end
+abstract type AbstractCategorical{ST} <: AbstractDistribution{ST} end
 
 """
     probability_vector(::AbstractCategorical)
@@ -39,8 +39,6 @@ end
 probability_vector(C::Categorical) = C.p
 
 dim(C::Categorical) = 1
-
-sample_type(C::Categorical) = eltype(eachindex(probability_vector(C)))
 
 function Base.copy!(Cdst::Categorical, Csrc::Categorical)
     copy!(probability_vector(Cdst), probability_vector(Csrc))
@@ -91,7 +89,7 @@ end
 function rand(rng::AbstractRNG, C::AbstractCategorical)
     p = probability_vector(C)
     at = AliasTable(p)
-    return rand(rng, at)
+    return sample_type(C)(rand(rng, at))
 end
 
 function Base.show(io::IO, C::Categorical)

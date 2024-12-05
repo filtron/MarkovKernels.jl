@@ -9,8 +9,6 @@
     cov_types = (HermOrSym, Cholesky)
 
     for T in etys
-        eltypes = T <: Real ? (Float32, Float64) : (ComplexF32, ComplexF64)
-
         @testset "UvNormal | $(T)" begin
             m1 = randn(T)
             l1 = randn(T)
@@ -27,19 +25,6 @@
             @test cov(uvN1) ≈ v1
             @test var(uvN1) ≈ v1
             @test std(uvN1) ≈ abs(l1)
-
-            # add tests for Normal{T}(::UvNormal)
-            for T2 in (Float32, Float64, ComplexF32, ComplexF64)
-                if T <: Complex && T2 <: Real
-                    @test_throws InexactError AbstractDistribution{T2}(uvN1)
-                    @test_throws InexactError AbstractNormal{T2}(uvN1)
-                    @test_throws InexactError Normal{T2}(uvN1)
-                else
-                    @test AbstractDistribution{T2}(uvN1) ==
-                          AbstractNormal{T2}(uvN1) ==
-                          Normal{T2}(uvN1)
-                end
-            end
 
             @test residual(uvN1, x) ≈ (x - m1) / lsqrt(v1)
             @test typeof(residual(uvN1, x)) == typeof(x)
@@ -92,9 +77,6 @@
                     @test (recursivecopy!(_N, N); _N) == N
                 end
 
-                for U in eltypes
-                    @test AbstractDistribution{U}(N) == AbstractNormal{U}(N) == Normal{U}(N)
-                end
                 @test N == N
                 @test mean(N) == μ
                 @test cov(N) ≈ V1p

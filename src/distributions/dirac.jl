@@ -1,16 +1,16 @@
 """
-    AbstractDirac{T<:Number}
+    AbstractDirac{ST}
 
-Abstract type for representing Dirac random vectors taking values in T.
+Abstract type for representing Dirac distributions taking values in ST.
 """
-abstract type AbstractDirac{T} <: AbstractDistribution{T} end
+abstract type AbstractDirac{ST} <: AbstractDistribution{ST} end
 
 """
-    Dirac{T<:Number}
+    Dirac
 
-Type for representing Dirac distributions with sample_eltype T.
+Type for representing Dirac distributions with sample_eltype ST.
 """
-struct Dirac{T,U} <: AbstractDirac{T}
+struct Dirac{ST,U} <: AbstractDirac{ST}
     μ::U
 end
 
@@ -19,7 +19,7 @@ end
 
 Creates a Dirac distribution with mean μ.
 """
-Dirac(μ) = Dirac{eltype(μ),typeof(μ)}(μ)
+Dirac(μ) = Dirac{typeof(μ),typeof(μ)}(μ)
 
 """
     mean(D::AbstractDirac)
@@ -27,16 +27,6 @@ Dirac(μ) = Dirac{eltype(μ),typeof(μ)}(μ)
 Computes the mean vector of the Dirac distribution D.
 """
 mean(D::Dirac) = D.μ
-
-sample_type(D::AbstractDirac) = typeof(mean(D))
-
-Dirac{T}(D::Dirac{U,<:Number}) where {T,U} = Dirac(convert(T, mean(D)))
-Dirac{T}(D::Dirac{U,<:AbstractVector}) where {T,U} =
-    Dirac(convert(AbstractVector{T}, mean(D)))
-
-AbstractDistribution{T}(D::AbstractDirac) where {T} = AbstractDirac{T}(D)
-AbstractDirac{T}(D::AbstractDirac{T}) where {T} = D
-AbstractDirac{T}(D::Dirac) where {T} = Dirac{T}(D)
 
 """
     dim(D::AbstractDirac)

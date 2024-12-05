@@ -1,42 +1,43 @@
 """
-    AbstractNormal{T<:Number}
+    AbstractNormal{ST}
 
-Abstract type for representing Normal distributed random vectors taking values in T.
+Abstract type for representing Normal distributed random vectors taking values in ST.
 """
-abstract type AbstractNormal{T} <: AbstractDistribution{T} end
+abstract type AbstractNormal{ST} <: AbstractDistribution{ST} end
 
 """
-    Normal{T,U,V}
+    Normal{ST,U,V}
 
-Standard mean vector / covariance matrix parametrisation of the normal distribution with element type T.
+Standard mean vector / covariance matrix parametrization of the Normal distribution with sample type ST.
 """
-struct Normal{T,U,V} <: AbstractNormal{T}
+struct Normal{ST,U,V} <: AbstractNormal{ST}
     μ::U
     Σ::V
 end
 
-function Normal{T}(μ::AbstractVector, Σ, ::IsPSD) where {T}
-    μ = convert(AbstractVector{T}, μ)
-    Σ = convert_psd_eltype(T, Σ)
-    return Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
-end
-
-function Normal{T}(μ::Number, Σ, ::IsPSD) where {T}
-    μ = convert(T, μ)
-    Σ = convert_psd_eltype(T, Σ)
-    return Normal{T,typeof(μ),typeof(Σ)}(μ, Σ)
-end
+Normal{ST}(μ::AbstractVector, Σ, ::IsPSD) where {ST<:AbstractVector} =
+    Normal{ST,typeof(μ),typeof(Σ)}(μ, Σ)
+Normal{ST}(μ::Number, Σ, ::IsPSD) where {ST<:Number} = Normal{ST,typeof(μ),typeof(Σ)}(μ, Σ)
 
 """
     Normal(μ, Σ)
 
 Creates a Normal distribution with mean μ and covariance Σ.
 """
-function Normal(μ, Σ)
+function Normal(μ::AbstractVector, Σ)
     T = promote_type(eltype(μ), eltype(Σ))
-    return Normal{T}(μ, Σ, psdcheck(Σ))
+    T = float(T)
+    ST = Base.promote_op(convert, Type{AbstractVector{T}}, typeof(μ))
+    return Normal{ST}(μ, Σ, psdcheck(Σ))
 end
 
+function Normal(μ::Number, Σ)
+    T = promote_type(eltype(μ), eltype(Σ))
+    ST = float(T)
+    return Normal{ST}(μ, Σ, psdcheck(Σ))
+end
+
+# this needs to change to allow for heterogneous eltype in fields / sample_type
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
@@ -106,22 +107,6 @@ var(N::UvNormal) = cov(N)
 Computes the vector of marginal standard deviations of the Normal distribution N.
 """
 std(N::AbstractNormal) = sqrt.(var(N))
-
-function sample_type(N::AbstractNormal)
-    T = promote_type(eltype(mean(N)), eltype(covp(N)))
-    T = float(T)
-    ST = Base.promote_op(convert, Type{AbstractVector{T}}, typeof(mean(N)))
-    return ST
-end
-sample_type(N::UvNormal) = float(promote_type(typeof(mean(N)), typeof(covp(N))))
-
-Normal{T}(N::Normal{A,<:AbstractVector}) where {T,A} =
-    Normal(convert(AbstractVector{T}, mean(N)), convert_psd_eltype(T, covp(N)))
-Normal{T}(N::Normal{A,<:Number}) where {T,A} =
-    Normal(convert(T, mean(N)), convert_psd_eltype(T, covp(N)))
-AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
-AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
-AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
 
 """
     residual(N::AbstractNormal, x::AbstractVector)
