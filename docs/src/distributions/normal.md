@@ -29,7 +29,7 @@ Normal{T}
 ### Constructors
 
 ```@docs
-Normal(μ, Σ)
+Normal(μ::AbstractVector, Σ)
 ```
 
 ### Methods
