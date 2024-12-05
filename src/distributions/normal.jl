@@ -108,22 +108,6 @@ Computes the vector of marginal standard deviations of the Normal distribution N
 """
 std(N::AbstractNormal) = sqrt.(var(N))
 
-function sample_type(N::AbstractNormal)
-    T = promote_type(eltype(mean(N)), eltype(covp(N)))
-    T = float(T)
-    ST = Base.promote_op(convert, Type{AbstractVector{T}}, typeof(mean(N)))
-    return ST
-end
-sample_type(N::UvNormal) = float(promote_type(typeof(mean(N)), typeof(covp(N))))
-
-Normal{T}(N::Normal{A,<:AbstractVector}) where {T,A} =
-    Normal(convert(AbstractVector{T}, mean(N)), convert_psd_eltype(T, covp(N)))
-Normal{T}(N::Normal{A,<:Number}) where {T,A} =
-    Normal(convert(T, mean(N)), convert_psd_eltype(T, covp(N)))
-AbstractDistribution{T}(N::AbstractNormal) where {T} = AbstractNormal{T}(N)
-AbstractNormal{T}(N::AbstractNormal{T}) where {T} = N
-AbstractNormal{T}(N::Normal) where {T} = Normal{T}(N)
-
 """
     residual(N::AbstractNormal, x::AbstractVector)
 
