@@ -9,6 +9,7 @@ include("scalar.jl")
 include("diagonal.jl")
 include("selfadjoint.jl")
 include("cholesky.jl")
+include("scalarfactorization.jl")
 
 stein(Σ, A::AbstractAffineMap) = stein(Σ, slope(A))
 stein(Σ, A::AbstractAffineMap, Q) = stein(Σ, slope(A), Q)

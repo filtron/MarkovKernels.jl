@@ -55,8 +55,10 @@ export PSDTrait,
     selfadjoint,
     rsqrt,
     lsqrt,
+    psdassemble,
     stein,
-    schur_reduce
+    schur_reduce,
+    ScalarFactorization
 
 include("distributions/distribution_generic.jl")
 export AbstractDistribution, sample_type, sample_eltype

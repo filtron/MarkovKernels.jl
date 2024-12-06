@@ -30,6 +30,14 @@ Computes a left square-root of Σ.
 lsqrt(Σ) = adjoint(rsqrt(Σ))
 
 """
+    psdassemble(A)
+
+Computes a positiive semi-definite matrix/number from the PSDParametrization A.
+"""
+psdassemble(A::AbstractMatrix) = A
+psdassemble(A) = lsqrt(A) * rsqrt(A)
+
+"""
     stein(Σ, Φ, [Q])
 
 Computes the output of the stein  operator
