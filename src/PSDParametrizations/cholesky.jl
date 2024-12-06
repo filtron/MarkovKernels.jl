@@ -15,6 +15,7 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix)
     return Π
 end
 
+# this should return ScalarFactorization
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
     m, n = size(Φ)
     work_arr = similar(Φ, n, m)
