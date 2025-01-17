@@ -29,6 +29,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         include("likelihoods/categoricallikelihood_test.jl")
         include("likelihoods/flatlikelihood_test.jl")
         include("likelihoods/likelihood_test.jl")
+        include("likelihoods/logquadratic_test.jl")
     end
 
     @testset "Binary Operations" begin
