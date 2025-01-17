@@ -1,8 +1,13 @@
 const RealSymmetric{T,S} = Symmetric{T,S} where {T<:Real,S}
 const ComplexHermitian{T,S} = Hermitian{T,S} where {T<:Complex,S}
 const RealDiagonal{T,S} = Diagonal{T,S} where {T<:Real,S}
-const SelfAdjoint{T,S} =
-    Union{RealSymmetric{T,S},ComplexHermitian{T,S},RealDiagonal{T,S}} where {T,S}
+const RealUniformScaling{T} = UniformScaling{T} where {T<:Real}
+const SelfAdjoint{T,S} = Union{
+    RealSymmetric{T,S},
+    ComplexHermitian{T,S},
+    RealDiagonal{T,S},
+    RealUniformScaling{T},
+} where {T,S}
 
 psdcheck(::SelfAdjoint) = IsPSD()
 

@@ -21,14 +21,14 @@ end
 """
     posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
 
-Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the log-likelihood L.
+Computes the conditional distribution C and the marginal log-likelihood ℓ associated with the prior distribution D and the likelihood L.
 """
 function posterior_and_loglike(::AbstractDistribution, ::AbstractLikelihood) end
 
 """
     posterior(D::AbstractDistribution, L::AbstractLikelihood)
 
-Computes the conditional distribution C associated with the prior distribution D and the log-likelihood L.
+Computes the conditional distribution C associated with the prior distribution D and the likelihood L.
 """
 function posterior(D::AbstractDistribution, L::AbstractLikelihood)
     C, _ = posterior_and_loglike(D, L)
@@ -37,6 +37,16 @@ end
 
 posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
+
+# beware: there's a bug below! 
+function posterior_and_loglike(D::AbstractDistribution, L::LogQuadraticLikelihood)
+    logc, y, C = L
+    K = NormalKernel(LinearMap(C), I)
+    logc = logc + length(y) / 2 * log(2π) # this is incorrect for complex eltypes
+
+    M, C = invert(D, K)
+    return condition(C, y), logc + logpdf(M, y)
+end
 
 function posterior_and_loglike(C::Categorical, L::CategoricalLikelihood)
     π = probability_vector(C)

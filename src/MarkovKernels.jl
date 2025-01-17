@@ -114,8 +114,14 @@ export Skedasticity,
 include("likelihoods/likelihood.jl")
 include("likelihoods/categorical_likelihood.jl")
 include("likelihoods/flatlikelihood.jl")
+include("likelihoods/logquadratic.jl")
 export Likelihood,
-    measurement_model, measurement, CategoricalLikelihood, likelihood_vector, FlatLikelihood
+    measurement_model,
+    measurement,
+    CategoricalLikelihood,
+    likelihood_vector,
+    FlatLikelihood,
+    LogQuadraticLikelihood
 
 include("binary_operations/compose.jl")
 include("binary_operations/marginalize.jl")

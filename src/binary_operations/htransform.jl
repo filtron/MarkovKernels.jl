@@ -32,3 +32,30 @@ function htransform(K::StochasticMatrix, L::Likelihood{<:StochasticMatrix})
     Ltmp = CategoricalLikelihood(ls)
     return htransform(K, Ltmp)
 end
+
+function htransform(K::AffineHomoskedasticNormalKernel, L::LogQuadraticLikelihood)
+    μ, Q = mean(K), covp(K)
+    Φ, u = slope(μ), intercept(μ)
+    logc, y, C = L
+
+    Rhat, Kbar, Qpost = schur_reduce(Q, C, I)
+
+    L = lsqrt(Rhat)
+    yout = L \ (y - C * u)
+    Cout = L \ C * Φ
+    logcout = logc - logdet(L)
+
+    Φpost = (I - Kbar * C) * Φ
+    upost = u + Kbar * (y - C * u)
+    μpost = AffineMap(Φpost, upost)
+
+    Kout = NormalKernel(μpost, Qpost)
+    Lout = LogQuadraticLikelihood(logcout, yout, Cout)
+
+    return Kout, Lout
+end
+
+htransform(
+    K::AffineHomoskedasticNormalKernel,
+    L::Likelihood{<:AffineHomoskedasticNormalKernel},
+) = htransform(K, LogQuadraticLikelihood(L))

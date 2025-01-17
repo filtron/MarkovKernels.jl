@@ -6,6 +6,7 @@ struct IsNotPSD <: PSDTrait end
 include("utils.jl")
 include("interface.jl")
 include("scalar.jl")
+include("uniformscaling.jl")
 include("diagonal.jl")
 include("selfadjoint.jl")
 include("cholesky.jl")
