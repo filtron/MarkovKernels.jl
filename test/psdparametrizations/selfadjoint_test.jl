@@ -16,6 +16,8 @@
 
         R3 = Diagonal(ones(real(T), m))
 
+        R4 = R2 * I
+
         @testset "PSDParametrizations | SelfAdjoint | $(T)" begin
             @test rsqrt(Σ) ≈ cholesky(Σ).U
             @test lsqrt(Σ) ≈ cholesky(Σ).L
@@ -29,6 +31,9 @@
             @test stein(Σ, C2, R2) ≈ _stein(Σ, C2, R2)
             @test all(isapprox.(schur_reduce(Σ, C2), _schur_reduce(Σ, C2)))
             @test all(isapprox.(schur_reduce(Σ, C2, R2), _schur_reduce(Σ, C2, R2)))
+
+            @test stein(Σ, C, R4) ≈ _stein(Σ, C, R4)
+            @test all(isapprox.(schur_reduce(Σ, C, R4), _schur_reduce(Σ, C, R4)))
         end
 
         ΣD = Diagonal(abs2.(randn(real(T), n)))
