@@ -38,12 +38,11 @@ end
 posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
 
-# beware: there's a bug below! 
 function posterior_and_loglike(D::AbstractDistribution, L::LogQuadraticLikelihood)
     logc, y, C = L
+    T = eltype(y)
     K = NormalKernel(LinearMap(C), I)
-    logc = logc + length(y) / 2 * log(2π) # this is incorrect for complex eltypes
-
+    logc = logc + _nscale(T) * length(y) * _logpiconst(T)
     M, C = invert(D, K)
     return condition(C, y), logc + logpdf(M, y)
 end

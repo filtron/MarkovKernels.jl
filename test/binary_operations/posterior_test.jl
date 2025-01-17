@@ -44,6 +44,16 @@
                 @test cov(P1) ≈ cov(P2) ≈ Π
             end
 
+            for L in (L1, L3)
+                Lq = LogQuadraticLikelihood(L)
+
+                @test all(
+                    splat(isapprox),
+                    zip(posterior_and_loglike(N, Lq), posterior_and_loglike(N, L)),
+                )
+                @test isapprox(posterior(N, Lq), posterior(N, L))
+            end
+
             L = FlatLikelihood()
             P1, ll = posterior_and_loglike(N, L)
             P2 = posterior(N, L)
@@ -80,6 +90,13 @@
                 @test isapprox(cov(P1), Π, atol = 10 * eps(real(T))) &&
                       isapprox(cov(P2), Π, atol = 10 * eps(real(T)))
             end
+
+            Lq = LogQuadraticLikelihood(L1)
+            @test all(
+                splat(isapprox),
+                zip(posterior_and_loglike(N, Lq), posterior_and_loglike(N, L1)),
+            )
+            @test isapprox(posterior(N, Lq), posterior(N, L1))
 
             L = FlatLikelihood()
             P1, ll = posterior_and_loglike(N, L)
