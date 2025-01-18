@@ -37,6 +37,7 @@ makedocs(;
             "likelihoods/likelihood_general.md",
             "likelihoods/categorical_likelihood.md",
             "likelihoods/likelihood.md",
+            "likelihoods/logquadratic.md",
             "likelihoods/flatlikelihood.md",
         ],
         "Binary operators" => "binary_operators.md",

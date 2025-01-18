@@ -15,6 +15,18 @@ compose(::AbstractMarkovKernel, ::AbstractMarkovKernel)
 ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 ```
 
+Additionally, given likelihoods ``l_1(x)`` and ``l_2(x)``, composition is a binary operator producing a third likelihood ``l_3(x)`` according to 
+
+```math
+l_3(x) = l_2(x) l_1(x).
+```
+
+```@docs
+compose(::AbstractLikelihood, ::AbstractLikelihood)
+∘(K2::AbstractLikelihood, K1::AbstractLikelihood)
+```
+
+
 ### Algebra
 
 ```@docs

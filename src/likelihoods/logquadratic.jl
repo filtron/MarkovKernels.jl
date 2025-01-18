@@ -1,10 +1,7 @@
 """
     LogQuadraticLikelihood
 
-Type for representing log-quadratic likelihoods, i.e.
-
-log L(x) = c - 0.5 * norm(y - C * x)^2
-
+Type for representing log-quadratic likelihoods.
 """
 struct LogQuadraticLikelihood{A,B,C} <: AbstractLikelihood
     logconst::A
@@ -17,6 +14,11 @@ Base.iterate(L::LogQuadraticLikelihood, ::Val{:y}) = (L.y, Val(:C))
 Base.iterate(L::LogQuadraticLikelihood, ::Val{:C}) = (L.C, Val(:done))
 Base.iterate(::LogQuadraticLikelihood, ::Val{:done}) = nothing
 
+"""
+    LogQuadraticLikelihood(L::Likelihood{<:AffineHomoskedasticNormalKernel})
+
+Computes a log-quadratic likelihood from L.
+"""
 function LogQuadraticLikelihood(L::Likelihood{<:AffineHomoskedasticNormalKernel})
     K, y = measurement_model(L), measurement(L)
     T = eltype(y)
