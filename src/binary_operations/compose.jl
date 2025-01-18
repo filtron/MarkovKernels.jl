@@ -61,6 +61,7 @@ function compose(::AbstractLikelihood, ::AbstractLikelihood) end
 
 compose(L1::AbstractLikelihood, L2::FlatLikelihood) = L1
 compose(L1::FlatLikelihood, L2::AbstractLikelihood) = compose(L2, L1)
+compose(::FlatLikelihood, ::FlatLikelihood) = FlatLikelihood()
 
 function compose(L1::CategoricalLikelihood, L2::CategoricalLikelihood)
     l1 = likelihood_vector(L1)
@@ -82,10 +83,10 @@ function compose(L1::LogQuadraticLikelihood, L2::LogQuadraticLikelihood)
 
     logc2, y2, C2 = L2
     m2, n2 = size(C2)
-    # throw DimensionMismatch if n1 != n2 
 
     Chat = vcat(C1, C2)
     yhat = vcat(y1, y2)
+    T = eltype(yhat)
 
     logcbar = logc1 + logc2
     F = qr!(Chat)
@@ -94,7 +95,7 @@ function compose(L1::LogQuadraticLikelihood, L2::LogQuadraticLikelihood)
 
     ybar = y3[1:min(m1 + m2, n1)]
     e_norm_sqr = norm(y3)^2 - norm(ybar)^2
-    logcbar = logcbar - e_norm_sqr / 2
+    logcbar = logcbar - _nscale(T) * e_norm_sqr
 
     return LogQuadraticLikelihood(logcbar, ybar, Cbar)
 end

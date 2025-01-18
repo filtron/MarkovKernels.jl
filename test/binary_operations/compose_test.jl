@@ -82,4 +82,69 @@
                   P4 * P3
         end
     end
+
+    @testset "compose | CategoricalLikelihood" begin
+        etys = (Float64,)
+        m, n = 2, 3
+        for T in etys
+            x = rand(1:n)
+
+            P1 = exp.(randn(T, m, n))
+            P1 = P1 * Diagonal(1 ./ [sum(p) for p in eachcol(P1)])
+            K1 = StochasticMatrix(P1)
+            y1 = rand(1:m)
+            L1 = Likelihood(K1, y1)
+
+            P2 = exp.(randn(T, n, n))
+            P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
+            K2 = StochasticMatrix(P2)
+            y2 = rand(1:n)
+            L2 = Likelihood(K2, y2)
+
+            L3 = FlatLikelihood()
+
+            Ls = (L1, L2, L3)
+            for LL in Ls
+                for LR in Ls
+                    Lnew = compose(LL, LR)
+                    @test log(Lnew, x) ≈ log(LL, x) + log(LR, x)
+                end
+            end
+        end
+    end
+
+    @testset "compose | Multivariate LogQuadraticLikelihood" begin
+        n, m = 2, 3
+        etys = (Float64, ComplexF64)
+        for T in etys
+            x = randn(T, m)
+
+            C1 = LinearMap(randn(n, m))
+            R1 = Cholesky(UpperTriangular(ones(n, n)))
+            K1 = NormalKernel(C1, R1)
+            y1 = rand(condition(K1, x))
+            L1 = Likelihood(K1, y1)
+
+            C2 = LinearMap(adjoint(randn(m)))
+            R2 = exp(randn(real(T)))
+            K2 = NormalKernel(C2, R2)
+            y2 = rand(condition(K2, x))
+            L2 = Likelihood(K2, y2)
+
+            R3 = exp(randn(real(T))) * I
+            K3 = NormalKernel(C1, I)
+            y3 = rand(condition(K3, x))
+            L3 = Likelihood(K3, y3)
+
+            L4 = FlatLikelihood()
+
+            Ls = (L1, L2, L3, L4)
+            for LL in Ls
+                for LR in Ls
+                    Lnew = compose(LL, LR)
+                    @test log(Lnew, x) ≈ log(LL, x) + log(LR, x)
+                end
+            end
+        end
+    end
 end
