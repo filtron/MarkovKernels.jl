@@ -37,8 +37,11 @@ function Normal(μ::Number, Σ)
     return Normal{ST}(μ, Σ, psdcheck(Σ))
 end
 
+Normal(μ::Number, Σ::UniformScaling) = Normal(μ, Σ.λ)
+
 # this needs to change to allow for heterogneous eltype in fields / sample_type
 const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
+const IsotropicNormal{ST,MT,VT} = Normal{ST,MT,VT} where {VT<:UniformScaling}
 
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
     copy!(mean(Ndst), mean(Nsrc))
@@ -93,14 +96,16 @@ Computes the covariance matrix of the Normal distribution N.
 cov(N::Normal) = AbstractMatrix(covp(N))
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = covp(N)
 cov(N::UvNormal) = covp(N)
+cov(N::IsotropicNormal) = covp(N)[1:dim(N), 1:dim(N)]
 
 """
     var(N::AbstractNormal)
 Computes the vector of marginal variances of the Normal distribution N.
 """
-var(N::AbstractNormal) = real(diag(covp(N)))
+var(N::AbstractNormal) = real(diag(cov(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachcol(rsqrt(covp(N))))
 var(N::UvNormal) = cov(N)
+var(N::IsotropicNormal) = typeof(mean(N))(fill(covp(N).λ, dim(N)))
 
 """
     std(N::AbstractNormal)
@@ -127,6 +132,12 @@ function logpdf(N::AbstractNormal, x)
            (dim(N) * _logpiconst(T) + real(logdet(covp(N))) + norm_sqr(residual(N, x)))
 end
 
+function logpdf(N::IsotropicNormal, x)
+    T = sample_eltype(N)
+    ld = dim(N) * log(covp(N).λ)
+    return -_nscale(T) * (dim(N) * _logpiconst(T) + ld + norm_sqr(residual(N, x)))
+end
+
 """
     entropy(N::AbstractNormal)
 
@@ -135,6 +146,12 @@ Computes the entropy of the Normal distribution N.
 function entropy(N::AbstractNormal)
     T = sample_eltype(N)
     _nscale(T) * (dim(N) * (_logpiconst(T) + one(real(T))) + real(logdet(covp(N))))
+end
+
+function entropy(N::IsotropicNormal)
+    T = sample_eltype(N)
+    ld = dim(N) * log(covp(N).λ)
+    _nscale(T) * (dim(N) * (_logpiconst(T) + one(real(T))) + ld)
 end
 
 """
@@ -148,6 +165,17 @@ function kldivergence(N1::AbstractNormal, N2::AbstractNormal)
     _nscale(T) * (
         norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
         real(T)(2) * real(logdet(root_ratio))
+    )
+end
+
+function kldivergence(N1::IsotropicNormal, N2::IsotropicNormal)
+    T = promote_type(sample_eltype(N1), sample_eltype(N2))
+    root_ratio = lsqrt(covp(N2)) \ lsqrt(covp(N1))
+    root_ratio_norm_sqr = root_ratio.λ^2 * dim(N1)
+    root_ratio_ld = dim(N1) * log(root_ratio.λ)
+    _nscale(T) * (
+        root_ratio_norm_sqr + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
+        real(T)(2) * root_ratio_ld
     )
 end
 

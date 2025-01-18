@@ -30,7 +30,8 @@ function stein(Σ::Cholesky, Φ::AbstractMatrix, Q)
     work_arr = similar(Φ, n + m, m)
 
     mul!(view(work_arr, 1:n, 1:m), rsqrt(Σ), adjoint(Φ))
-    view(work_arr, n+1:n+m, 1:m) .= rsqrt(Q)
+    #view(work_arr, n+1:n+m, 1:m) .= rsqrt(Q)
+    copyto!(view(work_arr, n+1:n+m, 1:m), rsqrt(Q))
 
     U = positive_qrwoq!(work_arr)
     Π = Cholesky(UpperTriangular(copy(U)))
@@ -47,6 +48,10 @@ function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     U = positive_qrwoq!(work_arr)
     Π = abs2(U[1, 1])
     return Π
+end
+
+function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::UniformScaling)
+    return stein(Σ, Φ, Q.λ)
 end
 
 function schur_reduce(Π::Cholesky, C::AbstractMatrix)
@@ -97,7 +102,8 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix, R)
     m, n = size(C)
     work_arr = similar(C, n + m, n + m)
 
-    view(work_arr, 1:m, 1:m) .= rsqrt(R)
+    #view(work_arr, 1:m, 1:m) .= rsqrt(R)
+    copyto!(view(work_arr, 1:m, 1:m), rsqrt(R))
     view(work_arr, 1:m, m+1:n+m) .= zero(eltype(work_arr))
     mul!(view(work_arr, m+1:n+m, 1:m), rsqrt(Π), adjoint(C))
     view(work_arr, m+1:n+m, m+1:n+m) .= rsqrt(Π)
@@ -111,7 +117,7 @@ function schur_reduce(Π::Cholesky, C::AbstractMatrix, R)
     K = @inbounds view(work_arr, xidx, yidx)
     K .= adjoint(Kadj)
     K = rdiv!(K, lsqrt(S))
-    K = copy(K) # copy because we dont want to return SubArray
+    K = copy(K)
 
     return S, K, Σ
 end
@@ -134,7 +140,11 @@ function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Nu
     K = @inbounds conj.(view(work_arr, yidx, xidx))
     K = rdiv!(K, Ssqrt)
     S = abs2(Ssqrt)
-    K = copy(K) # copy because we dont want to return SubArray
+    K = copy(K)
 
     return S, K, Σ
+end
+
+function schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::UniformScaling)
+    return schur_reduce(Π, C, R.λ)
 end

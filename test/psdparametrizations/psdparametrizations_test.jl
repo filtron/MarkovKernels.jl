@@ -4,6 +4,7 @@
 
     include("test_utils.jl")
     include("scalar_test.jl")
+    include("uniformscaling_test.jl")
     include("selfadjoint_test.jl")
     include("cholesky_test.jl")
 end

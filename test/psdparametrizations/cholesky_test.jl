@@ -17,6 +17,8 @@
         LR2 = randn(real(T))
         R2 = abs2(LR2)
 
+        R4 = R2 * I
+
         @testset "PSDParametrizations | Cholesky | $(T)" begin
             @test rsqrt(CΣ) ≈ cholesky(Σ).U
             @test lsqrt(CΣ) ≈ cholesky(Σ).L
@@ -34,6 +36,11 @@
             @test all(isapprox.(_to_matrix.(schur_reduce(CΣ, C2)), _schur_reduce(Σ, C2)))
             @test all(
                 isapprox.(_to_matrix.(schur_reduce(CΣ, C2, R2)), _schur_reduce(Σ, C2, R2)),
+            )
+
+            @test _to_matrix(stein(CΣ, C, R4)) ≈ _stein(Σ, C, R4)
+            @test all(
+                isapprox.(_to_matrix.(schur_reduce(CΣ, C, R4)), _schur_reduce(Σ, C, R4)),
             )
         end
 

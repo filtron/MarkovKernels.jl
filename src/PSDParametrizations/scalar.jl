@@ -7,6 +7,7 @@ lsqrt(x::Real) = rsqrt(x)
 
 stein(Σ::Real, Φ::Number) = abs2(Φ) * Σ
 stein(Σ::Real, Φ::Number, Q::Real) = stein(Σ, Φ) + Q
+stein(Σ::Real, Φ::Number, Q::UniformScaling) = stein(Σ, Φ, Q.λ)
 
 function schur_reduce(Π::Real, C::Number)
     # this probably breaks if iszero(C) returns true
@@ -24,3 +25,5 @@ function schur_reduce(Π::Real, C::Number, R::Real)
     Σ = abs2(L) * Π + abs2(K) * R
     return S, K, Σ
 end
+
+schur_reduce(Π::Real, C::Number, R::UniformScaling) = schur_reduce(Π, C, R.λ)
