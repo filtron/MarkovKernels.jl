@@ -8,6 +8,8 @@ Lout(z) = ∫ L(x) K(x, z) dx, and Kout(x, z) = L(x) K(x, z) / Lout(z)
 """
 function htransform(::AbstractMarkovKernel, ::AbstractLikelihood) end
 
+htransform(K::AbstractMarkovKernel, L::FlatLikelihood) = K, L
+
 function htransform(K::StochasticMatrix, L::CategoricalLikelihood)
     ls = likelihood_vector(L)
     P = probability_matrix(K)
@@ -37,13 +39,14 @@ function htransform(K::AffineHomoskedasticNormalKernel, L::LogQuadraticLikelihoo
     μ, Q = mean(K), covp(K)
     Φ, u = slope(μ), intercept(μ)
     logc, y, C = L
+    T = eltype(y)
 
     Rhat, Kbar, Qpost = schur_reduce(Q, C, I)
 
     L = lsqrt(Rhat)
     yout = L \ (y - C * u)
     Cout = L \ C * Φ
-    logcout = logc - logdet(L)
+    logcout = logc - _nscale(T) * 2 * logdet(L)
 
     Φpost = (I - Kbar * C) * Φ
     upost = u + Kbar * (y - C * u)
@@ -59,3 +62,25 @@ htransform(
     K::AffineHomoskedasticNormalKernel,
     L::Likelihood{<:AffineHomoskedasticNormalKernel},
 ) = htransform(K, LogQuadraticLikelihood(L))
+
+function htransform(K::AffineHomoskedasticNormalKernel, L::Likelihood{<:AffineDiracKernel})
+    μ, Q = mean(K), covp(K)
+    Φ, u = slope(μ), intercept(μ)
+
+    KL = L.K
+    yL = L.y
+    C = slope(mean(KL))
+    y = yL - intercept(mean(KL))
+
+    Rhat, Kbar, Qpost = schur_reduce(Q, C)
+
+    KLout = NormalKernel(compose(mean(KL), mean(K)), Rhat)
+    Lout = Likelihood(KLout, yL) # maybe return LogQuadraticLikelihood for consistency?
+
+    Φpost = (I - Kbar * C) * Φ
+    upost = u + Kbar * (y - C * u)
+    μpost = AffineMap(Φpost, upost)
+    Kout = NormalKernel(μpost, Qpost)
+
+    return Kout, Lout
+end
