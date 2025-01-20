@@ -7,17 +7,13 @@ Pkg.instantiate()
 
 using MarkovKernels
 using LinearAlgebra, Random
-using CairoMakie
+#using CairoMakie
+using Plots
 
 function sample(rng::AbstractRNG, init, fw_kernels)
-
-    # sample initial value
     x = rand(rng, init)
-
-    # allocate output
     n = length(fw_kernels) + 1
     xs = Vector{typeof(x)}(undef, n)
-
     xs[begin] = x
 
     for (m, fw_kernel) in pairs(fw_kernels)
@@ -28,8 +24,6 @@ function sample(rng::AbstractRNG, init, fw_kernels)
 end
 
 function sample(rng::AbstractRNG, init, fw_kernels, obs_kernels)
-    length(fw_kernels) + 1 == length(obs_kernels) || error("...")
-
     # sample initial values
     x = rand(rng, init)
     y = rand(rng, first(obs_kernels), x)
@@ -52,12 +46,11 @@ function sample(rng::AbstractRNG, init, fw_kernels, obs_kernels)
     return xs, ys
 end
 
-m, n = 5, 5
+m, n = 10, 10
 init = MarkovKernels.Categorical(ones(m))
 Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
 Kxx = StochasticMatrix(Pxx)
 
-#Pyx = reshape(float.(1:m*n), n, m)
 Pyx = (ones(m, m) - I)
 Kyx = StochasticMatrix(Pyx)
 
@@ -68,6 +61,51 @@ obs_kernels = fill(Kyx, T)
 rng = Random.Xoshiro(19910215)
 xs, ys = sample(rng, init, fw_kernels, obs_kernels)
 
+hmm_plt = Plots.scatter(
+    eachindex(xs),
+    xs,
+    color = "black",
+    title = "hidden state",
+    layout = (1, 2),
+)
+Plots.scatter!(
+    hmm_plt,
+    eachindex(ys),
+    ys,
+    color = "red",
+    title = "observations",
+    subplot = 2,
+)
+
+function backward_recursion(init, forward_kernels, likelihoods)
+    h = last(likelihoods)
+    KT = Base.promote_op(first ∘ htransform, eltype(forward_kernels), typeof(h))
+    post_forward_kernels = Vector{KT}(undef, length(forward_kernels))
+
+    for m in eachindex(forward_kernels)
+        fw_kernel = forward_kernels[end-m+1]
+        post_fw_kernel, h = htransform(fw_kernel, h)
+        post_forward_kernels[end-m+1] = post_fw_kernel
+
+        like = likelihoods[end-m]
+        h = compose(h, like)
+    end
+    post_init, loglike = posterior_and_loglike(init, h)
+    return post_init, post_forward_kernels, loglike
+end
+
+likes = [Likelihood(Kobs, y) for (Kobs, y) in zip(obs_kernels, ys)]
+
+post_init, post_fw_kernels = backward_recursion(init, fw_kernels, likes)
+
+nsample = 10
+for _ in 1:nsample
+    xs = sample(rng, post_init, post_fw_kernels)
+    Plots.scatter!(hmm_plt, eachindex(xs), xs, label = "", color = "blue", alpha = 0.1)
+end
+display(hmm_plt)
+
+#=
 fig = Figure()
 axstate = Axis(fig[1, 1], title = "state sequence", xlabel = "n", ylabel = "x")
 scatter!(axstate, eachindex(xs), xs, color = "black")
@@ -122,13 +160,4 @@ for _ in 1:nsample
     scatter!(ax, eachindex(xs_post), xs_post, color = "red", alpha = 0.05)
 end
 display(fig)
-
-marginals = fb_posterior_marginals(init, fw_kernels, likes)
-probs = probability_vector.(marginals) |> stack
-fig = Figure()
-ax = Axis(fig[1, 1])
-for i in axes(probs, 1)
-    pi = view(probs, i, :)
-    band!(ax, eachindex(pi), zero.(eachindex(pi)), pi)
-end
-display(fig)
+=#
