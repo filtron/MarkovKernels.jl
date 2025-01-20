@@ -42,7 +42,7 @@ makedocs(;
         ],
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
-            "Sampling from probabilistic state-space models" => "tutorial_pomp_sampling.md"
+            "Sampling and inference in Hidden Markov models" => "tutorials/hidden_markov_model.md",
             "Kalman filtering and smoothing" => "tutorial_kalman_filter.md"
         ],
     ],

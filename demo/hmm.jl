@@ -7,7 +7,6 @@ Pkg.instantiate()
 
 using MarkovKernels
 using LinearAlgebra, Random
-#using CairoMakie
 using Plots
 
 function sample(rng::AbstractRNG, init, fw_kernels)
@@ -95,13 +94,14 @@ function backward_recursion(init, forward_kernels, likelihoods)
 end
 
 likes = [Likelihood(Kobs, y) for (Kobs, y) in zip(obs_kernels, ys)]
-
 post_init, post_fw_kernels = backward_recursion(init, fw_kernels, likes)
 
-nsample = 10
-for _ in 1:nsample
-    xs = sample(rng, post_init, post_fw_kernels)
-    Plots.scatter!(hmm_plt, eachindex(xs), xs, label = "", color = "blue", alpha = 0.1)
+let xs
+    nsample = 10
+    for _ in 1:nsample
+        xs = sample(rng, post_init, post_fw_kernels)
+        Plots.scatter!(hmm_plt, eachindex(xs), xs, label = "", color = "blue", alpha = 0.1)
+    end
 end
 display(hmm_plt)
 
