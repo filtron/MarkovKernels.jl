@@ -21,7 +21,7 @@ This tutorial describes how to use ```MarkovKernels.jl``` to:
 
 ```@example 1
 using MarkovKernels
-using Random, LinearAlgebra, Plots
+using Random, LinearAlgebra
 import Plots
 rng = Random.Xoshiro(19910215)
 
@@ -192,17 +192,17 @@ nothing # hide
 ## Sampling a posteriori hidden sequences and plotting them
 
 ```@example 1
-    nsample = 10
-    for _ in 1:nsample
-        xs_post = sample(rng, post_init, post_fw_kernels)
-        Plots.scatter!(
-            hmm_plt,
-            eachindex(xs_post),
-            xs_post,
-            label = "",
-            color = "blue",
-            alpha = 0.1,
-            )
-    end
+nsample = 10
+for _ in 1:nsample
+    xs_post = sample(rng, post_init, post_fw_kernels)
+    Plots.scatter!(
+        hmm_plt,
+        eachindex(xs_post),
+        xs_post,
+        label = "",
+        color = "blue",
+        alpha = 0.1,
+        )
+end
 hmm_plt
 ```
