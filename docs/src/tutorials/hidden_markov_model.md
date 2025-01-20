@@ -21,6 +21,7 @@ This tutorial describes how to use ```MarkovKernels.jl``` to:
 ```@example 1
 using MarkovKernels
 using Random, LinearAlgebra, Plots
+import Plots
 rng = Random.Xoshiro(19910215)
 
 nothing # hide
