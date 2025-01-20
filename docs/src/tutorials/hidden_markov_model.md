@@ -1,5 +1,6 @@
 # Sampling and inference in Hidden Markov models
 
+
 A finite state hidden Markov model is specified by an initial distribution, a sequence of transition probabilities,
 and a sequence of observation probabilities:
 
