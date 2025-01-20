@@ -1,20 +1,21 @@
 # Sampling and inference in Hidden Markov models
 
+A finite state hidden Markov model is specified by an initial distribution, a sequence of transition probabilities,
+and a sequence of observation probabilities:
+
+
+```math
+\begin{aligned}
+&P(x_0 = i) \\
+&P(x_t = i \mid x_{t-1} = j), \quad t = 1, \ldots, T   \\
+&P(y_t = i \mid x_t = j), \quad t = 0, 1, \ldots, T
+\end{aligned}
+```
+
 This tutorial describes how to use ```MarkovKernels.jl``` to:
 
 * Sample from a (finite state) hidden Markov model
 * Compute the a posteriori distribution of the hidden sequence using the backward recursion
-
-Recall that a finite state Markov model with $n$ possible states of length $T+1$ is specified by an $n$ dimensional vector of initial probabilities $p_0$ and a sequence of stochastic matrices $\Pi_{t, t-1}$ such that
-
-```math
-\begin{aligned}
-P(x_0) &= (p_0)_i \\
-P(x_t = i \mid x_{t-1} = j) &= (\Pi_{t, t-1})_{ij}
-\end{aligned}
-```
-
-
 
 
 ```@example 1
@@ -76,7 +77,7 @@ nothing # hide
 m, n = 10, 10
 
 # probability vector of initial distribution
-init = MarkovKernels.Categorical(ones(m))
+init = Categorical(ones(m))
 
 # transition probabilities
 Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
@@ -136,7 +137,7 @@ The recursion is given by:
 ```math
 \begin{aligned}
 h_{t:T\mid t-1}(z) &= \sum_x h_{t:T \mid t}(x) P(x_t = x \mid x_{t-1} = z)  \\
-P(x_t = x \mid x_{t-1} = z) &= h_{t:T \mid t}(x) P(x_t = x \mid x_{t-1} = z) / h_{t:T\mid t-1}(z) \\
+P(x_t = x \mid x_{t-1} = z, y_{0:T}) &= h_{t:T \mid t}(x) P(x_t = x \mid x_{t-1} = z) / h_{t:T\mid t-1}(z) \\
 h_{t-1:T \mid t-1}(x) &= h_{t:T\mid t-1}(x) h_{t-1 \mid t-1}(x)
 \end{aligned}
 ```
@@ -146,12 +147,12 @@ The algorithm terminates by computing the a posteriori initial distribution and 
 
 ```math
 \begin{aligned}
-P(y_{0:T}) &=  \sum_x h_{0:T \mid 0}(x) P(x_0 = x) \\
+\log P(y_{0:T}) &=  \log \Big(\sum_x h_{0:T \mid 0}(x) P(x_0 = x) \Big) \\
 P(x_0 = x \mid y_{0:T}) &= h_{0:T \mid 0}(x) P(x_0 = x) / P(y_{0:T})
 \end{aligned}
 ```
-
-Using ```MarkovKernels.jl```, the code might look somethign like the following:
+These equations are implemented by ```posterior_and_loglike```.
+Using ```MarkovKernels.jl```, the code might look something like the following:
 
 
 ```@example 1
@@ -189,7 +190,7 @@ nothing # hide
 ## Sampling a posteriori hidden sequences and plotting them
 
 ```@example 1
-let xs
+let xs, rng = rng
     nsample = 10
     for _ in 1:nsample
         xs = sample(rng, post_init, post_fw_kernels)

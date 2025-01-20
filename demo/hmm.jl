@@ -46,7 +46,7 @@ function sample(rng::AbstractRNG, init, fw_kernels, obs_kernels)
 end
 
 m, n = 10, 10
-init = MarkovKernels.Categorical(ones(m))
+init = Categorical(ones(m))
 Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
 Kxx = StochasticMatrix(Pxx)
 

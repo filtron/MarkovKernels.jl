@@ -1,5 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+FiniteHorizonGramians = "b59a298d-d283-4a37-9369-85a9f9a111a5"
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 MarkovKernels = "202a2b00-fae3-41a1-a054-d2db40c1e3ea"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
