@@ -43,7 +43,7 @@ makedocs(;
         "Binary operators" => "binary_operators.md",
         "Tutorials" => [
             "Sampling and inference in Hidden Markov models" => "tutorials/hidden_markov_model.md",
-            "Kalman filtering and smoothing" => "tutorial_kalman_filter.md"
+            "Kalman filtering and smoothing" => "tutorial_kalman_filter.md",
         ],
     ],
 )
