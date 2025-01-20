@@ -190,19 +190,17 @@ nothing # hide
 ## Sampling a posteriori hidden sequences and plotting them
 
 ```@example 1
-let xs, rng = rng
     nsample = 10
     for _ in 1:nsample
-        xs = sample(rng, post_init, post_fw_kernels)
+        xs_post = sample(rng, post_init, post_fw_kernels)
         Plots.scatter!(
             hmm_plt,
-            eachindex(xs),
-            xs,
+            eachindex(xs_post),
+            xs_post,
             label = "",
             color = "blue",
             alpha = 0.1,
             )
     end
-end
 hmm_plt
 ```
