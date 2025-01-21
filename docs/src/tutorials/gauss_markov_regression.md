@@ -206,12 +206,7 @@ p(y_t \mid y_{0:t-1}) &= \int p(y_t \mid x_t) p(x_t \mid y_{0:t-1}) \mathrm{d} x
 \log p(y_{0:t}) &= \log p(y_{0:t-1}) + \log p(y_t \mid y_{0:t-1})
 \end{aligned}
 ```
-The first two equations are implemented by ```invert``` and the last two equations are, again, implemented by ```posterior_and_loglik
-```@example 2
-
-nothing # hide
-```
-e```.
+The first two equations are implemented by ```invert``` and the last two equations are, again, implemented by ```posterior_and_loglike```
 Using ```MarkovKernels.jl```, the code might look something like the following:
 
 
@@ -241,13 +236,15 @@ nothing # hide
 Compute likelihoods: 
 ```@example 2
 likelihoods = [Likelihood(compose(observation_kernel, output_kernel), y) for y in ys]
-nothing # hide 
+
+nothing # hide
 ```
 
 Compute reverse-time posterior: 
 ```@example 2
 backward_kernels, term, loglike = forward_recursion(init, forward_kernels, likelihoods)
-nothing # hide 
+
+nothing # hide
 ```
 
 
