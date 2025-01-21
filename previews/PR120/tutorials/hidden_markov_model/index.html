@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Sampling and inference in Hidden Markov models · MarkovKernels.jl</title><meta name="title" content="Sampling and inference in Hidden Markov models · MarkovKernels.jl"/><meta property="og:title" content="Sampling and inference in Hidden Markov models · MarkovKernels.jl"/><meta property="twitter:title" content="Sampling and inference in Hidden Markov models · MarkovKernels.jl"/><meta name="description" content="Documentation for MarkovKernels.jl."/><meta property="og:description" content="Documentation for MarkovKernels.jl."/><meta property="twitter:description" content="Documentation for MarkovKernels.jl."/><meta property="og:url" content="https://filtron.github.io/MarkovKernels.jl/tutorials/hidden_markov_model/"/><meta property="twitter:url" content="https://filtron.github.io/MarkovKernels.jl/tutorials/hidden_markov_model/"/><link rel="canonical" href="https://filtron.github.io/MarkovKernels.jl/tutorials/hidden_markov_model/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">MarkovKernels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../affinemaps/affinemaps/">Affine maps</a></li><li><span class="tocitem">PSDParametrizations</span><ul><li><a class="tocitem" href="../../PSDParametrizations/general/">General</a></li><li><a class="tocitem" href="../../PSDParametrizations/internal/">Internal</a></li></ul></li><li><span class="tocitem">Distributions</span><ul><li><a class="tocitem" href="../../distributions/distribution_general/">General</a></li><li><a class="tocitem" href="../../distributions/categorical/">Categorical</a></li><li><a class="tocitem" href="../../distributions/normal/">Normal</a></li><li><a class="tocitem" href="../../distributions/dirac/">Dirac</a></li></ul></li><li><span class="tocitem">Kernels</span><ul><li><a class="tocitem" href="../../kernels/kernel_general/">General</a></li><li><a class="tocitem" href="../../kernels/normalkernel/">NormalKernel</a></li><li><a class="tocitem" href="../../kernels/dirackernel/">DiracKernel</a></li><li><a class="tocitem" href="../../kernels/stochasticmatrix/">StochasticMatrix</a></li></ul></li><li><span class="tocitem">Likelihoods</span><ul><li><a class="tocitem" href="../../likelihoods/likelihood_general/">General</a></li><li><a class="tocitem" href="../../likelihoods/categorical_likelihood/">Categorical likelihoods</a></li><li><a class="tocitem" href="../../likelihoods/likelihood/">Likelihood</a></li><li><a class="tocitem" href="../../likelihoods/logquadratic/">Log-quadratic likelihoods</a></li><li><a class="tocitem" href="../../likelihoods/flatlikelihood/">Flat likelihoods</a></li></ul></li><li><a class="tocitem" href="../../binary_operators/">Binary operators</a></li><li><span class="tocitem">Tutorials</span><ul><li class="is-active"><a class="tocitem" href>Sampling and inference in Hidden Markov models</a><ul class="internal"><li><a class="tocitem" href="#Implementing-samplers-for-finite-state-(hidden)-Markov-models"><span>Implementing samplers for finite state (hidden) Markov models</span></a></li><li><a class="tocitem" href="#Defining-a-finite-state-hidden-Markov-model-and-sampling-it"><span>Defining a finite state hidden Markov model and sampling it</span></a></li><li><a class="tocitem" href="#Plotting-the-realization"><span>Plotting the realization</span></a></li><li><a class="tocitem" href="#Implementing-the-backward-algorithms"><span>Implementing the backward algorithms</span></a></li><li><a class="tocitem" href="#Computing-the-a-posteriori-distribution-of-the-hidden-sequence"><span>Computing the a posteriori distribution of the hidden sequence</span></a></li><li><a class="tocitem" href="#Sampling-a-posteriori-hidden-sequences-and-plotting-them"><span>Sampling a posteriori hidden sequences and plotting them</span></a></li></ul></li><li><a class="tocitem" href="../gauss_markov_regression/">Sampling and inference in Gauss-Markov models</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Sampling and inference in Hidden Markov models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Sampling and inference in Hidden Markov models</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/filtron/MarkovKernels.jl/blob/main/docs/src/tutorials/hidden_markov_model.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Sampling-and-inference-in-Hidden-Markov-models"><a class="docs-heading-anchor" href="#Sampling-and-inference-in-Hidden-Markov-models">Sampling and inference in Hidden Markov models</a><a id="Sampling-and-inference-in-Hidden-Markov-models-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-and-inference-in-Hidden-Markov-models" title="Permalink"></a></h1><p>A finite state hidden Markov model is specified by an initial distribution, a sequence of transition probabilities, and a sequence of observation probabilities:</p><p class="math-container">\[\begin{aligned}
+&amp;P(x_0 = i) \\
+&amp;P(x_t = i \mid x_{t-1} = j), \quad t = 1, \ldots, T   \\
+&amp;P(y_t = i \mid x_t = j), \quad t = 0, 1, \ldots, T
+\end{aligned}\]</p><p>This tutorial describes how to use <code>MarkovKernels.jl</code> to:</p><ul><li>Sample from a (finite state) hidden Markov model</li><li>Compute the a posteriori distribution of the hidden sequence using the backward recursion</li></ul><pre><code class="language-julia hljs">using MarkovKernels
+using Random, LinearAlgebra
+import Plots
+rng = Random.Xoshiro(19910215)</code></pre><h2 id="Implementing-samplers-for-finite-state-(hidden)-Markov-models"><a class="docs-heading-anchor" href="#Implementing-samplers-for-finite-state-(hidden)-Markov-models">Implementing samplers for finite state (hidden) Markov models</a><a id="Implementing-samplers-for-finite-state-(hidden)-Markov-models-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-samplers-for-finite-state-(hidden)-Markov-models" title="Permalink"></a></h2><pre><code class="language-julia hljs">function sample(rng::AbstractRNG, init, fw_kernels)
+    x = rand(rng, init)
+    n = length(fw_kernels) + 1
+    xs = Vector{typeof(x)}(undef, n)
+    xs[begin] = x
+
+    for (m, fw_kernel) in pairs(fw_kernels)
+        x = rand(rng, condition(fw_kernel, x))
+        xs[begin+m] = x
+    end
+    return xs
+end
+
+function sample(rng::AbstractRNG, init, fw_kernels, obs_kernels)
+    # sample initial values
+    x = rand(rng, init)
+    y = rand(rng, first(obs_kernels), x)
+
+    # allocate output
+    n = length(obs_kernels)
+    xs = Vector{typeof(x)}(undef, n)
+    ys = Vector{typeof(y)}(undef, n)
+
+    xs[begin] = x
+    ys[begin] = y
+
+    for (m, fw_kernel) in pairs(fw_kernels)
+        obs_kernel = obs_kernels[begin+m]
+        x = rand(rng, condition(fw_kernel, x))
+        y = rand(rng, condition(obs_kernel, x))
+        xs[begin+m] = x
+        ys[begin+m] = y
+    end
+    return xs, ys
+end</code></pre><h2 id="Defining-a-finite-state-hidden-Markov-model-and-sampling-it"><a class="docs-heading-anchor" href="#Defining-a-finite-state-hidden-Markov-model-and-sampling-it">Defining a finite state hidden Markov model and sampling it</a><a id="Defining-a-finite-state-hidden-Markov-model-and-sampling-it-1"></a><a class="docs-heading-anchor-permalink" href="#Defining-a-finite-state-hidden-Markov-model-and-sampling-it" title="Permalink"></a></h2><pre><code class="language-julia hljs"># number of possible hidden states and number of possible observation states
+m, n = 10, 10
+
+# probability vector of initial distribution
+init = Categorical(ones(m))
+
+# transition probabilities
+Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
+Kxx = StochasticMatrix(Pxx)
+
+# observation probabilites
+Pyx = (ones(m, m) - I)
+Kyx = StochasticMatrix(Pyx)
+
+T = 2^8 + 1
+fw_kernels = fill(Kxx, T - 1)
+obs_kernels = fill(Kyx, T)
+
+# sample hidden and observed states
+xs, ys = sample(rng, init, fw_kernels, obs_kernels)</code></pre><h2 id="Plotting-the-realization"><a class="docs-heading-anchor" href="#Plotting-the-realization">Plotting the realization</a><a id="Plotting-the-realization-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-the-realization" title="Permalink"></a></h2><pre><code class="language-julia hljs">hmm_plt = Plots.scatter(
+    layout = (1, 2)
+)
+Plots.scatter!(
+    hmm_plt,
+    eachindex(xs),
+    xs,
+    color = &quot;black&quot;,
+    subplot = 1,
+    title = &quot;hidden states&quot;,
+    label = &quot;&quot;,
+)
+Plots.scatter!(
+    hmm_plt,
+    eachindex(ys),
+    ys,
+    color = &quot;red&quot;,
+    subplot = 2,
+    title = &quot;observation states&quot;,
+    label = &quot;&quot;,
+)</code></pre><img src="36372611.svg" alt="Example block output"/><h2 id="Implementing-the-backward-algorithms"><a class="docs-heading-anchor" href="#Implementing-the-backward-algorithms">Implementing the backward algorithms</a><a id="Implementing-the-backward-algorithms-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-the-backward-algorithms" title="Permalink"></a></h2><p>The backward algorith operates on the sequence of likelihoods of future observations:</p><p class="math-container">\[h_{t:T \mid s}(x) = P(y_{t:T} \mid x_s = x).\]</p><p>It computes an a posteriori initial distribution, a sequence of a posteriori transition probabilities, and a log-likelihood of the observations, via a backward recursion. The recursion is given by:</p><p class="math-container">\[\begin{aligned}
+h_{t:T\mid t-1}(z) &amp;= \sum_x h_{t:T \mid t}(x) P(x_t = x \mid x_{t-1} = z)  \\
+P(x_t = x \mid x_{t-1} = z, y_{0:T}) &amp;= h_{t:T \mid t}(x) P(x_t = x \mid x_{t-1} = z) / h_{t:T\mid t-1}(z) \\
+h_{t-1:T \mid t-1}(x) &amp;= h_{t:T\mid t-1}(x) h_{t-1 \mid t-1}(x)
+\end{aligned}\]</p><p>The first two equations are implemented by <code>htransform</code> and the last equation is implemented by <code>compose</code>. The algorithm terminates by computing the a posteriori initial distribution and the log-likelihood of the observations:</p><p class="math-container">\[\begin{aligned}
+\log P(y_{0:T}) &amp;=  \log \Big(\sum_x h_{0:T \mid 0}(x) P(x_0 = x) \Big) \\
+P(x_0 = x \mid y_{0:T}) &amp;= h_{0:T \mid 0}(x) P(x_0 = x) / P(y_{0:T})
+\end{aligned}\]</p><p>These equations are implemented by <code>posterior_and_loglike</code>. Using <code>MarkovKernels.jl</code>, the code might look something like the following:</p><pre><code class="language-julia hljs">function backward_recursion(init, forward_kernels, likelihoods)
+    h = last(likelihoods)
+    KT = Base.promote_op(first ∘ htransform, eltype(forward_kernels), typeof(h))
+    post_forward_kernels = Vector{KT}(undef, length(forward_kernels))
+
+    for m in eachindex(forward_kernels)
+        fw_kernel = forward_kernels[end-m+1]
+        post_fw_kernel, h = htransform(fw_kernel, h)
+        post_forward_kernels[end-m+1] = post_fw_kernel
+
+        like = likelihoods[end-m]
+        h = compose(h, like)
+    end
+    post_init, loglike = posterior_and_loglike(init, h)
+    return post_init, post_forward_kernels, loglike
+end</code></pre><h2 id="Computing-the-a-posteriori-distribution-of-the-hidden-sequence"><a class="docs-heading-anchor" href="#Computing-the-a-posteriori-distribution-of-the-hidden-sequence">Computing the a posteriori distribution of the hidden sequence</a><a id="Computing-the-a-posteriori-distribution-of-the-hidden-sequence-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-the-a-posteriori-distribution-of-the-hidden-sequence" title="Permalink"></a></h2><pre><code class="language-julia hljs">likes = [Likelihood(Kobs, y) for (Kobs, y) in zip(obs_kernels, ys)] # compute the likelihoods associated with the observations
+post_init, post_fw_kernels, loglike = backward_recursion(init, fw_kernels, likes)</code></pre><h2 id="Sampling-a-posteriori-hidden-sequences-and-plotting-them"><a class="docs-heading-anchor" href="#Sampling-a-posteriori-hidden-sequences-and-plotting-them">Sampling a posteriori hidden sequences and plotting them</a><a id="Sampling-a-posteriori-hidden-sequences-and-plotting-them-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-a-posteriori-hidden-sequences-and-plotting-them" title="Permalink"></a></h2><pre><code class="language-julia hljs">nsample = 10
+for _ in 1:nsample
+    xs_post = sample(rng, post_init, post_fw_kernels)
+    Plots.scatter!(
+        hmm_plt,
+        eachindex(xs_post),
+        xs_post,
+        label = &quot;&quot;,
+        color = &quot;blue&quot;,
+        alpha = 0.1,
+        )
+end
+hmm_plt</code></pre><img src="baa9a5d2.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../binary_operators/">« Binary operators</a><a class="docs-footer-nextpage" href="../gauss_markov_regression/">Sampling and inference in Gauss-Markov models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Tuesday 21 January 2025 16:51">Tuesday 21 January 2025</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
