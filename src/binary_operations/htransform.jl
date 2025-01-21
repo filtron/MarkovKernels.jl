@@ -35,7 +35,10 @@ function htransform(K::StochasticMatrix, L::Likelihood{<:StochasticMatrix})
     return htransform(K, Ltmp)
 end
 
-function htransform(K::AffineHomoskedasticNormalKernel, L::LogQuadraticLikelihood)
+function htransform(
+    K::AffineHomoskedasticNormalKernel{TM,TC},
+    L::LogQuadraticLikelihood,
+) where {TM,TC<:Union{SelfAdjoint,Number}}
     μ, Q = mean(K), covp(K)
     Φ, u = slope(μ), intercept(μ)
     logc, y, C = L
@@ -50,6 +53,32 @@ function htransform(K::AffineHomoskedasticNormalKernel, L::LogQuadraticLikelihoo
 
     Φpost = (I - Kbar * C) * Φ
     upost = u + Kbar * (y - C * u)
+    μpost = AffineMap(Φpost, upost)
+
+    Kout = NormalKernel(μpost, Qpost)
+    Lout = LogQuadraticLikelihood(logcout, yout, Cout)
+
+    return Kout, Lout
+end
+
+function htransform(
+    K::AffineHomoskedasticNormalKernel{TM,<:Cholesky},
+    L::LogQuadraticLikelihood,
+) where {TM}
+    μ, Q = mean(K), covp(K)
+    Φ, u = slope(μ), intercept(μ)
+    logc, y, C = L
+    T = eltype(y)
+
+    Rhat, Kbar, Qpost = _schur_reduce(Q, C, I)
+
+    L = lsqrt(Rhat)
+    yout = L \ (y - C * u)
+    Cout = L \ C * Φ
+    logcout = logc - _nscale(T) * 2 * logdet(L)
+
+    Φpost = Φ - Kbar * Cout
+    upost = u + Kbar * yout
     μpost = AffineMap(Φpost, upost)
 
     Kout = NormalKernel(μpost, Qpost)
