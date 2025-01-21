@@ -1,15 +1,18 @@
 # Sampling and inference in Gauss-Markov models
 
-Gauss-Markov realizable signal:
+Gauss-Markov realizable signal, $s_t$, 
+is a signal that can be constructed as transform of a Gauss-Markov process:
 
 ```math
 \begin{aligned}
 x_0 &\sim \mathcal{N}(\mu_0, \Sigma_0) \\
-x_t \mid x_u &\sim \mathcal{N}( \Phi_{t, u} x_u, Q_{t, u}) \\
+x_t \mid x_u &\sim \mathcal{N}( \Phi_{t, u} x_u, Q_{t, u}), \quad u < t \\
 s_t \mid x_t &\sim \delta(\cdotp - C x_t)
 \end{aligned}
 ```
-Transition parameters:
+If $x_t$ is equal in distribution, to the solution of a linear time-invariant 
+stochastic differential equation, then there matrices $A$ and $B$
+such that the transition matrix, $\Phi$, and transition covariance $Q$ are given by
 ```math
 \begin{aligned}
 \Phi_{t, u} &= e^{A (t - u)}\\
@@ -17,11 +20,19 @@ Q_{t, u} &= \sqrt{t-u} \int_0^1 e^{A(t-u)z} B B^* e^{A^*(t-u)z} \mathrm{d} z
 \end{aligned}
 ```
 
-Observations:
+The signal is frequently only available through noisy observations:
 
 ```math
-y_{t_k} \mid s_{t_k} \sim \mathcal{N}(s_{t_k}, R)
+y_{t_k} \mid s_{t_k} \sim \mathcal{N}(s_{t_k}, R), \quad k = 1, \ldots, K
 ```
+
+This tutorial describes how to use ```MarkovKernels.jl``` to:
+
+* Sample Gauss-Markov realizable signals
+* Sample observations of Gauss-Markov realizable signals
+* Compute the path-posterior of the latent state $x$ on a grid that includes all the observations
+* Compute time-marginals of the latent state $x$ and the signal $s$
+
 
 
 
@@ -84,7 +95,8 @@ nothing # hide
 
 ## Defining a Gauss-Markov realizable signal and computing transition kernels 
 
-Implementation of transition kernel computation for continuous-time Gauss-Markov processes:
+Implementation of transition kernel computation in Cholesky parametrization 
+for continuous-time Gauss-Markov processes may be done by using ```FiniteHorizonGramians.jl``` like so:
 
 ```@example 2
 function transition_kernel(A, B, dt)
@@ -98,7 +110,7 @@ end
 nothing # hide
 ```
 
-Definiiton of continuous-time Gauss-Markov realizable process: 
+Definition of some  parametrized continuous-time Gauss-Markov realizable process: 
 
 ```@example 2
 function gauss_markov_realizable_model(λ, σ, p)
@@ -125,7 +137,7 @@ ts = LinRange(zero(T), T, n)
 # model parameters
 λ = 2.0
 σ = 1.0
-p = 3
+p = 4
 
 # model matrices 
 A, B, C = gauss_markov_realizable_model(λ, σ, p)
@@ -139,14 +151,14 @@ output_kernels = fill(output_kernel, n)
 nothing # hide
 ```
 
-Simulating the latent state and the signal: 
+Sampling the latent state and the signal: 
 ```@example 2
 xs, ss = sample(rng, init, forward_kernels, output_kernels)
 
 nothing # hide
 ```
 
-Defining observation kernel and simulating observations: 
+Defining observation kernel and sampling observations: 
 ```@example 2
 R = 0.1 
 observation_kernel = NormalKernel(LinearMap(one(R)), R)
@@ -186,13 +198,13 @@ gmr_plt
 
 The forward algorithm operates on a sequence of a posteriori terminal distributions (so-called filtering distributions):
 ```math
-p(x_t \mid y_{0:t})
+p(x_{t_m} \mid y_{t_0:t_m})
 ```
 The algorithm first initializes by:
 ```math
 \begin{aligned}
-p(y_0) &= \int p(y_0 \mid x_0) p(x_0) \mathrm{d} x_0 \\
-p(x_0 \mid y_0) &= p(y_0 \mid x_0) p(x_0)
+p(y_{t_0}) &= \int p(y_{t_0} \mid x_{t_0}) p(x_{t_0}) \mathrm{d} x_{t_0} \\
+p(x_0 \mid y_0) &= p(y_{t_0} \mid x_{t_0}) p(x_{t_0}) / p(y_{t_0})
 \end{aligned}
 ```
 These two equations are implemented by ```posterior_and_loglike```.
@@ -200,13 +212,15 @@ The algorithm then computes a sequence of filtering distributions, reverse-time 
 the following forward recursion:
 ```math
 \begin{aligned}
-p(x_t \mid y_{0:t-1}) &= \int p(x_t \mid x_{t-1}) p(x_{t-1} \mid y_{0:t-1}) \mathrm{d} x_{t-1} \\
-p(x_{t-1} \mid x_t, y_{0:T}) &= p(x_t \mid x_{t-1}) p(x_{t-1} \mid y_{0:t-1}) / p(x_t \mid y_{0:t-1}) \\
-p(y_t \mid y_{0:t-1}) &= \int p(y_t \mid x_t) p(x_t \mid y_{0:t-1}) \mathrm{d} x_t \\
-\log p(y_{0:t}) &= \log p(y_{0:t-1}) + \log p(y_t \mid y_{0:t-1})
+p(x_{t_m} \mid y_{0:t_{m-1}}) &= \int p(x_{t_m} \mid x_{t_{m-1}}) p(x_{t_{m-1}} \mid y_{t_0:t_{m-1}}) \mathrm{d} x_{t_{m-1}} \\
+p(x_{t_{m-1}} \mid x_{t_{m-1}}, y_{t_0:t_n}) &= p(x_{t_m} \mid x_{t_{m-1}}) p(x_{t_{m-1}} \mid y_{t_0:t_{m-1}}) / p(x_{t_m} \mid y_{t_0:t_{m-1}}) \\
+p(y_{t_m} \mid y_{t_0:t_{m-1}}) &= \int p(y_{t_m} \mid x_{t_m}) p(x_{t_m} \mid y_{t_0:t_{m-1}}) \mathrm{d} x_{t_m} \\
+p(x_{t_m} \mid y_{t_0:t_m}) &= p(y_{t_m} \mid x_{t_m}) p(x_{t_m} \mid y_{t_0:t_{m-1}}) / p(y_{t_m} \mid y_{t_0:t_{m-1}}) \\
+\log p(y_{t_0:t_m}) &= \log p(y_{t_0:t_{m-1}}) + \log p(y_{t_m} \mid y_{t_0:t_{m-1}})
 \end{aligned}
 ```
-The first two equations are implemented by ```invert``` and the last two equations are, again, implemented by ```posterior_and_loglike```
+The first two equations are implemented by ```invert``` and the next two equations are, again, implemented by ```posterior_and_loglike```. 
+The last equation is simply a cumulative sum of quantities already computed. 
 Using ```MarkovKernels.jl```, the code might look something like the following:
 
 
@@ -233,14 +247,16 @@ nothing # hide
 
 ## Computing a reverse-time Markov a posteriori path-distribution
 
-Compute likelihoods: 
+In order to compute the posterior, likelihood functions for the latent state based on 
+the observations. 
+Some observations are of type ```Missing``` but ```Likelihood{<:AbstractMarkovKernel,<:Missing}``` is interpreted as a likelihood of type ```FlatLikelihood```, 
+which turns ```posterior_and_loglike``` into a kind of identity mapping.  
 ```@example 2
 likelihoods = [Likelihood(compose(observation_kernel, output_kernel), y) for y in ys]
 
 nothing # hide
 ```
-
-Compute reverse-time posterior: 
+The reverse-time posterior is now computed by:  
 ```@example 2
 backward_kernels, term, loglike = forward_recursion(init, forward_kernels, likelihoods)
 
@@ -252,7 +268,8 @@ nothing # hide
 ## Computing a posteriori time-marginals
 The a posteriori time marginals may be computed according to the following backward recursion:
 ```math
-p(x_{t-1} \mid y_{0:T}) = \int p(x_{t-1} \mid x_t, y_{0:T}) p(x_t \mid y_{0:T}) \mathrm{d} x_t
+p(x_{t_{m-1}} \mid y_{t_0:t_n}) = \int p(x_{t_{m-1}} \mid x_{t_m}, y_{t_0:t_n}) 
+p(x_{t_m} \mid y_{t_0:t_n}) \mathrm{d} x_{t_m}
 ```
 This equation is implemented by ```marginalize```.
 Using ```MarkovKernels.jl```, the code might look something like the following:
@@ -268,6 +285,8 @@ function reverse_time_marginals(term, bw_kernels)
     end
     return dists
 end
+
+nothing # hide
 ```
 
 The time-marginals are then computed like so: 
@@ -278,7 +297,7 @@ post_output_dists = [marginalize(dist, output_kernel) for dist in post_state_dis
 nothing # hide
 ```
 
-## Plotting the a posteriori time marginals and some samples
+## Plotting the a posteriori time marginals and samples
 
 ```@example 2
 Plots.plot!(
@@ -291,7 +310,11 @@ Plots.plot!(
 
 nsample = 5
 for _ in 1:nsample 
+    # sample assumes an initial distribution and a series of forward kenrels 
+    # so the backward_kernels need to be wrapped in reverse
+    # giving the signal in reverse order
     _, ss_post = sample(rng, term, reverse(backward_kernels), output_kernels)
+    # reverse the signal path so that it is in the correct order
     ss_post = reverse(ss_post)
     Plots.plot!(
         gmr_plt,
