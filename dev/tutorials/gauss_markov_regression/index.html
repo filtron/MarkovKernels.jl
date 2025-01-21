@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Sampling and inference in Gauss-Markov models · MarkovKernels.jl</title><meta name="title" content="Sampling and inference in Gauss-Markov models · MarkovKernels.jl"/><meta property="og:title" content="Sampling and inference in Gauss-Markov models · MarkovKernels.jl"/><meta property="twitter:title" content="Sampling and inference in Gauss-Markov models · MarkovKernels.jl"/><meta name="description" content="Documentation for MarkovKernels.jl."/><meta property="og:description" content="Documentation for MarkovKernels.jl."/><meta property="twitter:description" content="Documentation for MarkovKernels.jl."/><meta property="og:url" content="https://filtron.github.io/MarkovKernels.jl/tutorials/gauss_markov_regression/"/><meta property="twitter:url" content="https://filtron.github.io/MarkovKernels.jl/tutorials/gauss_markov_regression/"/><link rel="canonical" href="https://filtron.github.io/MarkovKernels.jl/tutorials/gauss_markov_regression/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">MarkovKernels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../affinemaps/affinemaps/">Affine maps</a></li><li><span class="tocitem">PSDParametrizations</span><ul><li><a class="tocitem" href="../../PSDParametrizations/general/">General</a></li><li><a class="tocitem" href="../../PSDParametrizations/internal/">Internal</a></li></ul></li><li><span class="tocitem">Distributions</span><ul><li><a class="tocitem" href="../../distributions/distribution_general/">General</a></li><li><a class="tocitem" href="../../distributions/categorical/">Categorical</a></li><li><a class="tocitem" href="../../distributions/normal/">Normal</a></li><li><a class="tocitem" href="../../distributions/dirac/">Dirac</a></li></ul></li><li><span class="tocitem">Kernels</span><ul><li><a class="tocitem" href="../../kernels/kernel_general/">General</a></li><li><a class="tocitem" href="../../kernels/normalkernel/">NormalKernel</a></li><li><a class="tocitem" href="../../kernels/dirackernel/">DiracKernel</a></li><li><a class="tocitem" href="../../kernels/stochasticmatrix/">StochasticMatrix</a></li></ul></li><li><span class="tocitem">Likelihoods</span><ul><li><a class="tocitem" href="../../likelihoods/likelihood_general/">General</a></li><li><a class="tocitem" href="../../likelihoods/categorical_likelihood/">Categorical likelihoods</a></li><li><a class="tocitem" href="../../likelihoods/likelihood/">Likelihood</a></li><li><a class="tocitem" href="../../likelihoods/logquadratic/">Log-quadratic likelihoods</a></li><li><a class="tocitem" href="../../likelihoods/flatlikelihood/">Flat likelihoods</a></li></ul></li><li><a class="tocitem" href="../../binary_operators/">Binary operators</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../hidden_markov_model/">Sampling and inference in Hidden Markov models</a></li><li class="is-active"><a class="tocitem" href>Sampling and inference in Gauss-Markov models</a><ul class="internal"><li><a class="tocitem" href="#Implementing-samplers-for-Gauss-Markov-realizable-signals"><span>Implementing samplers for Gauss-Markov realizable signals</span></a></li><li><a class="tocitem" href="#Defining-a-Gauss-Markov-realizable-signal-and-computing-transition-kernels"><span>Defining a Gauss-Markov realizable signal and computing transition kernels</span></a></li><li><a class="tocitem" href="#Plotting-the-realization"><span>Plotting the realization</span></a></li><li><a class="tocitem" href="#Implementing-the-forward-algorithm"><span>Implementing the forward algorithm</span></a></li><li><a class="tocitem" href="#Computing-a-reverse-time-Markov-a-posteriori-path-distribution"><span>Computing a reverse-time Markov a posteriori path-distribution</span></a></li><li><a class="tocitem" href="#Computing-a-posteriori-time-marginals"><span>Computing a posteriori time-marginals</span></a></li><li><a class="tocitem" href="#Plotting-the-a-posteriori-time-marginals-and-samples"><span>Plotting the a posteriori time marginals and samples</span></a></li></ul></li><li><a class="tocitem" href="../../tutorial_kalman_filter/">Kalman filtering and smoothing</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Sampling and inference in Gauss-Markov models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Sampling and inference in Gauss-Markov models</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/filtron/MarkovKernels.jl/blob/main/docs/src/tutorials/gauss_markov_regression.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Sampling-and-inference-in-Gauss-Markov-models"><a class="docs-heading-anchor" href="#Sampling-and-inference-in-Gauss-Markov-models">Sampling and inference in Gauss-Markov models</a><a id="Sampling-and-inference-in-Gauss-Markov-models-1"></a><a class="docs-heading-anchor-permalink" href="#Sampling-and-inference-in-Gauss-Markov-models" title="Permalink"></a></h1><p>Gauss-Markov realizable signal, <span>$s_t$</span>,  is a signal that can be constructed as transform of a Gauss-Markov process:</p><p class="math-container">\[\begin{aligned}
+x_0 &amp;\sim \mathcal{N}(\mu_0, \Sigma_0) \\
+x_t \mid x_u &amp;\sim \mathcal{N}( \Phi_{t, u} x_u, Q_{t, u}), \quad u &lt; t \\
+s_t \mid x_t &amp;\sim \delta(\cdotp - C x_t)
+\end{aligned}\]</p><p>If <span>$x_t$</span> is equal in distribution, to the solution of a linear time-invariant  stochastic differential equation, then there matrices <span>$A$</span> and <span>$B$</span> such that the transition matrix, <span>$\Phi$</span>, and transition covariance <span>$Q$</span> are given by</p><p class="math-container">\[\begin{aligned}
+\Phi_{t, u} &amp;= e^{A (t - u)}\\
+Q_{t, u} &amp;= \sqrt{t-u} \int_0^1 e^{A(t-u)z} B B^* e^{A^*(t-u)z} \mathrm{d} z
+\end{aligned}\]</p><p>The signal is frequently only available through noisy observations:</p><p class="math-container">\[y_{t_k} \mid s_{t_k} \sim \mathcal{N}(s_{t_k}, R), \quad k = 1, \ldots, K\]</p><p>This tutorial describes how to use <code>MarkovKernels.jl</code> to:</p><ul><li>Sample Gauss-Markov realizable signals</li><li>Sample observations of Gauss-Markov realizable signals</li><li>Compute the path-posterior of the latent state <span>$x$</span> on a grid that includes all the observations</li><li>Compute time-marginals of the latent state <span>$x$</span> and the signal <span>$s$</span></li></ul><pre><code class="language-julia hljs">using MarkovKernels
+using FiniteHorizonGramians
+using Random, LinearAlgebra
+import Plots
+rng = Random.Xoshiro(19910215)</code></pre><h2 id="Implementing-samplers-for-Gauss-Markov-realizable-signals"><a class="docs-heading-anchor" href="#Implementing-samplers-for-Gauss-Markov-realizable-signals">Implementing samplers for Gauss-Markov realizable signals</a><a id="Implementing-samplers-for-Gauss-Markov-realizable-signals-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-samplers-for-Gauss-Markov-realizable-signals" title="Permalink"></a></h2><p>The code for sampling from a Gauss-Markov realizable signal is exactly the same as in the hidden Markov model tutorial.  For completeness, the code is given below. </p><pre><code class="language-julia hljs">function sample(rng::AbstractRNG, init, fw_kernels)
+    x = rand(rng, init)
+    n = length(fw_kernels) + 1
+    xs = Vector{typeof(x)}(undef, n)
+    xs[begin] = x
+
+    for (m, fw_kernel) in pairs(fw_kernels)
+        x = rand(rng, condition(fw_kernel, x))
+        xs[begin+m] = x
+    end
+    return xs
+end
+
+function sample(rng::AbstractRNG, init, fw_kernels, obs_kernels)
+    # sample initial values
+    x = rand(rng, init)
+    y = rand(rng, first(obs_kernels), x)
+
+    # allocate output
+    n = length(obs_kernels)
+    xs = Vector{typeof(x)}(undef, n)
+    ys = Vector{typeof(y)}(undef, n)
+
+    xs[begin] = x
+    ys[begin] = y
+
+    for (m, fw_kernel) in pairs(fw_kernels)
+        obs_kernel = obs_kernels[begin+m]
+        x = rand(rng, condition(fw_kernel, x))
+        y = rand(rng, condition(obs_kernel, x))
+        xs[begin+m] = x
+        ys[begin+m] = y
+    end
+    return xs, ys
+end</code></pre><h2 id="Defining-a-Gauss-Markov-realizable-signal-and-computing-transition-kernels"><a class="docs-heading-anchor" href="#Defining-a-Gauss-Markov-realizable-signal-and-computing-transition-kernels">Defining a Gauss-Markov realizable signal and computing transition kernels</a><a id="Defining-a-Gauss-Markov-realizable-signal-and-computing-transition-kernels-1"></a><a class="docs-heading-anchor-permalink" href="#Defining-a-Gauss-Markov-realizable-signal-and-computing-transition-kernels" title="Permalink"></a></h2><p>Implementation of transition kernel computation in Cholesky parametrization  for continuous-time Gauss-Markov processes may be done by using <code>FiniteHorizonGramians.jl</code> like so:</p><pre><code class="language-julia hljs">function transition_kernel(A, B, dt)
+    alg = FiniteHorizonGramians.ExpAndGram{Float64,13}()
+    Φ, U = FiniteHorizonGramians.exp_and_gram_chol(A, B, dt, alg)
+    Φ = LinearMap(Φ)
+    Q = Cholesky(UpperTriangular(U))
+    return NormalKernel(Φ, Q)
+end</code></pre><p>Definition of some  parametrized continuous-time Gauss-Markov realizable process: </p><pre><code class="language-julia hljs">function gauss_markov_realizable_model(λ, σ, p)
+A = λ * (I - 2 * tril(ones(p, p)))
+B = sqrt(2λ) * ones(p, 1)
+Cadj =
+    σ * factorial(p - 1) / sqrt(factorial(2(p - 1))) .* binomial.(p - 1, 0:p-1) .*
+    (-1) .^ (0:p-1)
+C = adjoint(Cadj)
+return A, B, C
+end</code></pre><p>Computing initial density, transition kernels, output kernel, and observation kernels: </p><pre><code class="language-julia hljs"># time grid
+n = 2^9 + 1
+T = 20.0
+ts = LinRange(zero(T), T, n)
+
+# model parameters
+λ = 2.0
+σ = 1.0
+p = 4
+
+# model matrices
+A, B, C = gauss_markov_realizable_model(λ, σ, p)
+
+
+init = Normal(zeros(p), cholesky(diagm(0 =&gt; ones(p))))
+forward_kernels = [transition_kernel(A, B, dt) for dt in diff(ts)]
+output_kernel = DiracKernel(LinearMap(C))
+output_kernels = fill(output_kernel, n)</code></pre><p>Sampling the latent state and the signal: </p><pre><code class="language-julia hljs">xs, ss = sample(rng, init, forward_kernels, output_kernels)</code></pre><p>Defining observation kernel and sampling observations: </p><pre><code class="language-julia hljs">R = 0.1
+observation_kernel = NormalKernel(LinearMap(one(R)), R)
+ys = [rand(rng, condition(observation_kernel, s)) for s in ss]
+
+obs_idx = [mod(n, 2^3) == 1 for n in eachindex(ts)]
+obs_ts = ts[obs_idx]
+ys = Union{eltype(ys), Missing}[obs_idx[n] ? ys[n] : missing for n in eachindex(obs_idx)]</code></pre><h2 id="Plotting-the-realization"><a class="docs-heading-anchor" href="#Plotting-the-realization">Plotting the realization</a><a id="Plotting-the-realization-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-the-realization" title="Permalink"></a></h2><pre><code class="language-julia hljs">gmr_plt = Plots.plot(
+    ts,
+    ss,
+    color = &quot;black&quot;,
+    label = &quot;&quot;,
+    xlabel = &quot;t&quot;
+)
+Plots.scatter!(
+    gmr_plt,
+    obs_ts,
+    filter(!ismissing, ys),
+    color = &quot;red&quot;,
+    label = &quot;&quot;
+)
+gmr_plt</code></pre><img src="aef61ee4.svg" alt="Example block output"/><h2 id="Implementing-the-forward-algorithm"><a class="docs-heading-anchor" href="#Implementing-the-forward-algorithm">Implementing the forward algorithm</a><a id="Implementing-the-forward-algorithm-1"></a><a class="docs-heading-anchor-permalink" href="#Implementing-the-forward-algorithm" title="Permalink"></a></h2><p>The forward algorithm operates on a sequence of a posteriori terminal distributions (so-called filtering distributions):</p><p class="math-container">\[p(x_{t_m} \mid y_{t_0:t_m})\]</p><p>The algorithm first initializes by:</p><p class="math-container">\[\begin{aligned}
+p(y_{t_0}) &amp;= \int p(y_{t_0} \mid x_{t_0}) p(x_{t_0}) \mathrm{d} x_{t_0} \\
+p(x_0 \mid y_0) &amp;= p(y_{t_0} \mid x_{t_0}) p(x_{t_0}) / p(y_{t_0})
+\end{aligned}\]</p><p>These two equations are implemented by <code>posterior_and_loglike</code>. The algorithm then computes a sequence of filtering distributions, reverse-time transition kernels, and accumulates the log-likelihood of the observations according to the following forward recursion:</p><p class="math-container">\[\begin{aligned}
+p(x_{t_m} \mid y_{0:t_{m-1}}) &amp;= \int p(x_{t_m} \mid x_{t_{m-1}}) p(x_{t_{m-1}} \mid y_{t_0:t_{m-1}}) \mathrm{d} x_{t_{m-1}} \\
+p(x_{t_{m-1}} \mid x_{t_{m-1}}, y_{t_0:t_n}) &amp;= p(x_{t_m} \mid x_{t_{m-1}}) p(x_{t_{m-1}} \mid y_{t_0:t_{m-1}}) / p(x_{t_m} \mid y_{t_0:t_{m-1}}) \\
+p(y_{t_m} \mid y_{t_0:t_{m-1}}) &amp;= \int p(y_{t_m} \mid x_{t_m}) p(x_{t_m} \mid y_{t_0:t_{m-1}}) \mathrm{d} x_{t_m} \\
+p(x_{t_m} \mid y_{t_0:t_m}) &amp;= p(y_{t_m} \mid x_{t_m}) p(x_{t_m} \mid y_{t_0:t_{m-1}}) / p(y_{t_m} \mid y_{t_0:t_{m-1}}) \\
+\log p(y_{t_0:t_m}) &amp;= \log p(y_{t_0:t_{m-1}}) + \log p(y_{t_m} \mid y_{t_0:t_{m-1}})
+\end{aligned}\]</p><p>The first two equations are implemented by <code>invert</code> and the next two equations are, again, implemented by <code>posterior_and_loglike</code>.  The last equation is simply a cumulative sum of quantities already computed.  Using <code>MarkovKernels.jl</code>, the code might look something like the following:</p><pre><code class="language-julia hljs">function forward_recursion(init, forward_kernels, likelihoods)
+    like = first(likelihoods)
+    filt, loglike = posterior_and_loglike(init, like)
+    KT = Base.promote_op(last ∘ invert, typeof(filt), eltype(forward_kernels))
+    backward_kernels = Vector{KT}(undef, length(forward_kernels))
+    for m in eachindex(forward_kernels)
+        fw_kernel = forward_kernels[m]
+        pred, bw_kernel = invert(filt, fw_kernel)
+
+        like = likelihoods[m+1]
+        filt, ll_incr = posterior_and_loglike(pred, like)
+        loglike = loglike + ll_incr
+        backward_kernels[m] = bw_kernel
+    end
+    return backward_kernels, filt, loglike
+end</code></pre><h2 id="Computing-a-reverse-time-Markov-a-posteriori-path-distribution"><a class="docs-heading-anchor" href="#Computing-a-reverse-time-Markov-a-posteriori-path-distribution">Computing a reverse-time Markov a posteriori path-distribution</a><a id="Computing-a-reverse-time-Markov-a-posteriori-path-distribution-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-a-reverse-time-Markov-a-posteriori-path-distribution" title="Permalink"></a></h2><p>In order to compute the posterior, likelihood functions for the latent state based on  the observations.  Some observations are of type <code>Missing</code> but <code>Likelihood{&lt;:AbstractMarkovKernel,&lt;:Missing}</code> is interpreted as a likelihood of type <code>FlatLikelihood</code>,  which turns <code>posterior_and_loglike</code> into a kind of identity mapping.  </p><pre><code class="language-julia hljs">likelihoods = [Likelihood(compose(observation_kernel, output_kernel), y) for y in ys]</code></pre><p>The reverse-time posterior is now computed by:  </p><pre><code class="language-julia hljs">backward_kernels, term, loglike = forward_recursion(init, forward_kernels, likelihoods)</code></pre><h2 id="Computing-a-posteriori-time-marginals"><a class="docs-heading-anchor" href="#Computing-a-posteriori-time-marginals">Computing a posteriori time-marginals</a><a id="Computing-a-posteriori-time-marginals-1"></a><a class="docs-heading-anchor-permalink" href="#Computing-a-posteriori-time-marginals" title="Permalink"></a></h2><p>The a posteriori time marginals may be computed according to the following backward recursion:</p><p class="math-container">\[p(x_{t_{m-1}} \mid y_{t_0:t_n}) = \int p(x_{t_{m-1}} \mid x_{t_m}, y_{t_0:t_n}) 
+p(x_{t_m} \mid y_{t_0:t_n}) \mathrm{d} x_{t_m}\]</p><p>This equation is implemented by <code>marginalize</code>. Using <code>MarkovKernels.jl</code>, the code might look something like the following:</p><pre><code class="language-julia hljs">function reverse_time_marginals(term, bw_kernels)
+    dist = term
+    dists = Vector{typeof(init)}(undef, length(bw_kernels)+1)
+    dists[end] = dist
+    for (m, kernel) in pairs(reverse(bw_kernels))
+        dist = marginalize(dist, kernel)
+        dists[end-m] = dist
+    end
+    return dists
+end</code></pre><p>The time-marginals are then computed like so: </p><pre><code class="language-julia hljs">post_state_dists = reverse_time_marginals(term, backward_kernels)
+post_output_dists = [marginalize(dist, output_kernel) for dist in post_state_dists]</code></pre><h2 id="Plotting-the-a-posteriori-time-marginals-and-samples"><a class="docs-heading-anchor" href="#Plotting-the-a-posteriori-time-marginals-and-samples">Plotting the a posteriori time marginals and samples</a><a id="Plotting-the-a-posteriori-time-marginals-and-samples-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-the-a-posteriori-time-marginals-and-samples" title="Permalink"></a></h2><pre><code class="language-julia hljs">Plots.plot!(
+    gmr_plt,
+    ts,
+    post_output_dists,
+    color = &quot;blue&quot;,
+    label = &quot;&quot;,
+)
+
+nsample = 5
+for _ in 1:nsample
+    # sample assumes an initial distribution and a series of forward kenrels
+    # so the backward_kernels need to be wrapped in reverse
+    # giving the signal in reverse order
+    _, ss_post = sample(rng, term, reverse(backward_kernels), output_kernels)
+    # reverse the signal path so that it is in the correct order
+    ss_post = reverse(ss_post)
+    Plots.plot!(
+        gmr_plt,
+        ts,
+        ss_post,
+        color = &quot;blue&quot;,
+        label = &quot;&quot;,
+    )
+end
+gmr_plt</code></pre><img src="3a676f90.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../hidden_markov_model/">« Sampling and inference in Hidden Markov models</a><a class="docs-footer-nextpage" href="../../tutorial_kalman_filter/">Kalman filtering and smoothing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Tuesday 21 January 2025 11:32">Tuesday 21 January 2025</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
