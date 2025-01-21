@@ -1,7 +1,7 @@
 name = "MarkovKernels"
 uuid = "202a2b00-fae3-41a1-a054-d2db40c1e3ea"
 authors = ["Filip Tronarp <filip.tronarp@matstat.lu.se> and contributors"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 AliasTables = "66dad0bd-aa9a-41b7-9441-69ab47430ed8"
