@@ -47,26 +47,31 @@ abstract type AbstractLikelihood end
 Currently, the following concrete types are defined: 
 
 ```julia
-Normal # Vector valued Normal distributons 
-Dirac  # Vector valued Dirac distributions 
+Categorical # Distribution over categories
+Normal # Vector/Scalar valued Normal distributons 
+Dirac  # Vector/Scalar valued Dirac distributions 
 
 NormalKernel # Vector valued Normal kernels 
 DiracKernel  # Vector valued Dirac kernels 
+IdentityKernel # acts as identity with respect to marginalize
+StochasticMatrix # Kernel over categories
 
+CategoricalLikelihood # Likelihood function for categories
+FlatLikelihood # Makes posterior/htransform (Bayes' rule) an identity mapping
 Likelihood   # AbstractMarkovKernel paired with a measurement 
+LogQuadraticLikelihood # Canonical parametrization of log-quadratic likelihood functions 
 ```
 
-The following type union is used to represent the (conditional) covariance:
+The following aliases are defined: 
 
 ```julia 
-const CovarianceParameter{T} = Union{HermOrSym{T},Factorization{T}}
-```
-
-Additionally, the following aliases are defined: 
-
-```julia 
-const AffineNormalKernel{T} = NormalKernel{T,<:AbstractAffineMap,<:CovarianceParameter}
-const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
+const HomoskedasticNormalKernel{TM,TC} = NormalKernel{<:Homoskedastic,TM,TC} where {TM,TC} # constant conditional covariance
+const AffineHomoskedasticNormalKernel{TM,TC} =
+    NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, constant conditional covariance
+const AffineHeteroskedasticNormalKernel{TM,TC} =
+    NormalKernel{<:Heteroskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, non-constant covariance
+const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where {TM,TC} # the general, nonlinear case
+const AffineDiracKernel{T} = DiracKernel{<:AbstractAffineMap{T}} where {T}
 ```
 
 ## Functions 
@@ -74,6 +79,7 @@ const AffineDiracKernel{T} = DiracKernel{T,<:AbstractAffineMap}
 For the purpose of Bayesian state estimation, ideally the following functions are defined:   
 
 ```julia
+htransform(::AbstractMarkovKernel, ::AbstractLikelihood)
 marginalize(D::AbstractDistribution, K::AbstractMarkovKernel)
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 posterior(D::AbstractDistribution, L::AbstractLikelihood)
@@ -83,7 +89,7 @@ posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel. 
 Additionally, marginalize is implemented for Dirac with respect to the aforementioned kernels. 
 
-In practice, these functions can not be implemented exactly for a given distribution / Markov kernel pair.
+In practice, these functions can not be implemented exactly for a given general distribution / Markov kernel pair.
 Therefore, it is up to the user to define, when required, appropriate approximations, i.e.: 
 
 ```julia
