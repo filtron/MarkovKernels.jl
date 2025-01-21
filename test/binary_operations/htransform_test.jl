@@ -115,7 +115,7 @@
             L2 = Likelihood(K2, y2)
 
             # exclude L2 for now since \(::UniformScaling, ::Number) is not implemented?
-            Ls = (L1,)
+            Ls = (L1, L2)
             for L in Ls
                 N = condition(K, x0)
                 NCgt, llgt = posterior_and_loglike(N, L)

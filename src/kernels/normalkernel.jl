@@ -49,6 +49,9 @@ const AffineHeteroskedasticNormalKernel{TM,TC} =
     NormalKernel{<:Heteroskedastic,TM,TC} where {TM<:AbstractAffineMap,TC} # affine conditional mean, non-constant covariance
 const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where {TM,TC} # the general, nonlinear case
 
+const AffineIsotropicNormalKernel{TM,TC} =
+    NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC<:UniformScaling}
+
 """
     mean(K::AbstractNormalKernel)
 
