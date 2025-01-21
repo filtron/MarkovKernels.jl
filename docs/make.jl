@@ -44,7 +44,6 @@ makedocs(;
         "Tutorials" => [
             "Sampling and inference in Hidden Markov models" => "tutorials/hidden_markov_model.md",
             "Sampling and inference in Gauss-Markov models" => "tutorials/gauss_markov_regression.md",
-            "Kalman filtering and smoothing" => "tutorial_kalman_filter.md",
         ],
     ],
 )
