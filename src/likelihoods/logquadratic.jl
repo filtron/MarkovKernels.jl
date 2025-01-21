@@ -32,6 +32,20 @@ function LogQuadraticLikelihood(L::Likelihood{<:AffineHomoskedasticNormalKernel}
     return LogQuadraticLikelihood(logc, ybar, Cbar)
 end
 
+# fix for missing Method: \(::UniformScaling, ::Number)
+function LogQuadraticLikelihood(L::Likelihood{<:AffineIsotropicNormalKernel})
+    K, y = measurement_model(L), measurement(L)
+    T = eltype(y)
+    F = mean(K)
+    Rsqrt = lsqrt(covp(K)).λ # typeof(Rsqrt) <: UniformScaling 
+    m = length(y)
+
+    ybar = Rsqrt \ (y - intercept(F))
+    Cbar = Rsqrt \ slope(F)
+    logc = -_nscale(T) * (m * _logpiconst(T) + 2 * logdet(Rsqrt))
+    return LogQuadraticLikelihood(logc, ybar, Cbar)
+end
+
 logconstant(L::LogQuadraticLikelihood) = L.logconst
 
 observation(L::LogQuadraticLikelihood) = L.y
