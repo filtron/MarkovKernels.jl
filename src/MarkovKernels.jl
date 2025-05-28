@@ -70,6 +70,7 @@ export AbstractLikelihood, log
 include("distributions/categorical.jl")
 include("distributions/dirac.jl")
 include("distributions/normal.jl")
+include("distributions/laplace.jl")
 include("distributions/plotting.jl")
 export AbstractCategorical,
     Categorical,
@@ -87,7 +88,10 @@ export AbstractCategorical,
     entropy,
     kldivergence,
     AbstractDirac,
-    Dirac
+    Dirac,
+    AbstractLaplace,
+    Laplace,
+    location
 
 include("kernels/normalkernel.jl")
 include("kernels/dirackernel.jl")

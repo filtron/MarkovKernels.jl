@@ -16,6 +16,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         include("distributions/categorical_test.jl")
         include("distributions/dirac_test.jl")
         include("distributions/normal_test.jl")
+        include("distributions/laplace_test.jl")
         #normal_plotting_test()
     end
 
@@ -53,8 +54,10 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         Aqua.test_all(MarkovKernels; ambiguities = false)
     end
 
-    @testset "Code linting (JET.jl)" begin
-        JET.test_package(MarkovKernels; target_defined_modules = true)
+    if !occursin("DEV", string(VERSION))
+        @testset "Code linting (JET.jl)" begin
+            JET.test_package(MarkovKernels; target_defined_modules = true)
+        end
     end
 
     @testset "Formatting (JuliaFormatter.jl)" begin

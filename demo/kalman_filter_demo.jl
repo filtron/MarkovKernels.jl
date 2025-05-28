@@ -114,7 +114,7 @@ function rts(filter_distributions, fw_kernel)
     smoother_distributions = similar(filter_distributions)
     smoother_distributions[end] = smoother_distribution
 
-    for m in length(smoother_distributions)-1:-1:1
+    for m in (length(smoother_distributions)-1):-1:1
         pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
         smoother_distribution = marginalize(smoother_distribution, bw_kernel)
         smoother_distributions[m] = smoother_distribution
