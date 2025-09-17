@@ -7,6 +7,7 @@ import Base:
     +,
     -,
     ∘,
+    \,
     eltype,
     length,
     size,
@@ -16,8 +17,10 @@ import Base:
     convert,
     show,
     log,
+    zero,
     copy,
     copy!,
+    copyto!,
     vcat
 
 import LinearAlgebra:
@@ -34,7 +37,9 @@ import LinearAlgebra:
     pinv,
     diag,
     tr,
-    norm_sqr
+    norm_sqr,
+    ldiv!,
+    mul!
 
 import Statistics: mean, cov, var, std
 import Random: rand, rand!, GLOBAL_RNG
