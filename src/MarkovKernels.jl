@@ -94,6 +94,7 @@ export AbstractCategorical,
     location
 
 include("kernels/normalkernel.jl")
+include("kernels/laplacekernel.jl")
 include("kernels/dirackernel.jl")
 include("kernels/stochasticmatrix.jl")
 export Skedasticity,
@@ -113,7 +114,10 @@ export Skedasticity,
     IdentityKernel,
     AbstractStochasticMatrix,
     StochasticMatrix,
-    probability_matrix
+    probability_matrix,
+    LaplaceKernel,
+    HomoskedasticLaplaceKernel,
+    AffineHomoskedasticLaplaceKernel
 
 include("likelihoods/likelihood.jl")
 include("likelihoods/categorical_likelihood.jl")
