@@ -28,7 +28,7 @@ function rts(
 
     # compute the backward kenrles for the Rauch-Tung-Striebel recursion
     bw_kernels = NormalKernel[]
-    for m in 1:length(filter_distributions)-1
+    for m in 1:(length(filter_distributions)-1)
         pred, bw_kernel = invert(filter_distributions[m], fw_kernel)
         push!(bw_kernels, bw_kernel)
     end
@@ -37,7 +37,7 @@ function rts(
     smoother_distributions = Normal[]
     smoother_distribution = filter_distributions[end]
     pushfirst!(smoother_distributions, smoother_distribution)
-    for m in length(filter_distributions)-1:-1:1
+    for m in (length(filter_distributions)-1):-1:1
         smoother_distribution = marginalize(smoother_distribution, bw_kernels[m])
         pushfirst!(smoother_distributions, smoother_distribution)
     end

@@ -70,6 +70,7 @@ export AbstractLikelihood, log
 include("distributions/categorical.jl")
 include("distributions/dirac.jl")
 include("distributions/normal.jl")
+include("distributions/laplace.jl")
 include("distributions/plotting.jl")
 export AbstractCategorical,
     Categorical,
@@ -87,9 +88,13 @@ export AbstractCategorical,
     entropy,
     kldivergence,
     AbstractDirac,
-    Dirac
+    Dirac,
+    AbstractLaplace,
+    Laplace,
+    location
 
 include("kernels/normalkernel.jl")
+include("kernels/laplacekernel.jl")
 include("kernels/dirackernel.jl")
 include("kernels/stochasticmatrix.jl")
 export Skedasticity,
@@ -109,7 +114,10 @@ export Skedasticity,
     IdentityKernel,
     AbstractStochasticMatrix,
     StochasticMatrix,
-    probability_matrix
+    probability_matrix,
+    LaplaceKernel,
+    HomoskedasticLaplaceKernel,
+    AffineHomoskedasticLaplaceKernel
 
 include("likelihoods/likelihood.jl")
 include("likelihoods/categorical_likelihood.jl")
