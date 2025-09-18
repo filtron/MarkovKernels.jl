@@ -31,3 +31,4 @@ Computes the measurement y
 measurement(L::Likelihood) = L.y
 
 log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))
+log(::Likelihood{<:AbstractMarkovKernel,<:Missing}, x) = zero(real(eltype(x)))

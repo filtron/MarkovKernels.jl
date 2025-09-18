@@ -59,9 +59,21 @@ See also [`∘`](@ref)
 """
 function compose(::AbstractLikelihood, ::AbstractLikelihood) end
 
-compose(L1::AbstractLikelihood, L2::FlatLikelihood) = L1
-compose(L1::FlatLikelihood, L2::AbstractLikelihood) = compose(L2, L1)
+compose(L1::AbstractLikelihood, ::FlatLikelihood) = L1
+compose(::FlatLikelihood, L2::AbstractLikelihood) = L2
 compose(::FlatLikelihood, ::FlatLikelihood) = FlatLikelihood()
+
+compose(L1::AbstractLikelihood, ::Likelihood{<:AbstractMarkovKernel,<:Missing}) =
+    compose(L1, FlatLikelihood())
+compose(::Likelihood{<:AbstractMarkovKernel,<:Missing}, L2::AbstractLikelihood) =
+    compose(FlatLikelihood(), L2)
+compose(
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+) = FlatLikelihood()
+
+compose(::FlatLikelihood, ::Likelihood{<:AbstractMarkovKernel,<:Missing}) = FlatLikelihood()
+compose(::Likelihood{<:AbstractMarkovKernel,<:Missing}, ::FlatLikelihood) = FlatLikelihood()
 
 function compose(L1::CategoricalLikelihood, L2::CategoricalLikelihood)
     l1 = likelihood_vector(L1)
@@ -105,8 +117,8 @@ compose(L1::LogQuadraticLikelihood, L2::Likelihood{<:AffineHomoskedasticNormalKe
 compose(L1::Likelihood{<:AffineHomoskedasticNormalKernel}, L2::LogQuadraticLikelihood) =
     compose(L2, L1)
 compose(
-    L1::Likelihood{<:AffineHomoskedasticNormalKernel},
-    L2::Likelihood{<:AffineHomoskedasticNormalKernel},
+    L1::Likelihood{<:AffineHomoskedasticNormalKernel,<:AbstractNumOrVec},
+    L2::Likelihood{<:AffineHomoskedasticNormalKernel,<:AbstractNumOrVec},
 ) = compose(LogQuadraticLikelihood(L1), LogQuadraticLikelihood(L2))
 
 """
