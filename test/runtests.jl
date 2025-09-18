@@ -1,5 +1,5 @@
 using MarkovKernels
-using Test, Aqua, JET, JuliaFormatter
+using Test, Aqua, JuliaFormatter
 using SafeTestsets
 
 using LinearAlgebra
@@ -53,8 +53,12 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
         Aqua.test_all(MarkovKernels; ambiguities = false)
     end
 
-    @testset "Code linting (JET.jl)" begin
-        JET.test_package(MarkovKernels; target_defined_modules = true)
+    # Only load / test JET if not on nightly
+    if !occursin("DEV", string(VERSION))
+        using JET
+        @testset "Code linting (JET.jl)" begin
+            JET.test_package(MarkovKernels; target_defined_modules = true)
+        end
     end
 
     @testset "Formatting (JuliaFormatter.jl)" begin
