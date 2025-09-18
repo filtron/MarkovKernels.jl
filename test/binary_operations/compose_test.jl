@@ -137,8 +137,9 @@
             L3 = Likelihood(K3, y3)
 
             L4 = FlatLikelihood()
+            L5 = Likelihood(K1, missing)
 
-            Ls = (L1, L2, L3, L4)
+            Ls = (L1, L2, L3, L4, L5)
             for LL in Ls
                 for LR in Ls
                     Lnew = compose(LL, LR)
