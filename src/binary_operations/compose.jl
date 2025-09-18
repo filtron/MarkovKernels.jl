@@ -93,7 +93,7 @@ function compose(L1::LogQuadraticLikelihood, L2::LogQuadraticLikelihood)
     Cbar = F.R
     y3 = adjoint(F.Q) * yhat
 
-    ybar = y3[1:min(m1 + m2, n1)]
+    ybar = y3[1:min(m1+m2, n1)]
     e_norm_sqr = norm(y3)^2 - norm(ybar)^2
     logcbar = logcbar - _nscale(T) * e_norm_sqr
 

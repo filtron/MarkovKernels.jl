@@ -8,6 +8,8 @@ abstract type AbstractAffineMap{T<:Number} end
 include("affinemap.jl")
 include("linearmap.jl")
 include("affinecorrector.jl")
+include("base_overloads.jl")
+include("linearalgebra_overloads.jl")
 
 eltype(::AbstractAffineMap{T}) where {T} = T
 
@@ -40,38 +42,3 @@ See also [`compose`](@ref)
 AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
 convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
 convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
-
-==(F1::T, F2::T) where {T<:AbstractAffineMap} =
-    all(f -> getfield(F1, f) == getfield(F2, f), 1:nfields(F1))
-
-for func in (:(==), :isequal, :isapprox)
-    @eval function Base.$func(P1::AbstractAffineMap, P2::AbstractAffineMap; kwargs...)
-        nameof(U) === nameof(V) || return false
-        fields = fieldnames(U)
-        fields === fieldnames(V) || return false
-
-        for f in fields
-            isdefined(P1, f) && isdefined(P2, f) || return false
-            getfield(P1, f) === getfield(P2, f) ||
-                $func(getfield(P1, f), getfield(P2, f); kwargs...) ||
-                return false
-        end
-        return true
-    end
-end
-
-for func in (:similar, :copy)
-    @eval function Base.$func(F::AbstractAffineMap)
-        fields = fieldnames(typeof(F))
-        input = Tuple($func(getfield(F, f)) for f in fields)
-        return typeof(F)(input...)
-    end
-end
-
-function Base.copy!(Fdst::T, Fsrc::T) where {T<:AbstractAffineMap}
-    fields = fieldnames(T)
-    dst = Tuple(getfield(Fdst, f) for f in fields)
-    src = Tuple(getfield(Fsrc, f) for f in fields)
-    foreach(Base.splat(copy!), zip(dst, src))
-    return Fdst
-end
