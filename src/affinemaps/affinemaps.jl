@@ -14,31 +14,37 @@ include("linearalgebra_overloads.jl")
 eltype(::AbstractAffineMap{T}) where {T} = T
 
 """
-    (F::AbstractAffineMap)(x)
+    (a::AbstractAffineMap)(x)
 
-Evaluates the affine map F at x.
+Evaluates the affine map a at x.
 """
-(F::AbstractAffineMap)(x) = slope(F) * x + intercept(F)
+(a::AbstractAffineMap)(x) = slope(a) * x + intercept(a)
+
+function (a::AbstractAffineMap)(y, x)
+    y .= intercept(a)
+    mul!(y, slope(a), x, true, true)
+    return y
+end
 
 """
-    compose(F2::AbstractAffineMap, F1::AbstractAffineMap)
+    compose(a2::AbstractAffineMap, a1::AbstractAffineMap)
 
-Computes the affine map F3 resulting from the composition F2 ∘ F1.
+Computes the affine map a3 resulting from the composition a2 ∘ a1.
 
 See also [`∘`](@ref)
 """
-compose(F2::AbstractAffineMap, F1::AbstractAffineMap) =
-    AffineMap(slope(F2) * slope(F1), slope(F2) * intercept(F1) + intercept(F2))
+compose(a2::AbstractAffineMap, a1::AbstractAffineMap) =
+    AffineMap(slope(a2) * slope(a1), slope(a2) * intercept(a1) + intercept(a2))
 
 """
-    ∘(F2::AbstractAffineMap, F1::AbstractAffineMap)
+    ∘(a2::AbstractAffineMap, a1::AbstractAffineMap)
 
-Equivalent to compose(F2::AbstractAffineMap, F1::AbstractAffineMap).
+Equivalent to compose(a2::AbstractAffineMap, a1::AbstractAffineMap).
 
 See also [`compose`](@ref)
 """
-∘(F2::AbstractAffineMap, F1::AbstractAffineMap) = compose(F2, F1)
+∘(a2::AbstractAffineMap, a1::AbstractAffineMap) = compose(a2, a1)
 
-AbstractAffineMap{T}(F::AbstractAffineMap{T}) where {T} = F
-convert(::Type{T}, F::T) where {T<:AbstractAffineMap} = F
-convert(::Type{T}, F::AbstractAffineMap) where {T<:AbstractAffineMap} = T(F)::T
+AbstractAffineMap{T}(a::AbstractAffineMap{T}) where {T} = a
+convert(::Type{T}, a::T) where {T<:AbstractAffineMap} = a
+convert(::Type{T}, a::AbstractAffineMap) where {T<:AbstractAffineMap} = T(a)::T

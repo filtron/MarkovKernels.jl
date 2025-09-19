@@ -14,23 +14,29 @@ Creates a LinearMap with slope A.
 """
 LinearMap(A) = LinearMap{eltype(A),typeof(A)}(A)
 
-Base.iterate(F::LinearMap) = (F.A, Val(:done))
+Base.iterate(a::LinearMap) = (a.A, Val(:done))
 Base.iterate(::LinearMap, ::Val{:done}) = nothing
 
-slope(F::LinearMap) = F.A
-intercept(F::LinearMap{T}) where {T} = zeros(T, size(slope(F), 1))
+slope(a::LinearMap) = a.A
+intercept(a::LinearMap{T}) where {T} = zeros(T, size(slope(a), 1))
 intercept(::LinearMap{T,<:Adjoint}) where {T} = zero(T)
 intercept(::LinearMap{T,<:Number}) where {T} = zero(T)
 
-(F::LinearMap)(x) = slope(F) * x
-compose(F2::LinearMap, F1::LinearMap) = LinearMap(slope(F2) * slope(F1))
+(a::LinearMap)(x) = slope(a) * x
 
-LinearMap{T}(F::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, F.A))
-LinearMap{T}(F::LinearMap{<:Number,<:Number}) where {T} = LinearMap(convert(T, F.A))
-AbstractAffineMap{T}(F::LinearMap) where {T} = LinearMap{T}(F)
+function (a::LinearMap)(y, x)
+    mul!(y, slope(a), x)
+    return y
+end
 
-function Base.show(io::IO, F::LinearMap{T,U}) where {T,U}
-    print(io, summary(F))
+compose(a2::LinearMap, a1::LinearMap) = LinearMap(slope(a2) * slope(a1))
+
+LinearMap{T}(a::LinearMap) where {T} = LinearMap(convert(AbstractMatrix{T}, a.A))
+LinearMap{T}(a::LinearMap{<:Number,<:Number}) where {T} = LinearMap(convert(T, a.A))
+AbstractAffineMap{T}(a::LinearMap) where {T} = LinearMap{T}(a)
+
+function Base.show(io::IO, a::LinearMap{T,U}) where {T,U}
+    print(io, summary(a))
     print(io, "\n A = ")
-    show(io, (F.A))
+    show(io, (a.A))
 end
