@@ -43,42 +43,50 @@ function AffineMap(A, b)
     AffineMap{T}(A, b)
 end
 
-Base.iterate(F::AffineMap) = (F.A, Val(:b))
-Base.iterate(F::AffineMap, ::Val{:b}) = (F.b, Val(:done))
+Base.iterate(a::AffineMap) = (a.A, Val(:b))
+Base.iterate(a::AffineMap, ::Val{:b}) = (a.b, Val(:done))
 Base.iterate(::AffineMap, ::Val{:done}) = nothing
 
 """
-    slope(F::AbstractAffineMap)
+    slope(a::AbstractAffineMap)
 
-Computes the slope of F.
+Computes the slope of a.
 """
-slope(F::AffineMap) = F.A
+slope(a::AffineMap) = a.A
 
 """
-    intercept(F::AffineMap)
+    intercept(a::AffineMap)
 
-Computes the intercept of F.
+Computes the intercept of a.
 """
-intercept(F::AffineMap) = F.b
+intercept(a::AffineMap) = a.b
 
-AffineMap{T}(F::AffineMap) where {T} =
-    AffineMap(convert(AbstractMatrix{T}, F.A), convert(AbstractVector{T}, F.b))
-AffineMap{T}(F::AffineMap{<:Number,<:Adjoint,<:Number}) where {T} =
-    AffineMap(convert(AbstractMatrix{T}, F.A), convert(T, F.b))
-AffineMap{T}(F::AffineMap{<:Number,<:Number,<:Number}) where {T} =
-    AffineMap(convert(T, F.A), convert(T, F.b))
+(a::AffineMap)(x) = slope(a) * x + intercept(a)
+
+function (a::AffineMap)(y, x)
+    y .= intercept(a)
+    mul!(y, slope(a), x, true, true)
+    return y
+end
+
+AffineMap{T}(a::AffineMap) where {T} =
+    AffineMap(convert(AbstractMatrix{T}, a.A), convert(AbstractVector{T}, a.b))
+AffineMap{T}(a::AffineMap{<:Number,<:Adjoint,<:Number}) where {T} =
+    AffineMap(convert(AbstractMatrix{T}, a.A), convert(T, a.b))
+AffineMap{T}(a::AffineMap{<:Number,<:Number,<:Number}) where {T} =
+    AffineMap(convert(T, a.A), convert(T, a.b))
 
 """
     AbstractAffineMap{T}(F::AbstractAffineMap)
 
 Creates an affine map from F with eltype T.
 """
-AbstractAffineMap{T}(F::AffineMap) where {T} = AffineMap{T}(F)
+AbstractAffineMap{T}(a::AffineMap) where {T} = AffineMap{T}(a)
 
-function Base.show(io::IO, F::AffineMap{T,U,V}) where {T,U,V}
-    print(io, summary(F))
+function Base.show(io::IO, a::AffineMap{T,U,V}) where {T,U,V}
+    print(io, summary(a))
     print(io, "\n A = ")
-    show(io, (F.A))
+    show(io, (a.A))
     print(io, "\n b = ")
-    show(io, F.b)
+    show(io, a.b)
 end

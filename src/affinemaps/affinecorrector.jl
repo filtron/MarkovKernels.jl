@@ -54,31 +54,39 @@ function AffineCorrector(A, b, c)
     AffineCorrector{T}(A, b, c)
 end
 
-Base.iterate(F::AffineCorrector) = (F.A, Val(:b))
-Base.iterate(F::AffineCorrector, ::Val{:b}) = (F.b, Val(:c))
-Base.iterate(F::AffineCorrector, ::Val{:c}) = (F.c, Val(:done))
+Base.iterate(a::AffineCorrector) = (a.A, Val(:b))
+Base.iterate(a::AffineCorrector, ::Val{:b}) = (a.b, Val(:c))
+Base.iterate(a::AffineCorrector, ::Val{:c}) = (a.c, Val(:done))
 Base.iterate(::AffineCorrector, ::Val{:done}) = nothing
 
-slope(F::AffineCorrector) = F.A
-intercept(F::AffineCorrector) = F.b - F.A * F.c
+slope(a::AffineCorrector) = a.A
+intercept(a::AffineCorrector) = a.b - a.A * a.c
 
-(F::AffineCorrector)(x) = F.b + slope(F) * (x - F.c)
-compose(F2::AffineCorrector, F1::AffineCorrector) =
-    AffineCorrector(F2.A * F1.A, F2(F1.b), F1.c)
+(a::AffineCorrector)(x) = a.b + slope(a) * (x - a.c)
 
-AffineCorrector{T}(F::AffineCorrector) where {T} = AffineCorrector(
-    convert(AbstractMatrix{T}, F.A),
-    convert(AbstractVector{T}, F.b),
-    convert(AbstractVector{T}, F.c),
+function (a::AffineCorrector)(y, x)
+    y .= a.b
+    mul!(y, a.A, a.c, -one(eltype(y)), true)
+    mul!(y, a.A, x, true, true)
+    return y
+end
+
+compose(a2::AffineCorrector, a1::AffineCorrector) =
+    AffineCorrector(a2.A * a1.A, a2(a1.b), a1.c)
+
+AffineCorrector{T}(a::AffineCorrector) where {T} = AffineCorrector(
+    convert(AbstractMatrix{T}, a.A),
+    convert(AbstractVector{T}, a.b),
+    convert(AbstractVector{T}, a.c),
 )
-AbstractAffineMap{T}(F::AffineCorrector) where {T} = AffineCorrector{T}(F)
+AbstractAffineMap{T}(a::AffineCorrector) where {T} = AffineCorrector{T}(a)
 
-function Base.show(io::IO, F::AffineCorrector{T,U,V,S}) where {T,U,V,S}
-    print(io, summary(F))
+function Base.show(io::IO, a::AffineCorrector{T,U,V,S}) where {T,U,V,S}
+    print(io, summary(a))
     print(io, "\n A = ")
-    show(io, (F.A))
+    show(io, (a.A))
     print(io, "\n b = ")
-    show(io, F.b)
+    show(io, a.b)
     print(io, "\n c = ")
-    show(io, F.c)
+    show(io, a.c)
 end
