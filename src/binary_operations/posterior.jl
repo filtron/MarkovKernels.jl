@@ -35,6 +35,10 @@ function posterior(D::AbstractDistribution, L::AbstractLikelihood)
     return C
 end
 
+
+posterior(kernel::AbstractMarkovKernel, like::AbstractLikelihood) = first(htransform_and_likelihood(kernel, like)) # Doob's h-transform
+
+
 posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
 

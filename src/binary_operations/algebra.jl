@@ -34,6 +34,6 @@ Equivalent to +(D, -v).
 """
     *(C, D::AbstractDistribution)
 
-Equivalent to marginalize(D, DiracKernel(LinearMap(C))).
+Equivalent to forward_operator(D, DiracKernel(LinearMap(C))).
 """
-*(C, D::AbstractDistribution) = marginalize(D, DiracKernel(LinearMap(C)))
+*(C, D::AbstractDistribution) = forward_operator(DiracKernel(LinearMap(C)), D)
