@@ -48,7 +48,7 @@ A Markov kernel ``k(y, x)`` defines an operator that maps a distribution $\pi(x)
 This is the so-called forward operator.
 
 ```@docs
-forward_operator(k::AbstractMarkovKernel, d::AbstractDistribution)
+forward_operator(k::AbstractMarkovKernel, d)
 ```
 
 ## Bayes' rule & invert

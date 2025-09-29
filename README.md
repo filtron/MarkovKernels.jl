@@ -79,11 +79,13 @@ const AffineDiracKernel{T} = DiracKernel{<:AbstractAffineMap{T}} where {T}
 For the purpose of Bayesian state estimation, ideally the following functions are defined:
 
 ```julia
-htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood)
-marginalize(D::AbstractDistribution, K::AbstractMarkovKernel)
+
+forward_operator(K::AbstractMarkovKernel, D::AbstractDistribution)
 invert(D::AbstractDistribution, K::AbstractMarkovKernel)
 posterior(D::AbstractDistribution, L::AbstractLikelihood)
+posterior(K::AbstractMarkovKernel, L::AbstractLikelihood)
 posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
+htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood)
 ```
 
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel.
