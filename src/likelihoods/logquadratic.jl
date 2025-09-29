@@ -23,7 +23,7 @@ function LogQuadraticLikelihood(L::Likelihood{<:AffineHomoskedasticNormalKernel}
     K, y = measurement_model(L), measurement(L)
     T = eltype(y)
     F = mean(K)
-    Rsqrt = lsqrt(covp(K))
+    Rsqrt = lsqrt(covparam(K))
     m = length(y)
 
     ybar = Rsqrt \ (y - intercept(F))
@@ -37,7 +37,7 @@ function LogQuadraticLikelihood(L::Likelihood{<:AffineIsotropicNormalKernel})
     K, y = measurement_model(L), measurement(L)
     T = eltype(y)
     F = mean(K)
-    Rsqrt = lsqrt(covp(K)).λ # typeof(Rsqrt) <: UniformScaling 
+    Rsqrt = lsqrt(covparam(K)).λ # typeof(Rsqrt) <: UniformScaling
     m = length(y)
 
     ybar = Rsqrt \ (y - intercept(F))

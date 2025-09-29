@@ -80,7 +80,7 @@
                 @test N == N
                 @test mean(N) == μ
                 @test cov(N) ≈ V1p
-                @test covp(N) == Σ
+                @test covparam(N) == Σ
                 @test var(N) ≈ real.(diag(V1p))
                 @test std(N) ≈ sqrt.(real.(diag(V1p)))
 

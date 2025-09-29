@@ -41,6 +41,6 @@ NormalKernel(μ, Σ)
 ```@docs
 mean(K::NormalKernel)
 cov(K::NormalKernel)
-covp(K::NormalKernel)
+covparam(K::NormalKernel)
 rand(rng::AbstractRNG, K::AbstractNormalKernel, x::AbstractNumOrVec)
 ```

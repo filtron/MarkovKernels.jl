@@ -10,9 +10,9 @@ Computes the output of the forward operator associated with k, gvien the input d
 function forward_operator(k::AbstractMarkovKernel, d) end
 
 forward_operator(k::AffineHomoskedasticNormalKernel, d::AbstractNormal) =
-    Normal(mean(k)(mean(d)), stein(covp(d), mean(k), covp(k)))
+    Normal(mean(k)(mean(d)), stein(covparam(d), mean(k), covparam(k)))
 forward_operator(k::AffineDiracKernel, d::AbstractNormal) =
-    Normal(mean(k)(mean(d)), stein(covp(d), mean(k)))
+    Normal(mean(k)(mean(d)), stein(covparam(d), mean(k)))
 forward_operator(k::AbstractMarkovKernel, d::AbstractDirac) = condition(k, mean(d))
 
 function forward_operator(k::StochasticMatrix, d::AbstractCategorical)
@@ -27,19 +27,19 @@ forward_operator(::IdentityKernel, d::AbstractDistribution) = d
 forward_operator(::IdentityKernel, d::AbstractDirac) = d
 
 forward_operator(k2::AffineHomoskedasticNormalKernel, k1::AffineHomoskedasticNormalKernel) =
-    NormalKernel(compose(mean(k2), mean(k1)), stein(covp(k1), mean(k2), covp(k2)))
+    NormalKernel(compose(mean(k2), mean(k1)), stein(covparam(k1), mean(k2), covparam(k2)))
 
 forward_operator(k2::AffineHomoskedasticNormalKernel, k1::AffineDiracKernel) =
-    NormalKernel(compose(mean(k2), mean(k1)), covp(k2))
+    NormalKernel(compose(mean(k2), mean(k1)), covparam(k2))
 
 forward_operator(k2::AffineHeteroskedasticNormalKernel, k1::AffineDiracKernel) =
-    NormalKernel(compose(mean(k2), mean(k1)), covp(k2) ∘ mean(k1))
+    NormalKernel(compose(mean(k2), mean(k1)), covparam(k2) ∘ mean(k1))
 
 forward_operator(k2::AffineDiracKernel, k1::AffineDiracKernel) =
     DiracKernel(compose(mean(k2), mean(k1)))
 
 forward_operator(k2::AffineDiracKernel, k1::AffineHomoskedasticNormalKernel) =
-    NormalKernel(compose(mean(k2), mean(k1)), stein(covp(k1), mean(k2)))
+    NormalKernel(compose(mean(k2), mean(k1)), stein(covparam(k1), mean(k2)))
 
 function forward_operator(k2::StochasticMatrix, k1::StochasticMatrix)
     P2 = probability_matrix(k2)

@@ -43,7 +43,7 @@ function htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel{TM,TC},
     L::LogQuadraticLikelihood,
 ) where {TM,TC<:Union{SelfAdjoint,Number}}
-    μ, Q = mean(K), covp(K)
+    μ, Q = mean(K), covparam(K)
     Φ, u = slope(μ), intercept(μ)
     logc, y, C = L
     T = eltype(y)
@@ -69,7 +69,7 @@ function htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel{TM,<:Cholesky},
     L::LogQuadraticLikelihood,
 ) where {TM}
-    μ, Q = mean(K), covp(K)
+    μ, Q = mean(K), covparam(K)
     Φ, u = slope(μ), intercept(μ)
     logc, y, C = L
     T = eltype(y)
@@ -100,7 +100,7 @@ function htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel,
     L::Likelihood{<:AffineDiracKernel},
 )
-    μ, Q = mean(K), covp(K)
+    μ, Q = mean(K), covparam(K)
     Φ, u = slope(μ), intercept(μ)
 
     KL = L.K

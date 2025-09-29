@@ -1,4 +1,4 @@
-+(v::AbstractNumOrVec, N::Normal) = Normal(v + mean(N), covp(N))
++(v::AbstractNumOrVec, N::Normal) = Normal(v + mean(N), covparam(N))
 +(v::AbstractNumOrVec, D::Dirac) = Dirac(v + mean(D))
 
 """
@@ -7,7 +7,7 @@
 Computes the image distribution of D under negation, i.e. if
 x ∼ D then -x ∼ -D.
 """
--(N::Normal) = Normal(-mean(N), covp(N)) # should techically be in src/distributions
+-(N::Normal) = Normal(-mean(N), covparam(N)) # should techically be in src/distributions
 -(D::Dirac) = Dirac(-mean(D)) # should techically be in src/distributions
 
 """

@@ -9,7 +9,7 @@ function invert(::AbstractDistribution, ::AbstractMarkovKernel) end
 
 function invert(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_reduce(covp(N), mean(K), covp(K))
+    S, G, Σ = schur_reduce(covparam(N), mean(K), covparam(K))
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
     return Nout, Kout
@@ -17,7 +17,7 @@ end
 
 function invert(N::AbstractNormal, K::AffineDiracKernel)
     pred = mean(K)(mean(N))
-    S, G, Σ = schur_reduce(covp(N), mean(K))
+    S, G, Σ = schur_reduce(covparam(N), mean(K))
     Nout = Normal(pred, S)
     Kout = NormalKernel(AffineCorrector(G, mean(N), pred), Σ)
     return Nout, Kout

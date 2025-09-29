@@ -1,7 +1,7 @@
 _mat_or_num(V) = Matrix(V)
 _mat_or_num(V::Number) = V
 
-_cov(K::NormalKernel) = _mat_or_num(covp(K))
+_cov(K::NormalKernel) = _mat_or_num(covparam(K))
 _cov(::DiracKernel) = false * I
 
 _symmetrise(T, Σ) = Σ
