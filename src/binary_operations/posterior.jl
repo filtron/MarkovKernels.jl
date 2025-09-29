@@ -50,19 +50,22 @@ function posterior_and_loglike(D::AbstractDistribution, L::LogQuadraticLikelihoo
     return condition(C, y), logc + logpdf(M, y)
 end
 
-function posterior_and_loglike(C::Categorical, L::CategoricalLikelihood)
+function posterior_and_loglike(C::ProbabilityVector, L::CategoricalLikelihood)
     π = probability_vector(C)
     ls = likelihood_vector(L)
 
     my = dot(ls, π)
     πout = similar(π)
     πout .= ls .* π ./ my
-    Cout = Categorical(πout)
+    Cout = ProbabilityVector(πout)
 
     return Cout, log(my)
 end
 
-function posterior_and_loglike(C::Categorical, L::Likelihood{<:StochasticMatrix,<:Int})
+function posterior_and_loglike(
+    C::ProbabilityVector,
+    L::Likelihood{<:StochasticMatrix,<:Int},
+)
     K, y = measurement_model(L), measurement(L)
     P = probability_matrix(K)
     ls = view(P, y, :)

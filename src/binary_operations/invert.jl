@@ -23,13 +23,13 @@ function invert(N::AbstractNormal, K::AffineDiracKernel)
     return Nout, Kout
 end
 
-function invert(C::Categorical, K::AbstractStochasticMatrix)
+function invert(C::ProbabilityVector, K::AbstractStochasticMatrix)
     π = probability_vector(C)
     P = probability_matrix(K)
 
     πout = similar(π, size(P, 1))
     πout = mul!(πout, P, π)
-    Cout = Categorical(πout)
+    Cout = ProbabilityVector(πout)
 
     Pout = similar(adjoint(P))
     for i in axes(Pout, 1), j in axes(Pout, 2)

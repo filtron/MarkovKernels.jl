@@ -79,7 +79,7 @@
             for T in etys
                 π2 = exp.(randn(T, m))
                 π2 = π2 / sum(π2)
-                C2 = Categorical(π2)
+                C2 = ProbabilityVector(π2)
 
                 P2 = exp.(randn(T, m, m))
                 P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
@@ -91,7 +91,7 @@
 
                 π4 = exp.(randn(T, n))
                 π4 = π4 / sum(π4)
-                C4 = Categorical(π4)
+                C4 = ProbabilityVector(π4)
 
                 P4 = exp.(randn(T, m, n))
                 P4 = P4 * Diagonal(1 ./ [sum(p) for p in eachcol(P4)])

@@ -71,12 +71,12 @@ export AbstractMarkovKernel, condition
 include("likelihoods/likelihood_generic.jl")
 export AbstractLikelihood, log
 
-include("distributions/categorical.jl")
+include("distributions/probability_vector.jl")
 include("distributions/dirac.jl")
 include("distributions/normal.jl")
 include("distributions/plotting.jl")
-export AbstractCategorical,
-    Categorical,
+export AbstractProbabilityVector,
+    ProbabilityVector,
     probability_vector,
     AbstractNormal,
     Normal,

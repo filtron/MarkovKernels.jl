@@ -15,12 +15,12 @@ forward_operator(k::AffineDiracKernel, d::AbstractNormal) =
     Normal(mean(k)(mean(d)), stein(covparam(d), mean(k)))
 forward_operator(k::AbstractMarkovKernel, d::AbstractDirac) = condition(k, mean(d))
 
-function forward_operator(k::StochasticMatrix, d::AbstractCategorical)
+function forward_operator(k::StochasticMatrix, d::AbstractProbabilityVector)
     π = probability_vector(d)
     P = probability_matrix(k)
     πout = similar(π, size(P, 1))
     mul!(πout, P, π)
-    return Categorical(πout)
+    return ProbabilityVector(πout)
 end
 
 forward_operator(::IdentityKernel, d::AbstractDistribution) = d

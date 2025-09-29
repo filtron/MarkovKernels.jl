@@ -13,7 +13,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     include("affinemaps/affinemaps_test.jl")
 
     @testset "Distributions" begin
-        include("distributions/categorical_test.jl")
+        include("distributions/probability_vector_test.jl")
         include("distributions/dirac_test.jl")
         include("distributions/normal_test.jl")
         #normal_plotting_test()

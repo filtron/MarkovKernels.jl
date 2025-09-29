@@ -47,7 +47,7 @@ abstract type AbstractLikelihood end
 Currently, the following concrete types are defined:
 
 ```julia
-Categorical # Distribution over categories
+ProbabilityVector # Distribution over finite outcomes
 Normal # Vector/Scalar valued Normal distributons
 Dirac  # Vector/Scalar valued Dirac distributions
 
@@ -80,12 +80,12 @@ For the purpose of Bayesian state estimation, ideally the following functions ar
 
 ```julia
 
-forward_operator(K::AbstractMarkovKernel, D::AbstractDistribution)
-invert(D::AbstractDistribution, K::AbstractMarkovKernel)
-posterior(D::AbstractDistribution, L::AbstractLikelihood)
-posterior(K::AbstractMarkovKernel, L::AbstractLikelihood)
-posterior_and_loglike(D::AbstractDistribution, L::AbstractLikelihood)
-htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood)
+forward_operator(k::AbstractMarkovKernel, d::AbstractDistribution)
+invert(d::AbstractDistribution, k::AbstractMarkovKernel)
+posterior(d::AbstractDistribution, h::AbstractLikelihood)
+posterior(k::AbstractMarkovKernel, h::AbstractLikelihood)
+posterior_and_loglike(d::AbstractDistribution, h::AbstractLikelihood)
+htransform_and_likelihood(k::AbstractMarkovKernel, h::AbstractLikelihood)
 ```
 
 These are currently implemented for Normal, AffineNormalKernel, AffineDiracKernel.
@@ -95,6 +95,6 @@ In practice, these functions can not be implemented exactly for a given general 
 Therefore, it is up to the user to define, when required, appropriate approximations, i.e.:
 
 ```julia
-predict(D::AbstractDistribution, K::AbstractMarkovKernel)
-update(D::AbstractDistribution, L::AbstractLikelihood)
+predict(d::AbstractDistribution, k::AbstractMarkovKernel)
+update(d::AbstractDistribution, h::AbstractLikelihood)
 ```

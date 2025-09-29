@@ -9,7 +9,7 @@
             π = exp.(randn(T, m))
             π = π / sum(π)
 
-            C0 = Categorical(π)
+            C0 = ProbabilityVector(π)
 
             Pxx = exp.(randn(T, m, m))
             Pxx = Pxx * Diagonal(1 ./ [sum(p) for p in eachcol(Pxx)])
