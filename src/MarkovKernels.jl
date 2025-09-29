@@ -127,14 +127,20 @@ export Likelihood,
     FlatLikelihood,
     LogQuadraticLikelihood
 
-include("binary_operations/compose.jl")
 include("binary_operations/forward_operator.jl")
+include("binary_operations/backward_operator.jl")
+include("binary_operations/compose.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
 include("binary_operations/htransform.jl")
-export compose,
-    forward_operator, invert, posterior_and_loglike, posterior, htransform_and_likelihood
+export forward_operator,
+    backward_operator,
+    compose,
+    invert,
+    posterior_and_loglike,
+    posterior,
+    htransform_and_likelihood
 
 include("deprecated.jl")
 

@@ -37,7 +37,7 @@ compose(::AbstractLikelihood, ::AbstractLikelihood)
 ```
 
 
-## Forward operator
+## The forward operator and backward operator
 
 A Markov kernel ``k(y, x)`` defines an operator that maps a distribution $\pi(x)$ according to
 
@@ -45,10 +45,18 @@ A Markov kernel ``k(y, x)`` defines an operator that maps a distribution $\pi(x)
 \int k(y, x) \pi(x) \mathrm{d} x.
 ```
 
-This is the so-called forward operator.
+This is the so-called forward operator, which is also commonly referred to as marginalization.
+The corresponding adjoint is the so-called backward operator, which is given by
+
+```math
+\int h(y) k(y, x) \mathrm{d} y.
+```
+
+
 
 ```@docs
 forward_operator(k::AbstractMarkovKernel, d)
+backward_operator(h, k::AbstractMarkovKernel)
 ```
 
 ## Bayes' rule & invert

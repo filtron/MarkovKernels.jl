@@ -81,6 +81,7 @@ For the purpose of Bayesian state estimation, ideally the following functions ar
 ```julia
 
 forward_operator(k::AbstractMarkovKernel, d::AbstractDistribution)
+backward_operator(h, k::AbstractMarkovKernel)
 invert(d::AbstractDistribution, k::AbstractMarkovKernel)
 posterior(d::AbstractDistribution, h::AbstractLikelihood)
 posterior(k::AbstractMarkovKernel, h::AbstractLikelihood)

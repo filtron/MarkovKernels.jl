@@ -33,8 +33,9 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Binary Operations" begin
-        include("binary_operations/compose_test.jl")
         include("binary_operations/forward_operator_test.jl")
+        include("binary_operations/backward_operator_test.jl")
+        include("binary_operations/compose_test.jl")
         include("binary_operations/invert_test.jl")
         include("binary_operations/posterior_test.jl")
         include("binary_operations/htransform_test.jl")
