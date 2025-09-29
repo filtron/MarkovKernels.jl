@@ -14,7 +14,7 @@ htransform_and_likelihood(
     ::Likelihood{<:AbstractMarkovKernel,<:Missing},
 ) = htransform_and_likelihood(K, FlatLikelihood())
 
-function htransform_and_likelihood(K::StochasticMatrix, L::CategoricalLikelihood)
+function htransform_and_likelihood(K::StochasticMatrix, L::LikelihoodVector)
     ls = likelihood_vector(L)
     P = probability_matrix(K)
 
@@ -27,7 +27,7 @@ function htransform_and_likelihood(K::StochasticMatrix, L::CategoricalLikelihood
         Pout[i, j] = ls[i] * P[i, j] / lsout[j]
     end
 
-    Lout = CategoricalLikelihood(lsout)
+    Lout = LikelihoodVector(lsout)
     Kout = StochasticMatrix(Pout)
     return Kout, Lout
 end
@@ -35,7 +35,7 @@ end
 function htransform_and_likelihood(K::StochasticMatrix, L::Likelihood{<:StochasticMatrix})
     Kobs, y = measurement_model(L), measurement(L)
     ls = view(probability_matrix(Kobs), y, :)
-    Ltmp = CategoricalLikelihood(ls)
+    Ltmp = LikelihoodVector(ls)
     return htransform_and_likelihood(K, Ltmp)
 end
 

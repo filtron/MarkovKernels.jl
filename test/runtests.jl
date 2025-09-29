@@ -26,7 +26,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Likelihoods" begin
-        include("likelihoods/categoricallikelihood_test.jl")
+        include("likelihoods/likelihood_vector_test.jl")
         include("likelihoods/flatlikelihood_test.jl")
         include("likelihoods/likelihood_test.jl")
         include("likelihoods/logquadratic_test.jl")

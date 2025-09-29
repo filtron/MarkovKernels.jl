@@ -116,13 +116,13 @@ export Skedasticity,
     probability_matrix
 
 include("likelihoods/likelihood.jl")
-include("likelihoods/categorical_likelihood.jl")
+include("likelihoods/likelihood_vector.jl")
 include("likelihoods/flatlikelihood.jl")
 include("likelihoods/logquadratic.jl")
 export Likelihood,
     measurement_model,
     measurement,
-    CategoricalLikelihood,
+    LikelihoodVector,
     likelihood_vector,
     FlatLikelihood,
     LogQuadraticLikelihood

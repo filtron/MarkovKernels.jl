@@ -4,7 +4,7 @@
     n, m = 2, 3
     etys = (Float64,)
 
-    @testset "htransform | StochasticMatrix / CategoricalLikelihood" begin
+    @testset "htransform | StochasticMatrix / LikelihoodVector" begin
         for T in etys
             π = exp.(randn(T, m))
             π = π / sum(π)

@@ -47,19 +47,19 @@ compose(
 compose(::FlatLikelihood, ::Likelihood{<:AbstractMarkovKernel,<:Missing}) = FlatLikelihood()
 compose(::Likelihood{<:AbstractMarkovKernel,<:Missing}, ::FlatLikelihood) = FlatLikelihood()
 
-function compose(L1::CategoricalLikelihood, L2::CategoricalLikelihood)
+function compose(L1::LikelihoodVector, L2::LikelihoodVector)
     l1 = likelihood_vector(L1)
     l2 = likelihood_vector(L2)
     l3 = similar(l1)
     l3 .= l1 .* l2
-    return CategoricalLikelihood(l3)
+    return LikelihoodVector(l3)
 end
 
-compose(L1::CategoricalLikelihood, L2::Likelihood{<:StochasticMatrix}) =
-    compose(L1, CategoricalLikelihood(L2))
-compose(L1::Likelihood{<:StochasticMatrix}, L2::CategoricalLikelihood) = compose(L2, L1)
+compose(L1::LikelihoodVector, L2::Likelihood{<:StochasticMatrix}) =
+    compose(L1, LikelihoodVector(L2))
+compose(L1::Likelihood{<:StochasticMatrix}, L2::LikelihoodVector) = compose(L2, L1)
 compose(L1::Likelihood{<:StochasticMatrix}, L2::Likelihood{<:StochasticMatrix}) =
-    compose(CategoricalLikelihood(L1), CategoricalLikelihood(L2))
+    compose(LikelihoodVector(L1), LikelihoodVector(L2))
 
 function compose(L1::LogQuadraticLikelihood, L2::LogQuadraticLikelihood)
     logc1, y1, C1 = L1

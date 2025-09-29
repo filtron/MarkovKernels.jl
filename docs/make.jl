@@ -35,7 +35,7 @@ makedocs(;
         ],
         "Likelihoods" => [
             "likelihoods/likelihood_general.md",
-            "likelihoods/categorical_likelihood.md",
+            "likelihoods/likelihood_vector.md",
             "likelihoods/likelihood.md",
             "likelihoods/logquadratic.md",
             "likelihoods/flatlikelihood.md",

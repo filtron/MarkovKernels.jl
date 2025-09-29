@@ -1,30 +1,30 @@
 """
-    CategoricalLikelihood
+    LikelihoodVector
 
 Type for representing a Likelihood function over categories.
 """
-struct CategoricalLikelihood{A} <: AbstractLikelihood
+struct LikelihoodVector{A} <: AbstractLikelihood
     ls::A
 end
 
 """
-    CategoricalLikelihood(L::Likelihood{<:StochasticMatrix})
+    LikelihoodVector(L::Likelihood{<:StochasticMatrix})
 
 Computes a categorical likelihood from L.
 """
-function CategoricalLikelihood(L::Likelihood{<:StochasticMatrix})
+function LikelihoodVector(L::Likelihood{<:StochasticMatrix})
     K, y = measurement_model(L), measurement(L)
     P = probability_matrix(K)
     ls = P[y, :]
-    return CategoricalLikelihood{typeof(ls)}(ls)
+    return LikelihoodVector{typeof(ls)}(ls)
 end
 
 """
-    likelihood_vector(L::CategoricalLikelihood)
+    likelihood_vector(L::LikelihoodVector)
 
 Computes the vector of likelihood evaluations.
 """
-likelihood_vector(L::CategoricalLikelihood) = L.ls
+likelihood_vector(L::LikelihoodVector) = L.ls
 
 function likelihood_vector(L::Likelihood{<:StochasticMatrix})
     K, y = measurement_model(L), measurement(L)
@@ -33,4 +33,4 @@ function likelihood_vector(L::Likelihood{<:StochasticMatrix})
     return ls
 end
 
-log(L::CategoricalLikelihood, x) = log(likelihood_vector(L)[x])
+log(L::LikelihoodVector, x) = log(likelihood_vector(L)[x])

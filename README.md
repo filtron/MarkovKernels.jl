@@ -56,7 +56,7 @@ DiracKernel  # Vector valued Dirac kernels
 IdentityKernel # acts as identity with respect to marginalize
 StochasticMatrix # Kernel over categories
 
-CategoricalLikelihood # Likelihood function for categories
+LikelihoodVector # Likelihood function for categories
 FlatLikelihood # Makes posterior/htransform (Bayes' rule) an identity mapping
 Likelihood   # AbstractMarkovKernel paired with a measurement
 LogQuadraticLikelihood # Canonical parametrization of log-quadratic likelihood functions
