@@ -1,16 +1,20 @@
 """
-    htransform(K::AbstractMarkov, L::AbstractLikelihood)
+    htransform_and_likelihood(K::AbstractMarkovKernel, L::AbstractLikelihood)
 
 Computes a Markov kernel Kout and Likelihood Lout such that
 
 Lout(z) = ∫ L(x) K(x, z) dx, and Kout(x, z) = L(x) K(x, z) / Lout(z)
 
 """
-function htransform(::AbstractMarkovKernel, ::AbstractLikelihood) end
+function htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood) end
 
-htransform(K::AbstractMarkovKernel, L::FlatLikelihood) = K, L
+htransform_and_likelihood(K::AbstractMarkovKernel, L::FlatLikelihood) = K, L
+htransform_and_likelihood(
+    K::AbstractMarkovKernel,
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+) = htransform_and_likelihood(K, FlatLikelihood())
 
-function htransform(K::StochasticMatrix, L::CategoricalLikelihood)
+function htransform_and_likelihood(K::StochasticMatrix, L::CategoricalLikelihood)
     ls = likelihood_vector(L)
     P = probability_matrix(K)
 
@@ -28,14 +32,14 @@ function htransform(K::StochasticMatrix, L::CategoricalLikelihood)
     return Kout, Lout
 end
 
-function htransform(K::StochasticMatrix, L::Likelihood{<:StochasticMatrix})
+function htransform_and_likelihood(K::StochasticMatrix, L::Likelihood{<:StochasticMatrix})
     Kobs, y = measurement_model(L), measurement(L)
     ls = view(probability_matrix(Kobs), y, :)
     Ltmp = CategoricalLikelihood(ls)
-    return htransform(K, Ltmp)
+    return htransform_and_likelihood(K, Ltmp)
 end
 
-function htransform(
+function htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel{TM,TC},
     L::LogQuadraticLikelihood,
 ) where {TM,TC<:Union{SelfAdjoint,Number}}
@@ -61,7 +65,7 @@ function htransform(
     return Kout, Lout
 end
 
-function htransform(
+function htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel{TM,<:Cholesky},
     L::LogQuadraticLikelihood,
 ) where {TM}
@@ -87,12 +91,15 @@ function htransform(
     return Kout, Lout
 end
 
-htransform(
+htransform_and_likelihood(
     K::AffineHomoskedasticNormalKernel,
     L::Likelihood{<:AffineHomoskedasticNormalKernel},
-) = htransform(K, LogQuadraticLikelihood(L))
+) = htransform_and_likelihood(K, LogQuadraticLikelihood(L))
 
-function htransform(K::AffineHomoskedasticNormalKernel, L::Likelihood{<:AffineDiracKernel})
+function htransform_and_likelihood(
+    K::AffineHomoskedasticNormalKernel,
+    L::Likelihood{<:AffineDiracKernel},
+)
     μ, Q = mean(K), covp(K)
     Φ, u = slope(μ), intercept(μ)
 

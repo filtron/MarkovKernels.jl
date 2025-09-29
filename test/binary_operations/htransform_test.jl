@@ -28,7 +28,7 @@
             C0_fb, Fxx_fb = invert(C1, Bxx)
 
             # backward / forward
-            Fxx_bf, L0 = htransform(Kxx, L)
+            Fxx_bf, L0 = htransform_and_likelihood(Kxx, L)
             C0_bf, ll_bf = posterior_and_loglike(C0, L0)
 
             @test ll_fb ≈ ll_bf
@@ -36,7 +36,7 @@
             @test Fxx_fb ≈ Fxx_bf
 
             L2 = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform(Kxx, L2), (Kxx, L2)))
+            @test all(splat(isequal), zip(htransform_and_likelihood(Kxx, L2), (Kxx, L2)))
         end
     end
 
@@ -80,7 +80,7 @@
                 N = condition(K, x0)
                 NCgt, llgt = posterior_and_loglike(N, L)
 
-                Knew, Lnew = htransform(K, L)
+                Knew, Lnew = htransform_and_likelihood(K, L)
                 NC = condition(Knew, x0)
                 ll = log(Lnew, x0)
 
@@ -90,7 +90,7 @@
             end
 
             L = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform(K, L), (K, L)))
+            @test all(splat(isequal), zip(htransform_and_likelihood(K, L), (K, L)))
         end
     end
 
@@ -114,13 +114,12 @@
             y2 = rand(condition(K2, x))
             L2 = Likelihood(K2, y2)
 
-            # exclude L2 for now since \(::UniformScaling, ::Number) is not implemented?
             Ls = (L1, L2)
             for L in Ls
                 N = condition(K, x0)
                 NCgt, llgt = posterior_and_loglike(N, L)
 
-                Knew, Lnew = htransform(K, L)
+                Knew, Lnew = htransform_and_likelihood(K, L)
                 NC = condition(Knew, x0)
                 ll = log(Lnew, x0)
 
@@ -130,7 +129,7 @@
             end
 
             L = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform(K, L), (K, L)))
+            @test all(splat(isequal), zip(htransform_and_likelihood(K, L), (K, L)))
         end
     end
 end

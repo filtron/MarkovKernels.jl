@@ -133,6 +133,9 @@ include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
 include("binary_operations/htransform.jl")
-export compose, marginalize, invert, posterior_and_loglike, posterior, htransform
+export compose,
+    marginalize, invert, posterior_and_loglike, posterior, htransform_and_likelihood
+
+include("deprecated.jl")
 
 end

@@ -15,7 +15,7 @@ compose(::AbstractMarkovKernel, ::AbstractMarkovKernel)
 ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 ```
 
-Additionally, given likelihoods ``l_1(x)`` and ``l_2(x)``, composition is a binary operator producing a third likelihood ``l_3(x)`` according to 
+Additionally, given likelihoods ``l_1(x)`` and ``l_2(x)``, composition is a binary operator producing a third likelihood ``l_3(x)`` according to
 
 ```math
 l_3(x) = l_2(x) l_1(x).
@@ -72,8 +72,8 @@ posterior(D::AbstractDistribution, L::AbstractLikelihood)
 
 ### Doob's h-transform
 
-Given a Markov kernel ``k(y, x)`` and a likelihood function ``h(y)``, computes a new Markov kernel ``f(y, x)`` and new likelihood function
+Given a Markov kernel ``k(y, x)`` and a likelihood function ``h(y)``, computes a new Markov kernel ``f(y, x)`` and new likelihood function ``g(x)``
 
 ```@docs
-htransform(::AbstractMarkovKernel, ::AbstractLikelihood)
+htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood)
 ```
