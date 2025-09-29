@@ -77,10 +77,11 @@ Computes the Kullback-Leibler divergence between the categorical distributions C
 function kldivergence(C1::AbstractProbabilityVector, C2::AbstractProbabilityVector)
     p1 = probability_vector(C1)
     p2 = probability_vector(C2)
+    T = promote_type(eltype(p1), eltype(p2))
     eachindex(p1) != eachindex(p2) && return Inf
-    kld = zero(float(eltype(p1)))
+    kld = zero(float(T))
     for i in eachindex(p1)
-        logratio = log(p1[i]) - log(p2[i])
+        logratio = ifelse(iszero(p1[i]) && iszero(p2[i]), zero(T), log(p1[i]) - log(p2[i]))
         kld = kld + logratio * p1[i]
     end
     return kld
