@@ -71,19 +71,19 @@ export AbstractMarkovKernel, condition
 include("likelihoods/likelihood_generic.jl")
 export AbstractLikelihood, log
 
-include("distributions/categorical.jl")
+include("distributions/probability_vector.jl")
 include("distributions/dirac.jl")
 include("distributions/normal.jl")
 include("distributions/plotting.jl")
-export AbstractCategorical,
-    Categorical,
+export AbstractProbabilityVector,
+    ProbabilityVector,
     probability_vector,
     AbstractNormal,
     Normal,
     dim,
     mean,
     cov,
-    covp,
+    covparam,
     var,
     std,
     residual,
@@ -116,23 +116,32 @@ export Skedasticity,
     probability_matrix
 
 include("likelihoods/likelihood.jl")
-include("likelihoods/categorical_likelihood.jl")
+include("likelihoods/likelihood_vector.jl")
 include("likelihoods/flatlikelihood.jl")
 include("likelihoods/logquadratic.jl")
 export Likelihood,
     measurement_model,
     measurement,
-    CategoricalLikelihood,
+    LikelihoodVector,
     likelihood_vector,
     FlatLikelihood,
     LogQuadraticLikelihood
 
+include("binary_operations/forward_operator.jl")
+include("binary_operations/backward_operator.jl")
 include("binary_operations/compose.jl")
-include("binary_operations/marginalize.jl")
 include("binary_operations/invert.jl")
 include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
 include("binary_operations/htransform.jl")
-export compose, marginalize, invert, posterior_and_loglike, posterior, htransform
+export forward_operator,
+    backward_operator,
+    compose,
+    invert,
+    posterior_and_loglike,
+    posterior,
+    htransform_and_likelihood
+
+include("deprecated.jl")
 
 end

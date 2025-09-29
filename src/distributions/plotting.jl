@@ -12,7 +12,7 @@
     return values
 end
 
-@recipe function f(::Type{T}, ns::T) where {T<:AbstractVector{<:UvNormal}}
+@recipe function f(::Type{T}, ns::T) where {T<:AbstractVector{<:UnivariateNormal}}
     ribbon_width = 1.96
     values = mean.(ns)
     stds = std.(ns)

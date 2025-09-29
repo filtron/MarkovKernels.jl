@@ -1,19 +1,19 @@
-@safetestset "Categorical" begin
+@safetestset "ProbabilityVector" begin
     using MarkovKernels, LinearAlgebra
     etys = (Float64,)
 
     for T in etys
         p1 = T[1, 2, 3]
         p1 = p1 / sum(p1)
-        C1 = Categorical(p1)
+        C1 = ProbabilityVector(p1)
 
         p2 = T[3, 2, 1]
         p2 = p2 / sum(p2)
-        C2 = Categorical(p2)
+        C2 = ProbabilityVector(p2)
 
         p3 = T[2, 1]
         p3 = p3 / sum(p3)
-        C3 = Categorical(p3)
+        C3 = ProbabilityVector(p3)
 
         @test_nowarn repr(C1)
         @test copy(C1) == C1

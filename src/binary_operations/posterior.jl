@@ -35,6 +35,9 @@ function posterior(D::AbstractDistribution, L::AbstractLikelihood)
     return C
 end
 
+posterior(kernel::AbstractMarkovKernel, like::AbstractLikelihood) =
+    first(htransform_and_likelihood(kernel, like)) # Doob's h-transform
+
 posterior_and_loglike(D::AbstractDistribution, L::Likelihood) =
     posterior_and_loglike(D, measurement_model(L), measurement(L))
 
@@ -47,23 +50,26 @@ function posterior_and_loglike(D::AbstractDistribution, L::LogQuadraticLikelihoo
     return condition(C, y), logc + logpdf(M, y)
 end
 
-function posterior_and_loglike(C::Categorical, L::CategoricalLikelihood)
+function posterior_and_loglike(C::ProbabilityVector, L::LikelihoodVector)
     π = probability_vector(C)
     ls = likelihood_vector(L)
 
     my = dot(ls, π)
     πout = similar(π)
     πout .= ls .* π ./ my
-    Cout = Categorical(πout)
+    Cout = ProbabilityVector(πout)
 
     return Cout, log(my)
 end
 
-function posterior_and_loglike(C::Categorical, L::Likelihood{<:StochasticMatrix,<:Int})
+function posterior_and_loglike(
+    C::ProbabilityVector,
+    L::Likelihood{<:StochasticMatrix,<:Int},
+)
     K, y = measurement_model(L), measurement(L)
     P = probability_matrix(K)
     ls = view(P, y, :)
-    LC = CategoricalLikelihood(ls)
+    LC = LikelihoodVector(ls)
     return posterior_and_loglike(C, LC)
 end
 

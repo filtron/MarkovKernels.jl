@@ -1,10 +1,10 @@
-@safetestset "htransform" begin
+@safetestset "backward_operator" begin
     using MarkovKernels, LinearAlgebra
 
     n, m = 2, 3
     etys = (Float64,)
 
-    @testset "htransform | StochasticMatrix / LikelihoodVector" begin
+    @testset "backward_operator | StochasticMatrix / LikelihoodVector" begin
         for T in etys
             π = exp.(randn(T, m))
             π = π / sum(π)
@@ -28,19 +28,17 @@
             C0_fb, Fxx_fb = invert(C1, Bxx)
 
             # backward / forward
-            Fxx_bf, L0 = htransform_and_likelihood(Kxx, L)
+            L0 = backward_operator(L, Kxx)
             C0_bf, ll_bf = posterior_and_loglike(C0, L0)
 
             @test ll_fb ≈ ll_bf
-            @test C0_fb ≈ C0_bf
-            @test Fxx_fb ≈ Fxx_bf
 
             L2 = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform_and_likelihood(Kxx, L2), (Kxx, L2)))
+            @test backward_operator(L2, Kxx) == L2
         end
     end
 
-    @testset "htransform | Multivariate NormalKernel" begin
+    @testset "backward_operator | Multivariate NormalKernel" begin
         n, m = 2, 3
         etys = (Float64, ComplexF64)
         for T in etys
@@ -80,21 +78,18 @@
                 N = condition(K, x0)
                 NCgt, llgt = posterior_and_loglike(N, L)
 
-                Knew, Lnew = htransform_and_likelihood(K, L)
-                NC = condition(Knew, x0)
+                Lnew = backward_operator(L, K)
                 ll = log(Lnew, x0)
 
-                @test mean(NC) ≈ mean(NCgt)
-                @test cov(NC) ≈ cov(NCgt)
                 @test ll ≈ llgt
             end
 
             L = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform_and_likelihood(K, L), (K, L)))
+            @test L == backward_operator(L, K)
         end
     end
 
-    @testset "htransform | Univariate NormalKernel" begin
+    @testset "backward_operator | Univariate NormalKernel" begin
         etys = (Float64, ComplexF64)
         for T in etys
             Φ = LinearMap(randn(T))
@@ -119,17 +114,14 @@
                 N = condition(K, x0)
                 NCgt, llgt = posterior_and_loglike(N, L)
 
-                Knew, Lnew = htransform_and_likelihood(K, L)
-                NC = condition(Knew, x0)
+                Lnew = backward_operator(L, K)
                 ll = log(Lnew, x0)
 
-                @test mean(NC) ≈ mean(NCgt)
-                @test cov(NC) ≈ cov(NCgt)
                 @test ll ≈ llgt
             end
 
             L = FlatLikelihood()
-            @test all(splat(isequal), zip(htransform_and_likelihood(K, L), (K, L)))
+            @test L == backward_operator(L, K)
         end
     end
 end

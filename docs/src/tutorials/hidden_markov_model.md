@@ -79,7 +79,7 @@ nothing # hide
 m, n = 10, 10
 
 # probability vector of initial distribution
-init = Categorical(ones(m))
+init = ProbabilityVector(ones(m))
 
 # transition probabilities
 Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
@@ -144,7 +144,7 @@ h_{t-1:T \mid t-1}(x) &= h_{t:T\mid t-1}(x) h_{t-1 \mid t-1}(x)
 \end{aligned}
 ```
 
-The first two equations are implemented by ```htransform``` and the last equation is implemented by ```compose```.
+The first two equations are implemented by ```htransform_and_likelihood``` and the last equation is implemented by ```compose```.
 The algorithm terminates by computing the a posteriori initial distribution and the log-likelihood of the observations:
 
 ```math
@@ -160,12 +160,12 @@ Using ```MarkovKernels.jl```, the code might look something like the following:
 ```@example 1
 function backward_recursion(init, forward_kernels, likelihoods)
     h = last(likelihoods)
-    KT = Base.promote_op(first ∘ htransform, eltype(forward_kernels), typeof(h))
+    KT = Base.promote_op(first ∘ htransform_and_likelihood, eltype(forward_kernels), typeof(h))
     post_forward_kernels = Vector{KT}(undef, length(forward_kernels))
 
     for m in eachindex(forward_kernels)
         fw_kernel = forward_kernels[end-m+1]
-        post_fw_kernel, h = htransform(fw_kernel, h)
+        post_fw_kernel, h = htransform_and_likelihood(fw_kernel, h)
         post_forward_kernels[end-m+1] = post_fw_kernel
 
         like = likelihoods[end-m]

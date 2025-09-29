@@ -23,7 +23,7 @@ makedocs(;
         ],
         "Distributions" => [
             "General" => "distributions/distribution_general.md",
-            "Categorical" => "distributions/categorical.md",
+            "Probability vector" => "distributions/probability_vector.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
         ],
@@ -35,7 +35,7 @@ makedocs(;
         ],
         "Likelihoods" => [
             "likelihoods/likelihood_general.md",
-            "likelihoods/categorical_likelihood.md",
+            "likelihoods/likelihood_vector.md",
             "likelihoods/likelihood.md",
             "likelihoods/logquadratic.md",
             "likelihoods/flatlikelihood.md",

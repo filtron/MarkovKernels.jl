@@ -83,7 +83,7 @@
         end
     end
 
-    @testset "compose | CategoricalLikelihood" begin
+    @testset "compose | LikelihoodVector" begin
         etys = (Float64,)
         m, n = 2, 3
         for T in etys

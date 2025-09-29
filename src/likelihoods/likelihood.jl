@@ -32,3 +32,12 @@ measurement(L::Likelihood) = L.y
 
 log(L::Likelihood, x) = logpdf(condition(measurement_model(L), x), measurement(L))
 log(::Likelihood{<:AbstractMarkovKernel,<:Missing}, x) = zero(real(eltype(x)))
+
+function Base.show(io::IO, h::Likelihood)
+    println(io, summary(h))
+    println(io, "observation kernel: ")
+    show(io, h.K)
+    println(io, "")
+    println(io, "observation: ")
+    show(io, h.y)
+end

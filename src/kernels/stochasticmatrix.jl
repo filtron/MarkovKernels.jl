@@ -39,7 +39,7 @@ end
 
 probability_matrix(K::StochasticMatrix) = K.P
 
-condition(K::AbstractStochasticMatrix, x) = Categorical(K.P[:, x])
+condition(K::AbstractStochasticMatrix, x) = ProbabilityVector(K.P[:, x])
 
 """
     rand([rng::AbstractRNG], K::AbstractStochasticMatrix, x)

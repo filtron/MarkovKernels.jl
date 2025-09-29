@@ -1,12 +1,12 @@
-@safetestset "marginalize" begin
+@safetestset "forward_operator" begin
     using MarkovKernels, LinearAlgebra
-    include("marginalize_test_utils.jl")
+    include("forward_operator_test_utils.jl")
 
     m = 2
     etys = (Float64, ComplexF64)
 
     for T in etys
-        @testset "marginalize | Multivariate Dirac/Normal" begin
+        @testset "forward_operator | Multivariate Dirac/Normal" begin
             μ1 = randn(T, m)
             V1 = Cholesky(UpperTriangular(ones(T, m, m)))
 
@@ -30,9 +30,8 @@
             # Any
             IK = IdentityKernel()
 
-            # marginalize
             for dist in (N, D), kernel in (NK2, DK2, IK)
-                _test_pair_marginalize(dist, kernel)
+                _test_pair_forward_operator(kernel, dist)
             end
 
             # plus / minus
@@ -47,11 +46,11 @@
             C = randn(T, m, m)
             F = LinearMap(C)
             for dist in (N, D)
-                @test C * dist == marginalize(dist, DiracKernel(F))
+                @test C * dist == forward_operator(DiracKernel(F), dist)
             end
         end
 
-        @testset "marginalize | Univariate Dirac/Normal" begin
+        @testset "forward_operator | Univariate Dirac/Normal" begin
             μ1 = randn(T)
             V1 = one(real(T))
 
@@ -68,9 +67,8 @@
             # Any
             IK = IdentityKernel()
 
-            # marginalize
             for dist in (N, D), kernel in (NK2, DK2, IK)
-                _test_pair_marginalize(dist, kernel)
+                _test_pair_forward_operator(kernel, dist)
             end
 
             # plus / minus
@@ -85,17 +83,17 @@
             C = randn(T)
             F = LinearMap(C)
             for dist in (N, D)
-                @test C * dist == marginalize(dist, DiracKernel(F))
+                @test C * dist == forward_operator(DiracKernel(F), dist)
             end
         end
 
-        @testset "marginalize | Stochastic Matrix" begin
+        @testset "forward_operator | Stochastic Matrix" begin
             etys = (Float64,)
             m, n = 2, 3
             for T in etys
                 π2 = exp.(randn(T, m))
                 π2 = π2 / sum(π2)
-                C2 = Categorical(π2)
+                C2 = ProbabilityVector(π2)
 
                 P2 = exp.(randn(T, m, m))
                 P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
@@ -107,15 +105,15 @@
 
                 π4 = exp.(randn(T, n))
                 π4 = π4 / sum(π4)
-                C4 = Categorical(π4)
+                C4 = ProbabilityVector(π4)
 
                 P4 = exp.(randn(T, m, n))
                 P4 = P4 * Diagonal(1 ./ [sum(p) for p in eachcol(P4)])
                 K4 = StochasticMatrix(P4)
 
-                @test probability_vector(marginalize(C2, K2)) ≈ P2 * π2
-                @test probability_vector(marginalize(C2, K3)) ≈ P3 * π2
-                @test probability_vector(marginalize(C4, K4)) ≈ P4 * π4
+                @test probability_vector(forward_operator(K2, C2)) ≈ P2 * π2
+                @test probability_vector(forward_operator(K3, C2)) ≈ P3 * π2
+                @test probability_vector(forward_operator(K4, C4)) ≈ P4 * π4
             end
         end
     end

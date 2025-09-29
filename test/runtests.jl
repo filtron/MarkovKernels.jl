@@ -13,7 +13,7 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     include("affinemaps/affinemaps_test.jl")
 
     @testset "Distributions" begin
-        include("distributions/categorical_test.jl")
+        include("distributions/probability_vector_test.jl")
         include("distributions/dirac_test.jl")
         include("distributions/normal_test.jl")
         #normal_plotting_test()
@@ -26,15 +26,16 @@ import RecursiveArrayTools: recursivecopy, recursivecopy!
     end
 
     @testset "Likelihoods" begin
-        include("likelihoods/categoricallikelihood_test.jl")
+        include("likelihoods/likelihood_vector_test.jl")
         include("likelihoods/flatlikelihood_test.jl")
         include("likelihoods/likelihood_test.jl")
         include("likelihoods/logquadratic_test.jl")
     end
 
     @testset "Binary Operations" begin
+        include("binary_operations/forward_operator_test.jl")
+        include("binary_operations/backward_operator_test.jl")
         include("binary_operations/compose_test.jl")
-        include("binary_operations/marginalize_test.jl")
         include("binary_operations/invert_test.jl")
         include("binary_operations/posterior_test.jl")
         include("binary_operations/htransform_test.jl")

@@ -111,10 +111,10 @@
     etys = (Float64,)
 
     for T in etys
-        @testset "StochasticMatrix / CategoricalLikelihood" begin
+        @testset "StochasticMatrix / LikelihoodVector" begin
             π1 = exp.(randn(T, m))
             π1 = π1 / sum(π1)
-            C1 = Categorical(π1)
+            C1 = ProbabilityVector(π1)
 
             P1 = exp.(randn(T, m, m))
             P1 = P1 * Diagonal(1 ./ [sum(p) for p in eachcol(P1)])
@@ -122,7 +122,7 @@
 
             π2 = exp.(randn(T, n))
             π2 = π2 / sum(π2)
-            C2 = Categorical(π2)
+            C2 = ProbabilityVector(π2)
 
             P2 = exp.(randn(T, m, n))
             P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
@@ -142,7 +142,7 @@
                 πgt = π .* ls / my
                 llgt = log(my)
 
-                CL = CategoricalLikelihood(L)
+                CL = LikelihoodVector(L)
 
                 CC1, ll1 = posterior_and_loglike(C, L)
                 CC2 = posterior(C, L)

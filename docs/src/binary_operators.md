@@ -2,7 +2,7 @@
 CurrentModule = MarkovKernels
 ```
 
-### Composition
+## Composition
 
 Given Markov kernels ``k_2(y,z)`` and ``k_1(z,x)``, composition is a binary operator producing a third kernel ``k_3(y,x)`` according to
 
@@ -15,7 +15,7 @@ compose(::AbstractMarkovKernel, ::AbstractMarkovKernel)
 ∘(K2::AbstractMarkovKernel, K1::AbstractMarkovKernel)
 ```
 
-Additionally, given likelihoods ``l_1(x)`` and ``l_2(x)``, composition is a binary operator producing a third likelihood ``l_3(x)`` according to 
+Additionally, given likelihoods ``l_1(x)`` and ``l_2(x)``, composition is a binary operator producing a third likelihood ``l_3(x)`` according to
 
 ```math
 l_3(x) = l_2(x) l_1(x).
@@ -27,7 +27,7 @@ compose(::AbstractLikelihood, ::AbstractLikelihood)
 ```
 
 
-### Algebra
+## Algebra
 
 ```@docs
 +(D::AbstractDistribution, v::AbstractNumOrVec)
@@ -37,19 +37,29 @@ compose(::AbstractLikelihood, ::AbstractLikelihood)
 ```
 
 
-### Marginalization
+## The forward operator and backward operator
 
-Given a distribution ``\pi(x)`` and a Markov kernel ``k(y,x)``, marginalization is a binary operator producing a new distriubution ``p(y)`` according to
+A Markov kernel ``k(y, x)`` defines an operator that maps a distribution $\pi(x)$ according to
 
 ```math
-p(y) = \int k(y, x) \pi(x) \mathrm{d} x.
+\int k(y, x) \pi(x) \mathrm{d} x.
 ```
+
+This is the so-called forward operator, which is also commonly referred to as marginalization.
+The corresponding adjoint is the so-called backward operator, which is given by
+
+```math
+\int h(y) k(y, x) \mathrm{d} y.
+```
+
+
 
 ```@docs
-marginalize(N::AbstractNormal, K::AffineHomoskedasticNormalKernel)
+forward_operator(k::AbstractMarkovKernel, d)
+backward_operator(h, k::AbstractMarkovKernel)
 ```
 
-### Bayes' rule & invert
+## Bayes' rule & invert
 
 Given a distribution ``\pi(x)`` and a Markov kernel ``k(y,x)``, invert is a binary operator producing a new distribution ``m(y)`` and a new Markov kernel ``p(x , y)`` according to
 
@@ -70,10 +80,10 @@ posterior(D::AbstractDistribution, K::AbstractMarkovKernel, y)
 posterior(D::AbstractDistribution, L::AbstractLikelihood)
 ```
 
-### Doob's h-transform
+## Doob's h-transform
 
-Given a Markov kernel ``k(y, x)`` and a likelihood function ``h(y)``, computes a new Markov kernel ``f(y, x)`` and new likelihood function
+Given a Markov kernel ``k(y, x)`` and a likelihood function ``h(y)``, computes a new Markov kernel ``f(y, x)`` and new likelihood function ``g(x)``
 
 ```@docs
-htransform(::AbstractMarkovKernel, ::AbstractLikelihood)
+htransform_and_likelihood(::AbstractMarkovKernel, ::AbstractLikelihood)
 ```

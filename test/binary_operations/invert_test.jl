@@ -79,7 +79,7 @@
             for T in etys
                 π2 = exp.(randn(T, m))
                 π2 = π2 / sum(π2)
-                C2 = Categorical(π2)
+                C2 = ProbabilityVector(π2)
 
                 P2 = exp.(randn(T, m, m))
                 P2 = P2 * Diagonal(1 ./ [sum(p) for p in eachcol(P2)])
@@ -91,24 +91,25 @@
 
                 π4 = exp.(randn(T, n))
                 π4 = π4 / sum(π4)
-                C4 = Categorical(π4)
+                C4 = ProbabilityVector(π4)
 
                 P4 = exp.(randn(T, m, n))
                 P4 = P4 * Diagonal(1 ./ [sum(p) for p in eachcol(P4)])
                 K4 = StochasticMatrix(P4)
 
                 C2C, K2C = invert(C2, K2)
-                @test probability_vector(C2C) ≈ probability_vector(marginalize(C2, K2))
+                @test probability_vector(C2C) ≈ probability_vector(forward_operator(K2, C2))
                 @test probability_matrix(K2C) ≈
                       Diagonal(π2) * adjoint(P2) * Diagonal(1 ./ probability_vector(C2C))
 
                 C2C2, K3C = invert(C2, K3)
-                @test probability_vector(C2C2) ≈ probability_vector(marginalize(C2, K3))
+                @test probability_vector(C2C2) ≈
+                      probability_vector(forward_operator(K3, C2))
                 @test probability_matrix(K3C) ≈
                       Diagonal(π2) * adjoint(P3) * Diagonal(1 ./ probability_vector(C2C2))
 
                 C4C, K4C = invert(C4, K4)
-                @test probability_vector(C4C) ≈ probability_vector(marginalize(C4, K4))
+                @test probability_vector(C4C) ≈ probability_vector(forward_operator(K4, C4))
                 @test probability_matrix(K4C) ≈
                       Diagonal(π4) * adjoint(P4) * Diagonal(1 ./ probability_vector(C4C))
             end

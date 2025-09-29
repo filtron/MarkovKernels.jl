@@ -61,12 +61,12 @@ That is, the output is callable.
 mean(K::NormalKernel) = K.μ
 
 """
-    covp(K::AbstractNormalKernel)
+    covparam(K::AbstractNormalKernel)
 
 Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
 For computing the actual conditional covariance matrix, use cov.
 """
-covp(K::NormalKernel) = K.Σ
+covparam(K::NormalKernel) = K.Σ
 
 """
     cov(K::AbstractNormalKernel)
@@ -74,27 +74,27 @@ covp(K::NormalKernel) = K.Σ
 Computes the conditonal covariance function of the Normal kernel K.
 That is, the output is callable.
 """
-cov(K::NormalKernel) = covp(K)
-cov(K::HomoskedasticNormalKernel) = x -> covp(K)
+cov(K::NormalKernel) = covparam(K)
+cov(K::HomoskedasticNormalKernel) = x -> covparam(K)
 
-condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), cov(K)(x))
-condition(K::HomoskedasticNormalKernel, x) = Normal(mean(K)(x), covp(K))
+condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), covparam(K)(x))
+condition(K::HomoskedasticNormalKernel, x) = Normal(mean(K)(x), covparam(K))
 
 function Base.copy!(
     Kdst::TK,
     Ksrc::TK,
 ) where {TM,TK<:HomoskedasticNormalKernel{TM,<:Cholesky}}
     copy!(mean(Kdst), mean(Ksrc))
-    if covp(Kdst).uplo == covp(Ksrc).uplo
-        copy!(covp(Kdst).factors, covp(Ksrc).factors)
+    if covparam(Kdst).uplo == covparam(Ksrc).uplo
+        copy!(covparam(Kdst).factors, covparam(Ksrc).factors)
     else
-        copy!(covp(Kdst).factors, adjoint(covp(Ksrc).factors))
+        copy!(covparam(Kdst).factors, adjoint(covparam(Ksrc).factors))
     end
     return Kdst
 end
 
 function Base.similar(K::HomoskedasticNormalKernel{TM,<:Cholesky}) where {TM}
-    C = covp(K)
+    C = covparam(K)
     return NormalKernel(similar(mean(K)), Cholesky(similar(C.factors), C.uplo, C.info))
 end
 
