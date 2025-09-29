@@ -1,11 +1,11 @@
 #=
 
-* marginalize
 * AbstractCategorical
 * Categorical
 * CategoricalLikelihood
 * covp
 * UvNormal
+* compose
 
 =#
 

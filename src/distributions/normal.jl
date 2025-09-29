@@ -40,7 +40,8 @@ end
 Normal(μ::Number, Σ::UniformScaling) = Normal(μ, Σ.λ)
 
 # this needs to change to allow for heterogneous eltype in fields / sample_type
-const UvNormal{T,V} = Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
+const UnivariateNormal{T,V} =
+    Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 const IsotropicNormal{ST,MT,VT} = Normal{ST,MT,VT} where {VT<:UniformScaling}
 
 function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
@@ -95,7 +96,7 @@ Computes the covariance matrix of the Normal distribution N.
 """
 cov(N::Normal) = AbstractMatrix(covp(N))
 cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = covp(N)
-cov(N::UvNormal) = covp(N)
+cov(N::UnivariateNormal) = covp(N)
 cov(N::IsotropicNormal) = covp(N)[1:dim(N), 1:dim(N)]
 
 """
@@ -104,7 +105,7 @@ Computes the vector of marginal variances of the Normal distribution N.
 """
 var(N::AbstractNormal) = real(diag(cov(N)))
 var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachcol(rsqrt(covp(N))))
-var(N::UvNormal) = cov(N)
+var(N::UnivariateNormal) = cov(N)
 var(N::IsotropicNormal) = typeof(mean(N))(fill(covp(N).λ, dim(N)))
 
 """
@@ -185,7 +186,8 @@ function rand(rng::AbstractRNG, N::AbstractNormal)
     return sample_type(N)(x)
 end
 
-rand(rng::AbstractRNG, N::UvNormal) = mean(N) + lsqrt(covp(N)) * randn(rng, sample_type(N))
+rand(rng::AbstractRNG, N::UnivariateNormal) =
+    mean(N) + lsqrt(covp(N)) * randn(rng, sample_type(N))
 
 function Base.show(io::IO, N::Normal)
     println(io, summary(N))
@@ -195,7 +197,7 @@ function Base.show(io::IO, N::Normal)
     show(io, N.Σ)
 end
 
-function Base.show(io::IO, N::UvNormal)
+function Base.show(io::IO, N::UnivariateNormal)
     println(io, summary(N))
     print(io, "μ = ")
     show(io, (N.μ))
