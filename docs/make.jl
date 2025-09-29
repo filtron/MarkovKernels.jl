@@ -23,7 +23,7 @@ makedocs(;
         ],
         "Distributions" => [
             "General" => "distributions/distribution_general.md",
-            "Categorical" => "distributions/categorical.md",
+            "Probability vector" => "distributions/probability_vector.md",
             "Normal" => "distributions/normal.md",
             "Dirac" => "distributions/dirac.md",
         ],

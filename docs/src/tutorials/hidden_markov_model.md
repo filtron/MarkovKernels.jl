@@ -79,7 +79,7 @@ nothing # hide
 m, n = 10, 10
 
 # probability vector of initial distribution
-init = Categorical(ones(m))
+init = ProbabilityVector(ones(m))
 
 # transition probabilities
 Pxx = Matrix(Tridiagonal(ones(m - 1), 5 * ones(m), ones(m - 1)))
