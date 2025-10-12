@@ -84,6 +84,30 @@ function compose(L1::LogQuadraticLikelihood, L2::LogQuadraticLikelihood)
     return LogQuadraticLikelihood(logcbar, ybar, Cbar)
 end
 
+function compose(
+    L1::LogQuadraticLikelihood{A1,<:Number,<:Number},
+    L2::LogQuadraticLikelihood{A2,<:Number,<:Number},
+) where {A1,A2}
+    logc1, y1, C1 = L1
+    logc2, y2, C2 = L2
+
+    Chat = [C1; C2;;]
+    yhat = vcat(y1, y2)
+    T = eltype(yhat)
+
+    logcbar = logc1 + logc2
+    F = qr!(Chat)
+    Cbar = F.R[begin, begin]
+    y3 = adjoint(F.Q) * yhat
+
+    ybar = y3[begin]
+
+    e_norm_sqr = norm(y3)^2 - norm(ybar)^2
+    logcbar = logcbar - _nscale(T) * e_norm_sqr
+
+    return LogQuadraticLikelihood(logcbar, ybar, Cbar)
+end
+
 compose(L1::LogQuadraticLikelihood, L2::Likelihood{<:AffineHomoskedasticNormalKernel}) =
     compose(L1, LogQuadraticLikelihood(L2))
 compose(L1::Likelihood{<:AffineHomoskedasticNormalKernel}, L2::LogQuadraticLikelihood) =

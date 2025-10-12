@@ -28,7 +28,7 @@ function LogQuadraticLikelihood(L::Likelihood{<:AffineHomoskedasticNormalKernel}
 
     ybar = Rsqrt \ (y - intercept(F))
     Cbar = Rsqrt \ slope(F)
-    logc = -_nscale(T) * (m * _logpiconst(T) + 2 * logdet(Rsqrt))
+    logc = -_nscale(T) * (m * _logpiconst(T) + 2 * real(logdet(Rsqrt)))
     return LogQuadraticLikelihood(logc, ybar, Cbar)
 end
 
@@ -42,7 +42,7 @@ function LogQuadraticLikelihood(L::Likelihood{<:AffineIsotropicNormalKernel})
 
     ybar = Rsqrt \ (y - intercept(F))
     Cbar = Rsqrt \ slope(F)
-    logc = -_nscale(T) * (m * _logpiconst(T) + 2 * logdet(Rsqrt))
+    logc = -_nscale(T) * (m * _logpiconst(T) + 2 * real(logdet(Rsqrt)))
     return LogQuadraticLikelihood(logc, ybar, Cbar)
 end
 
