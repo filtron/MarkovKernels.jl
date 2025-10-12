@@ -119,13 +119,13 @@
         for T in etys
             x = randn(T, m)
 
-            C1 = LinearMap(randn(n, m))
-            R1 = Cholesky(UpperTriangular(ones(n, n)))
+            C1 = LinearMap(randn(T, n, m))
+            R1 = Cholesky(UpperTriangular(ones(T, n, n)))
             K1 = NormalKernel(C1, R1)
             y1 = rand(condition(K1, x))
             L1 = Likelihood(K1, y1)
 
-            C2 = LinearMap(adjoint(randn(m)))
+            C2 = LinearMap(adjoint(randn(T, m)))
             R2 = exp(randn(real(T)))
             K2 = NormalKernel(C2, R2)
             y2 = rand(condition(K2, x))
@@ -143,7 +143,27 @@
             for LL in Ls
                 for LR in Ls
                     Lnew = compose(LL, LR)
-                    @test log(Lnew, x) ≈ log(LL, x) + log(LR, x)
+                    logsum = log(LL, x) + log(LR, x)
+                    @test isreal(logsum)
+                    @test log(Lnew, x) ≈ logsum
+                end
+            end
+
+            x = randn(T)
+            C6 = LinearMap(randn(T))
+            R6 = exp(randn(real(T)))
+            K6 = NormalKernel(C6, R6)
+            y6 = randn(T)
+            L6 = Likelihood(K6, y6)
+            L7 = FlatLikelihood()
+            L8 = Likelihood(K6, missing)
+            Ls = (L6, L7, L8)
+            for LL in Ls
+                for LR in Ls
+                    Lnew = compose(LL, LR)
+                    logsum = log(LL, x) + log(LR, x)
+                    @test isreal(logsum)
+                    @test log(Lnew, x) ≈ logsum
                 end
             end
         end
