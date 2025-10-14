@@ -15,6 +15,14 @@ Abstract type for representing Normal kernels.
 """
 abstract type AbstractNormalKernel <: AbstractMarkovKernel end
 
+mean(k::AbstractNormalKernel, x::AbstractNumOrVec) = mean(k)(x)
+covparam(k::AbstractNormalKernel, x) = covparam(k)(x)
+
+mean_and_covparam(k::AbstractNormalKernel) = mean(k), covparam(k)
+mean_and_covparam(k::AbstractNormalKernel, x) = mean(k, x), covparam(k, x)
+
+condition(k::AbstractNormalKernel, x) = Normal(mean_and_covparam(k, x)...)
+
 """
     NormalKernel
 
@@ -53,12 +61,12 @@ const AffineIsotropicNormalKernel{TM,TC} =
     NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC<:UniformScaling}
 
 """
-    mean(K::AbstractNormalKernel)
+    mean(k::AbstractNormalKernel)
 
-Computes the conditonal mean function of the Normal kernel K.
+Computes the conditonal mean function of the Normal kernel k.
 That is, the output is callable.
 """
-mean(K::NormalKernel) = K.μ
+mean(k::NormalKernel) = k.μ
 
 """
     covparam(K::AbstractNormalKernel)
@@ -66,7 +74,8 @@ mean(K::NormalKernel) = K.μ
 Returns the internal representation of the conditonal covariance matrix of the Normal kernel K.
 For computing the actual conditional covariance matrix, use cov.
 """
-covparam(K::NormalKernel) = K.Σ
+covparam(k::NormalKernel) = k.Σ
+covparam(k::HomoskedasticNormalKernel, x) = covparam(k)
 
 """
     cov(K::AbstractNormalKernel)
@@ -76,9 +85,6 @@ That is, the output is callable.
 """
 cov(K::NormalKernel) = covparam(K)
 cov(K::HomoskedasticNormalKernel) = x -> covparam(K)
-
-condition(K::AbstractNormalKernel, x) = Normal(mean(K)(x), covparam(K)(x))
-condition(K::HomoskedasticNormalKernel, x) = Normal(mean(K)(x), covparam(K))
 
 function Base.copy!(
     Kdst::TK,
