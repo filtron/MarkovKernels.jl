@@ -14,12 +14,14 @@ function Random.rand(::AbstractRNG, ::AbstractDistribution) end
 
 Random.rand(D::AbstractDistribution) = rand(Random.default_rng(), D)
 
+sample_type(::Type{<:AbstractDistribution{ST}}) where {ST} = ST
+
 """
-    sample_type(D::AbstractDistribution)
+    sample_type(dist::AbstractDistribution)
 
 Computes the type of samples from D, e.g. same as typeof(rand(D)).
 """
-sample_type(::AbstractDistribution{ST}) where {ST} = ST
+sample_type(dist::AbstractDistribution) = sample_type(typeof(dist))
 
 """
 sample_eltype(D::AbstractDistribution)
