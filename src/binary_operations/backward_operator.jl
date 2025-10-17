@@ -15,21 +15,59 @@ backward_operator(::FlatLikelihood, k::AbstractMarkovKernel) = FlatLikelihood()
 backward_operator(::Likelihood{<:AbstractMarkovKernel,<:Missing}, k::AbstractMarkovKernel) =
     backward_operator(FlatLikelihood(), k)
 
-function backward_operator(h::LikelihoodVector, k::StochasticMatrix)
-    ls = likelihood_vector(h)
-    P = probability_matrix(k)
+# apparently needed to break ambiguity 
+backward_operator(::Likelihood{<:StochasticMatrix,<:Missing}, k::StochasticMatrix) =
+    backward_operator(FlatLikelihood(), k)
 
-    lsout = similar(P, axes(P, 2))
-    lsout = mul!(lsout, adjoint(P), ls)
-    hout = LikelihoodVector(lsout)
+function backward_operator(h::Likelihood{<:StochasticMatrix}, k::StochasticMatrix)
+    P = probability_matrix(k)
+    hout = similar(h, axes(P, 2))
+    return backward_operator!(hout, h, k)
+end
+
+backward_operator!(
+    hout::LikelihoodVector,
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+    k::StochasticMatrix,
+) = backward_operator!(hout, FlatLikelihood(), k)
+
+function backward_operator!(hout::LikelihoodVector, ::FlatLikelihood, k::StochasticMatrix)
+    ls = likelihood_vector(hout)
+    P = probability_matrix(k)
+    sum!(ls, adjoint(P))
     return hout
 end
 
-function backward_operator(h::Likelihood{<:StochasticMatrix}, k::StochasticMatrix)
-    Kobs, y = measurement_model(h), measurement(h)
-    ls = view(probability_matrix(Kobs), y, :)
-    htmp = LikelihoodVector(ls)
-    return backward_operator(htmp, k)
+function backward_operator!(
+    hout::LikelihoodVector,
+    h::Likelihood{<:StochasticMatrix},
+    k::StochasticMatrix,
+)
+    hk = measurement_model(h)
+    hy = measurement(h)
+    P = probability_matrix(hk)
+    ls = view(P, hy, :)
+    h = LikelihoodVector(ls)
+    return backward_operator!(hout, h, k)
+end
+
+function backward_operator(h::LikelihoodVector, k::StochasticMatrix)
+    P = probability_matrix(k)
+    hout = similar(h, axes(P, 2))
+    hout = backward_operator!(hout, h, k)
+    return hout
+end
+
+function backward_operator!(
+    hout::LikelihoodVector,
+    h::LikelihoodVector,
+    k::StochasticMatrix,
+)
+    lsout = likelihood_vector(hout)
+    ls = likelihood_vector(h)
+    P = probability_matrix(k)
+    lsout = mul!(lsout, adjoint(P), ls)
+    return hout
 end
 
 function backward_operator(h::LogQuadraticLikelihood, k::AffineHomoskedasticNormalKernel)

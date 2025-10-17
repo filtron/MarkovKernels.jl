@@ -30,7 +30,7 @@ for func in (:(==), :isequal, :isapprox)
     end
 end
 
-for func in (:similar, :copy)
+for func in (:copy,)
     @eval function Base.$func(L::AbstractLikelihood)
         fields = fieldnames(typeof(L))
         input = Tuple($func(getfield(L, f)) for f in fields)

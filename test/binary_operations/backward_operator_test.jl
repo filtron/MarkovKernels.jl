@@ -34,7 +34,17 @@
             @test ll_fb ≈ ll_bf
 
             L2 = FlatLikelihood()
-            @test backward_operator(L2, Kxx) == L2
+            @test backward_operator(Kxx, Kyx) ≈ forward_operator(Kyx, Kxx)
+            @test backward_operator(L2, Kxx) ==
+                  L2 ==
+                  backward_operator(Likelihood(Kxx, missing), Kxx)
+
+            h = LikelihoodVector(ones(T, m))
+            hout = similar(h)
+            @test backward_operator!(hout, FlatLikelihood(), Kxx) ≈
+                  backward_operator(h, Kxx)
+            @test backward_operator!(hout, FlatLikelihood(), Kxx) ≈
+                  backward_operator!(similar(hout), FlatLikelihood(), Kxx)
         end
     end
 

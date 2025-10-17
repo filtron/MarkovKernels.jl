@@ -16,6 +16,9 @@
         x1s = 1:m
         x2s = 1:n
 
+        T2 = Float32
+        r = 5
+
         for y in ys
             for K in (K1, K2)
                 LSM = Likelihood(K, y)
@@ -25,6 +28,11 @@
 
                 @test CL1 == CL2
                 @test likelihood_vector(CL1) ≈ likelihood_vector(CL2) ≈ ls
+                @test log(LSM, 2) ≈ log(CL1, 2)
+
+                @test typeof(similar(LSM)) <: LikelihoodVector
+                @test eltype(likelihood_vector(similar(LSM, T2))) <: T2
+                @test length(likelihood_vector(similar(LSM, r))) == r
             end
         end
     end

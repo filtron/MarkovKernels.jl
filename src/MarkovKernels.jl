@@ -137,6 +137,7 @@ include("binary_operations/algebra.jl")
 include("binary_operations/htransform.jl")
 export forward_operator,
     backward_operator,
+    backward_operator!,
     compose,
     invert,
     posterior_and_loglike,
