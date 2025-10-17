@@ -25,6 +25,19 @@ function backward_operator(h::Likelihood{<:StochasticMatrix}, k::StochasticMatri
     return backward_operator!(hout, h, k)
 end
 
+backward_operator!(
+    hout::LikelihoodVector,
+    ::Likelihood{<:AbstractMarkovKernel,<:Missing},
+    k::StochasticMatrix,
+) = backward_operator!(hout, FlatLikelihood(), k)
+
+function backward_operator!(hout::LikelihoodVector, ::FlatLikelihood, k::StochasticMatrix)
+    ls = likelihood_vector(hout)
+    P = probability_matrix(k)
+    sum!(ls, adjoint(P))
+    return hout
+end
+
 function backward_operator!(
     hout::LikelihoodVector,
     h::Likelihood{<:StochasticMatrix},
