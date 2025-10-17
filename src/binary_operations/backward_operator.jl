@@ -15,6 +15,10 @@ backward_operator(::FlatLikelihood, k::AbstractMarkovKernel) = FlatLikelihood()
 backward_operator(::Likelihood{<:AbstractMarkovKernel,<:Missing}, k::AbstractMarkovKernel) =
     backward_operator(FlatLikelihood(), k)
 
+# apparently needed to break ambiguity 
+backward_operator(::Likelihood{<:StochasticMatrix,<:Missing}, k::StochasticMatrix) =
+    backward_operator(FlatLikelihood(), k)
+
 function backward_operator(h::Likelihood{<:StochasticMatrix}, k::StochasticMatrix)
     P = probability_matrix(k)
     hout = similar(h, axes(P, 2))

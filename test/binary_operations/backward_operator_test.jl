@@ -34,7 +34,10 @@
             @test ll_fb ≈ ll_bf
 
             L2 = FlatLikelihood()
-            @test backward_operator(L2, Kxx) == L2
+            @test backward_operator(Kxx, Kyx) ≈ forward_operator(Kyx, Kxx)
+            @test backward_operator(L2, Kxx) ==
+                  L2 ==
+                  backward_operator(Likelihood(Kxx, missing), Kxx)
         end
     end
 
