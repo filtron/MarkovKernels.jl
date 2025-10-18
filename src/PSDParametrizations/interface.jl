@@ -15,6 +15,12 @@ function convert_psd_eltype(::Type{T}, P) where {T} end
 
 convert_psd_eltype(P) = convert_psd_eltype(eltype(P), P)
 
+psdsimilar(P) = psdsimilar(P, eltype(P), size(P, 1))
+psdsimilar(P, ::Type{T}) where {T} = psdsimilar(P, T, size(P, 1))
+psdsimilar(P, d) = psdsimilar(P, eltype(P), d)
+
+function psdsimilar(P, ::Type{T}, d) where {T} end
+
 """
     rsqrt(Σ)
 

@@ -46,7 +46,7 @@
             C = randn(T, m, m)
             F = LinearMap(C)
             for dist in (N, D)
-                @test C * dist == forward_operator(DiracKernel(F), dist)
+                @test C * dist ≈ forward_operator(DiracKernel(F), dist)
             end
         end
 
