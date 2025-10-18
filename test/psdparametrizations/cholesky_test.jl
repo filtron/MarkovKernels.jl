@@ -44,12 +44,15 @@
             )
         end
 
-        RD = Diagonal(abs2.(randn(real(T), m)))
+        RD = cholesky(Diagonal(abs2.(randn(real(T), m))))
 
         @testset "PSDParametrizations | Cholesky | Diagonal | $(T)" begin
-            @test _to_matrix(stein(CΣ, C, RD)) ≈ _stein(Σ, C, RD)
+            @test _to_matrix(stein(CΣ, C, RD)) ≈ _stein(Σ, C, _to_matrix(RD))
             @test all(
-                isapprox.(_to_matrix.(schur_reduce(CΣ, C, RD)), _schur_reduce(Σ, C, RD)),
+                isapprox.(
+                    _to_matrix.(schur_reduce(CΣ, C, RD)),
+                    _schur_reduce(Σ, C, _to_matrix(RD)),
+                ),
             )
         end
     end

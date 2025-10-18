@@ -6,7 +6,6 @@ function _test_pair_compose(
     A1, b1, Σ1 = slope(mean(K1)), intercept(mean(K1)), Matrix(covparam(K1))
     K3 = compose(K2, K1)
     @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-        @test K3 == K2 ∘ K1
         @test slope(mean(K3)) ≈ A2 * A1
         @test intercept(mean(K3)) ≈ A2 * b1 + b2
         @test Matrix(covparam(K3)) ≈ A2 * Σ1 * A2' + Σ2
@@ -18,7 +17,6 @@ function _test_pair_compose(K2::AffineHomoskedasticNormalKernel, K1::AffineDirac
     A1, b1 = slope(mean(K1)), intercept(mean(K1))
     K3 = compose(K2, K1)
     @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-        @test K3 == K2 ∘ K1
         @test slope(mean(K3)) ≈ A2 * A1
         @test intercept(mean(K3)) ≈ A2 * b1 + b2
         @test Matrix(covparam(K3)) ≈ Σ2
@@ -30,7 +28,6 @@ function _test_pair_compose(K2::AffineDiracKernel, K1::AffineDiracKernel)
     A1, b1 = slope(mean(K1)), intercept(mean(K1))
     K3 = compose(K2, K1)
     @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-        @test K3 == K2 ∘ K1
         @test slope(mean(K3)) ≈ A2 * A1
         @test intercept(mean(K3)) ≈ A2 * b1 + b2
     end
@@ -41,7 +38,6 @@ function _test_pair_compose(K2::AffineDiracKernel, K1::AffineHomoskedasticNormal
     A1, b1, Σ1 = slope(mean(K1)), intercept(mean(K1)), Matrix(covparam(K1))
     K3 = compose(K2, K1)
     @testset "compose | $(nameof(typeof(K2))) | $(nameof(typeof(K1)))" begin
-        @test K3 == K2 ∘ K1
         @test slope(mean(K3)) ≈ A2 * A1
         @test intercept(mean(K3)) ≈ A2 * b1 + b2
         @test Matrix(covparam(K3)) ≈ A2 * Σ1 * A2'

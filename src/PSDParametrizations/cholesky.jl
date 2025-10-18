@@ -5,19 +5,45 @@ convert_psd_eltype(::Type{T}, C::Cholesky) where {T} = convert(Factorization{T},
 
 rsqrt(C::Cholesky) = C.uplo == 'U' ? C.U : adjoint(C.L)
 
-function stein(Σ::Cholesky, Φ::AbstractMatrix)
+function psdsimilar(C::Cholesky, ::Type{T}, d) where {T}
+    factors = similar(C.factors, T, d, d)
+    return Cholesky(UpperTriangular(factors))
+end
+
+function stein(
+    Σ::Cholesky,
+    Φ::AbstractMatrix,
+    work_arr::AbstractMatrix = similar(Φ, reverse(size(Φ))),
+)
     m, n = size(Φ)
-    work_arr = similar(Φ, n, m)
+    work_arr = view(work_arr, 1:n, 1:m)
+    Π = psdsimilar(Σ, m)
+    return stein!(Π, Σ, Φ, work_arr)
+end
+
+function stein!(
+    Π::Cholesky,
+    Σ::Cholesky,
+    Φ::AbstractMatrix,
+    work_arr::AbstractMatrix = similar(Φ, reverse(size(Φ))),
+)
+    m, n = size(Φ)
+    work_arr = view(work_arr, 1:n, 1:m)
 
     mul!(work_arr, rsqrt(Σ), adjoint(Φ))
     U = positive_qrwoq!(work_arr)
-    Π = Cholesky(UpperTriangular(copy(U)))
+    copy!(rsqrt(Π), UpperTriangular(U))
     return Π
 end
 
-function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector})
+# can not be made in-place because numbers are not mutable. 
+function stein(
+    Σ::Cholesky,
+    Φ::Adjoint{<:Number,<:AbstractVector},
+    work_arr::AbstractMatrix = similar(Φ, reverse(size(Φ))),
+)
     m, n = size(Φ)
-    work_arr = similar(Φ, n, m)
+    work_arr = view(work_arr, 1:n, 1:m)
 
     mul!(work_arr, rsqrt(Σ), adjoint(Φ))
     U = positive_qrwoq!(work_arr)

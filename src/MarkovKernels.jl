@@ -54,12 +54,14 @@ export PSDTrait,
     IsPSD,
     IsNotPSD,
     psdcheck,
+    psdsimilar,
     convert_psd_eltype,
     SelfAdjoint,
     selfadjoint,
     rsqrt,
     lsqrt,
     stein,
+    stein!,
     schur_reduce
 
 include("distributions/distribution_generic.jl")
