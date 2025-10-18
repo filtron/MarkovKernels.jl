@@ -51,18 +51,38 @@ function stein(
     return Π
 end
 
-function stein(Σ::Cholesky, Φ::AbstractMatrix, Q)
+
+function stein(
+    Σ::Cholesky,
+    Φ::AbstractMatrix,
+    Q,
+    work_arr::AbstractMatrix = similar(Φ, sum(size(Φ)), size(Φ, 1)),
+)
     m, n = size(Φ)
-    work_arr = similar(Φ, n + m, m)
+    work_arr = view(work_arr, 1:(n+m), 1:m)
+    Π = psdsimilar(Σ, m)
+    return stein!(Π, Σ, Φ, Q, work_arr)
+end
+
+function stein!(
+    Π::Cholesky,
+    Σ::Cholesky,
+    Φ::AbstractMatrix,
+    Q,
+    work_arr::AbstractMatrix = similar(Φ, sum(size(Φ)), size(Φ, 1)),
+)
+    m, n = size(Φ)
+    work_arr = view(work_arr, 1:(n+m), 1:m)
 
     mul!(view(work_arr, 1:n, 1:m), rsqrt(Σ), adjoint(Φ))
     copyto!(view(work_arr, (n+1):(n+m), 1:m), rsqrt(Q))
 
     U = positive_qrwoq!(work_arr)
-    Π = Cholesky(UpperTriangular(copy(U)))
+    copy!(rsqrt(Π), UpperTriangular(U))
     return Π
 end
 
+# can not be made in-place because numbers are not mutable. 
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     m, n = size(Φ)
     work_arr = similar(Φ, n + m, m)
@@ -75,6 +95,7 @@ function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
     return Π
 end
 
+# can not be made in-place because numbers are not mutable. 
 function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::UniformScaling)
     return stein(Σ, Φ, Q.λ)
 end
