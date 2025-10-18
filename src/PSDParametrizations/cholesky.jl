@@ -51,7 +51,6 @@ function stein(
     return Π
 end
 
-
 function stein(
     Σ::Cholesky,
     Φ::AbstractMatrix,
