@@ -82,9 +82,15 @@ function stein!(
 end
 
 # can not be made in-place because numbers are not mutable. 
-function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
+function stein(
+    Σ::Cholesky,
+    Φ::Adjoint{<:Number,<:AbstractVector},
+    Q::Number,
+    work_arr::AbstractMatrix = similar(Φ, sum(size(Φ)), size(Φ, 1)),
+)
     m, n = size(Φ)
-    work_arr = similar(Φ, n + m, m)
+    work_arr = view(work_arr, 1:(n+m), 1:m)
+    #work_arr = similar(Φ, n + m, m)
 
     mul!(view(work_arr, 1:n, 1:m), rsqrt(Σ), adjoint(Φ))
     view(work_arr, (n+1):(n+m), 1:m) .= rsqrt(Q)
@@ -95,8 +101,13 @@ function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::Number)
 end
 
 # can not be made in-place because numbers are not mutable. 
-function stein(Σ::Cholesky, Φ::Adjoint{<:Number,<:AbstractVector}, Q::UniformScaling)
-    return stein(Σ, Φ, Q.λ)
+function stein(
+    Σ::Cholesky,
+    Φ::Adjoint{<:Number,<:AbstractVector},
+    Q::UniformScaling,
+    work_arr::AbstractMatrix = similar(Φ, sum(size(Φ)), size(Φ, 1)),
+)
+    return stein(Σ, Φ, Q.λ, work_arr)
 end
 
 function _schur_reduce(Π::Cholesky, C::AbstractMatrix)
