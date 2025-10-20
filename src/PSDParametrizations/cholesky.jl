@@ -90,8 +90,6 @@ function stein(
 )
     m, n = size(Φ)
     work_arr = view(work_arr, 1:(n+m), 1:m)
-    #work_arr = similar(Φ, n + m, m)
-
     mul!(view(work_arr, 1:n, 1:m), rsqrt(Σ), adjoint(Φ))
     view(work_arr, (n+1):(n+m), 1:m) .= rsqrt(Q)
 
@@ -110,16 +108,6 @@ function stein(
     return stein(Σ, Φ, Q.λ, work_arr)
 end
 
-# to be deleted (breaks htransform_and_likelihood?)
-function _schur_reduce(Π::Cholesky, C::AbstractMatrix)
-    m, n = size(C)
-    work_arr = similar(C, n + m, n + m)
-
-    S = psdsimilar(Π, m)
-    K = similar(adjoint(C))
-    Σ = psdsimilar(Π, n)
-    return _schur_reduce!(S, K, Σ, Π, C, work_arr)
-end
 
 function schur_reduce(
     Π::Cholesky,
@@ -220,36 +208,6 @@ function _schur_reduce!(
     copy!(K, Kadj)
 
     return S, K, Σ
-end
-
-# to be deleted (breaks htransform_and_likelihood ?)
-function _schur_reduce(Π::Cholesky, C::AbstractMatrix, R)
-    m, n = size(C)
-    work_arr = similar(C, n + m, n + m)
-
-    S = psdsimilar(Π, m)
-    K = similar(adjoint(C))
-    Σ = psdsimilar(Π, n)
-    return _schur_reduce!(S, K, Σ, Π, C, R, work_arr)
-end
-
-# to be deleted (breaks htransform_and_likelihood ?)
-function _schur_reduce(Π::Cholesky, C::Adjoint{<:Number,<:AbstractVector}, R::Number)
-    m, n = size(C)
-    work_arr = similar(C, n + m, n + m)
-
-    K = similar(adjoint(C))
-    Σ = psdsimilar(Π, n)
-    return _schur_reduce!(K, Σ, Π, C, R, work_arr)
-end
-
-# to be deleted (breaks htransform_and_likelihood ?)
-function _schur_reduce(
-    Π::Cholesky,
-    C::Adjoint{<:Number,<:AbstractVector},
-    R::UniformScaling,
-)
-    return _schur_reduce(Π, C, R.λ)
 end
 
 function schur_reduce(
@@ -390,11 +348,3 @@ function _schur_reduce!(
 )
     return _schur_reduce!(K, Σ, Π, C, R.λ, work_arr)
 end
-
-#=
-function schur_reduce(Π::Cholesky, C::AbstractMatrix, R)
-    S, K, Σ = _schur_reduce(Π, C, R)
-    K = rdiv!(K, lsqrt(S))
-    return S, K, Σ
-end
-=#
