@@ -74,7 +74,40 @@ function htransform_and_likelihood(
     logc, y, C = L
     T = eltype(y)
 
-    Rhat, Kbar, Qpost = _schur_reduce(Q, C, I)
+    work_arr = similar(C, sum(size(C)), sum(size(C)))
+    Rhat = psdsimilar(Q, size(C, 1))
+    Kbar = similar(adjoint(C))
+    Qpost = psdsimilar(Q, size(Q, 1))
+    Rhat, Kbar, Qpost = _schur_reduce!(Rhat, Kbar, Qpost, Q, C, I, work_arr)
+
+    L = lsqrt(Rhat)
+    yout = L \ (y - C * u)
+    Cout = L \ C * Φ
+    logcout = logc - _nscale(T) * 2 * logdet(L)
+
+    Φpost = Φ - Kbar * Cout
+    upost = u + Kbar * yout
+    μpost = AffineMap(Φpost, upost)
+
+    Kout = NormalKernel(μpost, Qpost)
+    Lout = LogQuadraticLikelihood(logcout, yout, Cout)
+
+    return Kout, Lout
+end
+
+function htransform_and_likelihood(
+    K::AffineHomoskedasticNormalKernel{TM,<:Cholesky},
+    L::MISOLogQuadraticLikelihood,
+) where {TM}
+    μ, Q = mean(K), covparam(K)
+    Φ, u = slope(μ), intercept(μ)
+    logc, y, C = L
+    T = eltype(y)
+
+    work_arr = similar(C, sum(size(C)), sum(size(C)))
+    Kbar = similar(adjoint(C))
+    Qpost = psdsimilar(Q, size(Q, 1))
+    Rhat, Kbar, Qpost = _schur_reduce!(Kbar, Qpost, Q, C, I, work_arr)
 
     L = lsqrt(Rhat)
     yout = L \ (y - C * u)

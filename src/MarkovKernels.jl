@@ -62,7 +62,8 @@ export PSDTrait,
     lsqrt,
     stein,
     stein!,
-    schur_reduce
+    schur_reduce,
+    schur_reduce!
 
 include("distributions/distribution_generic.jl")
 export AbstractDistribution, sample_type, sample_eltype
