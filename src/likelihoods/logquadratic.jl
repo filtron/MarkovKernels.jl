@@ -9,6 +9,10 @@ struct LogQuadraticLikelihood{A,B,C} <: AbstractLikelihood
     C::C
 end
 
+const SISOLogQuadraticLikelihood = LogQuadraticLikelihood{<:Number,<:Number,<:Number}
+const MISOLogQuadraticLikelihood =
+    LogQuadraticLikelihood{<:Number,<:Number,<:Adjoint{<:Number,<:AbstractVector}}
+
 Base.iterate(L::LogQuadraticLikelihood) = (L.logconst, Val(:y))
 Base.iterate(L::LogQuadraticLikelihood, ::Val{:y}) = (L.y, Val(:C))
 Base.iterate(L::LogQuadraticLikelihood, ::Val{:C}) = (L.C, Val(:done))
