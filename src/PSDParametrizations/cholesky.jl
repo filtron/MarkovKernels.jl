@@ -108,7 +108,6 @@ function stein(
     return stein(Σ, Φ, Q.λ, work_arr)
 end
 
-
 function schur_reduce(
     Π::Cholesky,
     C::AbstractMatrix,
