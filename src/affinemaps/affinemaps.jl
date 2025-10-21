@@ -11,6 +11,12 @@ include("affinecorrector.jl")
 include("base_overloads.jl")
 include("linearalgebra_overloads.jl")
 
+# this also includes LinearMap{T,<:Adjoint}, which is bad
+const MIMOAffineMap{T} = Union{
+    LinearMap{T,<:AbstractMatrix},
+    AffineMap{T,<:AbstractMatrix,<:AbstractVector},
+} where {T}
+
 eltype(::AbstractAffineMap{T}) where {T} = T
 
 """

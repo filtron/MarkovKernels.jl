@@ -23,31 +23,24 @@ struct ProbabilityVector{T,A} <: AbstractProbabilityVector{T}
     p::A
 end
 
-_normalize_vector!(v::AbstractVector) = ldiv!(sum(v), v)
-
 """
     ProbabilityVector(p::AbstractVector)
 
 Constructs a categorical distribution from the vector of probabilities p.
 """
-function ProbabilityVector(p::AbstractVector)
-    π = copy(p)
-    _normalize_vector!(π)
+function ProbabilityVector(p::AbstractVector, normalize = true)
+    if normalize
+        π = copy(p)
+        normalize!(π, 1)
+    else
+        π = p
+    end
     return ProbabilityVector{eltype(eachindex(π)),typeof(π)}(π)
 end
 
-probability_vector(C::ProbabilityVector) = C.p
-
-dim(C::ProbabilityVector) = 1
-
-function Base.copy!(Cdst::ProbabilityVector, Csrc::ProbabilityVector)
-    copy!(probability_vector(Cdst), probability_vector(Csrc))
-    return Cdst
-end
-
-Base.similar(C::ProbabilityVector) = ProbabilityVector(similar(probability_vector(C)))
-Base.isapprox(C1::ProbabilityVector, C2::ProbabilityVector, kwargs...) =
-    isapprox(probability_vector(C1), probability_vector(C2), kwargs...)
+probability_vector(d::ProbabilityVector) = d.p
+noutcomes(d::ProbabilityVector) = length(probability_vector(d))
+dim(d::ProbabilityVector) = 1
 
 function logpdf(C::ProbabilityVector, x)
     p = probability_vector(C)
@@ -64,7 +57,8 @@ function entropy(C::AbstractProbabilityVector)
     e = zero(float(eltype(p)))
     for i in eachindex(p)
         pi = p[i]
-        e = e - log(pi) * pi
+        e_incr = ifelse(iszero(pi), zero(pi), -log(pi) * pi)
+        e = e + e_incr
     end
     return e
 end
@@ -91,6 +85,24 @@ function rand(rng::AbstractRNG, C::AbstractProbabilityVector)
     p = probability_vector(C)
     at = AliasTable(p)
     return sample_type(C)(rand(rng, at))
+end
+
+function Base.copy!(Cdst::ProbabilityVector, Csrc::ProbabilityVector)
+    copy!(probability_vector(Cdst), probability_vector(Csrc))
+    return Cdst
+end
+
+Base.isapprox(C1::ProbabilityVector, C2::ProbabilityVector, kwargs...) =
+    isapprox(probability_vector(C1), probability_vector(C2), kwargs...)
+
+similar(d::ProbabilityVector{ST,VT}) where {ST,VT} = similar(d, eltype(VT), noutcomes(d))
+similar(d::ProbabilityVector{ST,VT}, m) where {ST,VT} = similar(d, eltype(VT), m)
+similar(d::ProbabilityVector, ::Type{T}) where {T} = similar(d, T, noutcomes(d))
+
+function similar(d::ProbabilityVector, ::Type{T}, m) where {T}
+    p = probability_vector(d)
+    pout = similar(p, T, m)
+    return ProbabilityVector(pout, false)
 end
 
 function Base.show(io::IO, C::ProbabilityVector)

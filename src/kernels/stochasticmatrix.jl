@@ -22,18 +22,18 @@ struct StochasticMatrix{A} <: AbstractStochasticMatrix
     P::A
 end
 
-function _normalize_matrix!(P::AbstractMatrix)
-    foreach(_normalize_vector!, eachcol(P))
-end
-
 """
 StochasticMatrix(P::AbstractMatrix)
 
 Constructs a stochastic matrix from the matrix of transition probabilities P.
 """
-function StochasticMatrix(P::AbstractMatrix)
-    Π = copy(P)
-    _normalize_matrix!(Π)
+function StochasticMatrix(P::AbstractMatrix, normalize = true)
+    if normalize
+        Π = copy(P)
+        foreach(Base.Fix2(normalize!, 1), eachcol(P))
+    else
+        Π = P
+    end
     return StochasticMatrix{typeof(Π)}(Π)
 end
 

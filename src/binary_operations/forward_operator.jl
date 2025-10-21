@@ -16,11 +16,21 @@ forward_operator(k::AffineDiracKernel, d::AbstractNormal) =
 forward_operator(k::AbstractMarkovKernel, d::AbstractDirac) = condition(k, mean(d))
 
 function forward_operator(k::StochasticMatrix, d::AbstractProbabilityVector)
-    π = probability_vector(d)
     P = probability_matrix(k)
-    πout = similar(π, size(P, 1))
+    dout = similar(d, size(P, 1))
+    return forward_operator!(dout, k, d)
+end
+
+function forward_operator!(
+    dout::ProbabilityVector,
+    k::StochasticMatrix,
+    d::AbstractProbabilityVector,
+)
+    π = probability_vector(d)
+    πout = probability_vector(dout)
+    P = probability_matrix(k)
     mul!(πout, P, π)
-    return ProbabilityVector(πout)
+    return dout
 end
 
 forward_operator(::IdentityKernel, d::AbstractDistribution) = d
