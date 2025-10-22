@@ -141,6 +141,7 @@ include("binary_operations/posterior.jl")
 include("binary_operations/algebra.jl")
 include("binary_operations/htransform.jl")
 export forward_operator,
+    forward_operator!,
     backward_operator,
     backward_operator!,
     compose,
