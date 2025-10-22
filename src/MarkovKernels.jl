@@ -13,6 +13,8 @@ import Base:
     length,
     size,
     log,
+    isequal,
+    isapprox,
     ==,
     similar,
     convert,

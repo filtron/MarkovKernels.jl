@@ -57,7 +57,7 @@
 
             N = Normal(μ, Σ)
 
-            @testset "MultivariateNormal | Unary | $(T) | " begin
+            @testset "MultivariateNormal | Unary | $(T) | $(cov_t)" begin
                 @test_nowarn repr(N)
 
                 @test sample_type(N) == typeof(mean(N))
