@@ -5,6 +5,11 @@ Abstract type for representing Normal distributed random vectors taking values i
 """
 abstract type AbstractNormal{ST} <: AbstractDistribution{ST} end
 
+const AbstractMultivariateNormal{ST} = AbstractNormal{ST} where {ST<:AbstractVector}
+const AbstractUnivariateNormal{ST} = AbstractNormal{ST} where {ST<:Number}
+
+mean_and_covparam(d::AbstractNormal) = Tuple(getfield(d, f) for f in fieldnames(typeof(d)))
+
 """
     Normal{ST,U,V}
 
@@ -39,87 +44,65 @@ end
 
 Normal(μ::Number, Σ::UniformScaling) = Normal(μ, Σ.λ)
 
+const CholeskyNormal{ST,MT,CT} = Normal{ST,MT,CT} where {ST,MT,CT<:Cholesky}
+
 # this needs to change to allow for heterogneous eltype in fields / sample_type
 const UnivariateNormal{T,V} =
     Union{Normal{V,V,V},Normal{T,T,V}} where {V<:Real,T<:Complex{V}}
 const IsotropicNormal{ST,MT,VT} = Normal{ST,MT,VT} where {VT<:UniformScaling}
 
-function Base.copy!(Ndst::A, Nsrc::A) where {T,U,V<:Cholesky,A<:Normal{T,U,V}}
-    copy!(mean(Ndst), mean(Nsrc))
-    if covparam(Ndst).uplo == covparam(Nsrc).uplo
-        copy!(covparam(Ndst).factors, covparam(Nsrc).factors)
-    else
-        copy!(covparam(Ndst).factors, adjoint(covparam(Nsrc).factors))
-    end
-    return Ndst
-end
-
-function Base.similar(N::Normal{T,U,V}) where {T,U,V<:Cholesky}
-    C = covparam(N)
-    return Normal(similar(mean(N)), Cholesky(similar(C.factors), C.uplo, C.info))
-end
-
-function Base.isapprox(
-    N1::Normal{T1,V1,<:Cholesky},
-    N2::Normal{T2,V2,<:Cholesky},
-    kwargs...,
-) where {T1,V1,T2,V2}
-    return isapprox(mean(N1), mean(N2); kwargs...) &&
-           isapprox(rsqrt(covparam(N1)), rsqrt(covparam(N2)); kwargs...)
-end
-
 """
-    dim(N::AbstractNormal)
+    mean(d::AbstractNormal)
 
-Returns the dimension of the Normal distribution N.
+Computes the mean vector of the Normal distribution d.
 """
-dim(N::Normal) = length(N.μ)
-
-"""
-    mean(N::AbstractNormal)
-
-Computes the mean vector of the Normal distribution N.
-"""
-mean(N::Normal) = N.μ
+mean(d::Normal) = mean_and_covparam(d)[1]
 """
     covparam(N::AbstractNormal)
 
-Returns the internal representation of the covariance matrix of the Normal distribution N.
+Returns the internal representation of the covariance matrix of the Normal distribution d.
 For computing the actual covariance matrix, use cov.
 """
-covparam(N::Normal) = N.Σ
+covparam(d::Normal) = mean_and_covparam(d)[2]
 
 """
-    cov(N::AbstractNormal)
+    dim(d::AbstractNormal)
 
-Computes the covariance matrix of the Normal distribution N.
+Returns the dimension of the Normal distribution d.
 """
-cov(N::Normal) = AbstractMatrix(covparam(N))
-cov(N::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = covparam(N)
-cov(N::UnivariateNormal) = covparam(N)
-cov(N::IsotropicNormal) = covparam(N)[1:dim(N), 1:dim(N)]
+dim(d::AbstractNormal) = length(mean(d))
 
 """
-    var(N::AbstractNormal)
-Computes the vector of marginal variances of the Normal distribution N.
+    cov(d::AbstractNormal)
+
+Computes the covariance matrix of the Normal distribution d.
 """
-var(N::AbstractNormal) = real(diag(cov(N)))
-var(N::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachcol(rsqrt(covparam(N))))
-var(N::UnivariateNormal) = cov(N)
-var(N::IsotropicNormal) = typeof(mean(N))(fill(covparam(N).λ, dim(N)))
+cov(d::AbstractMultivariateNormal) = AbstractMatrix(covparam(d))
+cov(d::AbstractUnivariateNormal) = covparam(d)
+cov(d::Normal{T,U,V}) where {T,U,V<:AbstractMatrix} = covparam(d)
+cov(d::IsotropicNormal) = covparam(d)[1:dim(d), 1:dim(d)]
 
 """
-    std(N::AbstractNormal)
-Computes the vector of marginal standard deviations of the Normal distribution N.
+    var(d::AbstractNormal)
+Computes the vector of marginal variances of the Normal distribution d.
 """
-std(N::AbstractNormal) = sqrt.(var(N))
+var(d::AbstractMultivariateNormal) = real(diag(cov(d)))
+var(d::AbstractUnivariateNormal) = cov(d)
+var(d::Normal{T,U,V}) where {T,U,V<:Cholesky} = map(norm_sqr, eachcol(rsqrt(covparam(d))))
+var(d::IsotropicNormal) = fill(covparam(d).λ, dim(d))
 
 """
-    residual(N::AbstractNormal, x::AbstractVector)
-
-Computes the whitened residual associated with the Normal distribution N and observed vector x.
+    std(d::AbstractNormal)
+Computes the vector of marginal standard deviations of the Normal distribution d.
 """
-residual(N::AbstractNormal, x) = lsqrt(covparam(N)) \ (x - mean(N))
+std(d::AbstractNormal) = sqrt.(var(d))
+
+"""
+    residual(d::AbstractNormal, x::AbstractVector)
+
+Computes the whitened residual associated with the Normal distribution d and observed vector x.
+"""
+residual(d::AbstractNormal, x) = lsqrt(covparam(d)) \ (x - mean(d))
 
 _nscale(T::Type{<:Real}) = T(0.5)
 _nscale(T::Type{<:Complex}) = one(real(T))
@@ -127,80 +110,115 @@ _nscale(T::Type{<:Complex}) = one(real(T))
 _logpiconst(T::Type{<:Real}) = log(T(2π))
 _logpiconst(T::Type{<:Complex}) = log(real(T)(π))
 
-function logpdf(N::AbstractNormal, x)
-    T = sample_eltype(N)
+function logpdf(d::AbstractNormal, x)
+    T = sample_eltype(d)
     return -_nscale(T) *
-           (dim(N) * _logpiconst(T) + real(logdet(covparam(N))) + norm_sqr(residual(N, x)))
+           (dim(d) * _logpiconst(T) + real(logdet(covparam(d))) + norm_sqr(residual(d, x)))
 end
 
-function logpdf(N::IsotropicNormal, x)
-    T = sample_eltype(N)
-    ld = dim(N) * log(covparam(N).λ)
-    return -_nscale(T) * (dim(N) * _logpiconst(T) + ld + norm_sqr(residual(N, x)))
-end
-
-"""
-    entropy(N::AbstractNormal)
-
-Computes the entropy of the Normal distribution N.
-"""
-function entropy(N::AbstractNormal)
-    T = sample_eltype(N)
-    _nscale(T) * (dim(N) * (_logpiconst(T) + one(real(T))) + real(logdet(covparam(N))))
-end
-
-function entropy(N::IsotropicNormal)
-    T = sample_eltype(N)
-    ld = dim(N) * log(covparam(N).λ)
-    _nscale(T) * (dim(N) * (_logpiconst(T) + one(real(T))) + ld)
+function logpdf(d::IsotropicNormal, x)
+    T = sample_eltype(d)
+    ld = dim(d) * log(covparam(d).λ)
+    return -_nscale(T) * (dim(d) * _logpiconst(T) + ld + norm_sqr(residual(d, x)))
 end
 
 """
-    kldivergence(N1::AbstractNormal, N2::AbstractNormal)
+    entropy(d::AbstractNormal)
 
-Computes the Kullback-Leibler divergence between the Normal distributions N1 and N2.
+Computes the entropy of the Normal distribution d.
 """
-function kldivergence(N1::AbstractNormal, N2::AbstractNormal)
-    T = promote_type(sample_eltype(N1), sample_eltype(N2))
-    root_ratio = lsqrt(covparam(N2)) \ lsqrt(covparam(N1))
+function entropy(d::AbstractNormal)
+    T = sample_eltype(d)
+    _nscale(T) * (dim(d) * (_logpiconst(T) + one(real(T))) + real(logdet(covparam(d))))
+end
+
+function entropy(d::IsotropicNormal)
+    T = sample_eltype(d)
+    ld = dim(d) * log(covparam(d).λ)
+    _nscale(T) * (dim(d) * (_logpiconst(T) + one(real(T))) + ld)
+end
+
+"""
+    kldivergence(d1::AbstractNormal, d2::AbstractNormal)
+
+Computes the Kullback-Leibler divergence between the Normal distributions d1 and d2.
+"""
+function kldivergence(d1::AbstractNormal, d2::AbstractNormal)
+    T = promote_type(sample_eltype(d1), sample_eltype(d2))
+    root_ratio = lsqrt(covparam(d2)) \ lsqrt(covparam(d1))
     _nscale(T) * (
-        norm_sqr(root_ratio) + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
+        norm_sqr(root_ratio) + norm_sqr(residual(d2, mean(d1))) - dim(d1) -
         real(T)(2) * real(logdet(root_ratio))
     )
 end
 
-function kldivergence(N1::IsotropicNormal, N2::IsotropicNormal)
-    T = promote_type(sample_eltype(N1), sample_eltype(N2))
-    root_ratio = lsqrt(covparam(N2)) \ lsqrt(covparam(N1))
-    root_ratio_norm_sqr = root_ratio.λ^2 * dim(N1)
-    root_ratio_ld = dim(N1) * log(root_ratio.λ)
+function kldivergence(d1::IsotropicNormal, d2::IsotropicNormal)
+    T = promote_type(sample_eltype(d1), sample_eltype(d2))
+    root_ratio = lsqrt(covparam(d2)) \ lsqrt(covparam(d1))
+    root_ratio_norm_sqr = root_ratio.λ^2 * dim(d1)
+    root_ratio_ld = dim(d1) * log(root_ratio.λ)
     _nscale(T) * (
-        root_ratio_norm_sqr + norm_sqr(residual(N2, mean(N1))) - dim(N1) -
+        root_ratio_norm_sqr + norm_sqr(residual(d2, mean(d1))) - dim(d1) -
         real(T)(2) * root_ratio_ld
     )
 end
 
-function rand(rng::AbstractRNG, N::AbstractNormal)
-    T = sample_eltype(N)
-    x = mean(N) + lsqrt(covparam(N)) * randn(rng, T, dim(N))
-    return sample_type(N)(x)
+function rand(rng::AbstractRNG, d::AbstractMultivariateNormal)
+    T = eltype(sample_type(d))
+    x = mean(d) + lsqrt(covparam(d)) * randn(rng, T, dim(d))
+    return sample_type(d)(x)
 end
 
-rand(rng::AbstractRNG, N::UnivariateNormal) =
-    mean(N) + lsqrt(covparam(N)) * randn(rng, sample_type(N))
+rand(rng::AbstractRNG, d::AbstractUnivariateNormal) =
+    mean(d) + lsqrt(covparam(d)) * randn(rng, sample_type(d))
 
-function Base.show(io::IO, N::Normal)
-    println(io, summary(N))
+function Base.copy!(ddst::CholeskyNormal, dsrc::CholeskyNormal)
+    μdst, Σdst = mean_and_covparam(ddst)
+    μsrc, Σsrc = mean_and_covparam(dsrc)
+    copy!(μdst, μsrc)
+    copy!(rsqrt(Σdst), rsqrt(Σsrc))
+    return ddst
+end
+
+#= 
+function Base.similar(d::CholeskyNormal)
+    C = covparam(d)
+    return Normal(similar(mean(d)), Cholesky(similar(C.factors), C.uplo, C.info))
+end
+=#
+
+similar(d::Normal) = similar(d, eltype(sample_type(d)), dim(d))
+similar(d::Normal, m) = similar(d, eltype(sample_type(d)), m)
+similar(d::Normal, ::Type{T}) where {T} = similar(d, T, dim(d))
+
+function similar(d::Normal, ::Type{T}, m) where {T}
+    μ, Σ = mean_and_covparam(d)
+    μ = similar(μ, T, m)
+    Σ = psdsimilar(Σ, T, m)
+    return Normal(μ, Σ)
+end
+
+isequal(d1::CholeskyNormal, d2::CholeskyNormal) =
+    mean(d1) == mean(d2) && rsqrt(covparam(d1)) == rsqrt(covparam(d2))
+==(d1::CholeskyNormal, d2::CholeskyNormal) = isequal(d1, d2)
+
+function Base.isapprox(d1::CholeskyNormal, d2::CholeskyNormal, kwargs...)
+    return isapprox(mean(d1), mean(d2); kwargs...) &&
+           isapprox(rsqrt(covparam(d1)), rsqrt(covparam(d2)); kwargs...)
+end
+
+function Base.show(io::IO, d::AbstractMultivariateNormal)
+    println(io, summary(d))
     print(io, "μ = ")
-    show(io, (N.μ))
+    show(io, mean(d))
     print(io, "\nΣ = ")
-    show(io, N.Σ)
+    show(io, covparam(d))
 end
 
-function Base.show(io::IO, N::UnivariateNormal)
-    println(io, summary(N))
+function Base.show(io::IO, d::AbstractUnivariateNormal)
+    println(io, summary(d))
     print(io, "μ = ")
-    show(io, (N.μ))
+    show(io, mean(d))
     print(io, "\nσ² = ")
-    show(io, N.Σ)
+    show(io, covparam(d))
 end

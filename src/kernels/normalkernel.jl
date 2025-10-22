@@ -60,6 +60,9 @@ const NonlinearNormalKernel{TM,TC} = NormalKernel{<:Heteroskedastic,TM,TC} where
 const AffineIsotropicNormalKernel{TM,TC} =
     NormalKernel{<:Homoskedastic,TM,TC} where {TM<:AbstractAffineMap,TC<:UniformScaling}
 
+const MIMOAffineNormalKernel{TM,TC} =
+    NormalKernel{<:Homoskedastic,TM,TC} where {TM<:MIMOAffineMap,TC}
+
 """
     mean(k::AbstractNormalKernel)
 

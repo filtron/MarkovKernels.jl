@@ -16,6 +16,11 @@ convert_psd_eltype(::Type{T}, A::ComplexHermitian) where {T<:Complex} =
 convert_psd_eltype(::Type{T}, A::RealSymmetric) where {T<:Real} =
     convert(AbstractMatrix{T}, A)
 
+function psdsimilar(A::SelfAdjoint, ::Type{T}, d) where {T}
+    A = similar(A, T, d, d)
+    return selfadjoint!(A)
+end
+
 """
     selfadjoint!(A)
 

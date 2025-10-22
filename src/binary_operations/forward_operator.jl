@@ -11,16 +11,78 @@ function forward_operator(k::AbstractMarkovKernel, d) end
 
 forward_operator(k::AffineHomoskedasticNormalKernel, d::AbstractNormal) =
     Normal(mean(k)(mean(d)), stein(covparam(d), mean(k), covparam(k)))
+
+function forward_operator(
+    k::MIMOAffineNormalKernel,
+    d::CholeskyNormal,
+    work_arr = similar(slope(mean(k)), sum(size(slope(mean(k)))), size(slope(mean(k)), 1)),
+)
+    a = mean(k)
+    dout = similar(d, size(slope(a), 1))
+
+    return forward_operator!(dout, k, d, work_arr)
+end
+
+function forward_operator!(
+    dout::CholeskyNormal,
+    k::MIMOAffineNormalKernel,
+    d::CholeskyNormal,
+    work_arr = similar(slope(mean(k)), sum(size(slope(mean(k)))), size(slope(mean(k)), 1)),
+)
+    μout, Σout = mean(dout), covparam(dout)
+    a, Q = mean_and_covparam(k)
+    μ, Σ = mean_and_covparam(d)
+    a(μout, μ)
+    stein!(Σout, Σ, slope(a), Q, work_arr)
+    return dout
+end
+
 forward_operator(k::AffineDiracKernel, d::AbstractNormal) =
     Normal(mean(k)(mean(d)), stein(covparam(d), mean(k)))
+
+function forward_operator(
+    k::AffineDiracKernel,
+    d::CholeskyNormal,
+    work_arr = similar(slope(mean(k)), reverse(size(slope(mean(k))))),
+)
+    a = mean(k)
+    m, n = size(slope(a))
+    dout = similar(d, m)
+    return forward_operator!(dout, k, d)
+end
+
+function forward_operator!(
+    dout::CholeskyNormal,
+    k::AffineDiracKernel,
+    d::CholeskyNormal,
+    work_arr = similar(slope(mean(k)), reverse(size(slope(mean(k))))),
+)
+    μout, Σout = mean(dout), covparam(dout)
+    a = mean(k)
+    μ, Σ = mean_and_covparam(d)
+    a(μout, μ)
+    stein!(Σout, Σ, slope(a), work_arr)
+    return dout
+end
+
 forward_operator(k::AbstractMarkovKernel, d::AbstractDirac) = condition(k, mean(d))
 
 function forward_operator(k::StochasticMatrix, d::AbstractProbabilityVector)
-    π = probability_vector(d)
     P = probability_matrix(k)
-    πout = similar(π, size(P, 1))
+    dout = similar(d, size(P, 1))
+    return forward_operator!(dout, k, d)
+end
+
+function forward_operator!(
+    dout::ProbabilityVector,
+    k::StochasticMatrix,
+    d::AbstractProbabilityVector,
+)
+    π = probability_vector(d)
+    πout = probability_vector(dout)
+    P = probability_matrix(k)
     mul!(πout, P, π)
-    return ProbabilityVector(πout)
+    return dout
 end
 
 forward_operator(::IdentityKernel, d::AbstractDistribution) = d

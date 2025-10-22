@@ -9,7 +9,7 @@
     cov_types = (HermOrSym, Cholesky)
 
     for T in etys
-        @testset "UvNormal | $(T)" begin
+        @testset "UnivariateNormal | $(T)" begin
             m1 = randn(T)
             l1 = randn(T)
             v1 = abs2(l1)
@@ -57,7 +57,7 @@
 
             N = Normal(μ, Σ)
 
-            @testset "Normal | Unary | $(T) | " begin
+            @testset "MultivariateNormal | Unary | $(T) | $(cov_t)" begin
                 @test_nowarn repr(N)
 
                 @test sample_type(N) == typeof(mean(N))
@@ -87,6 +87,42 @@
                 @test residual(N, x) ≈ cholesky(V1p).L \ (x - μ)
                 @test logpdf(N, x) ≈ _logpdf(T, μ, V1p, x)
                 @test entropy(N) ≈ _entropy(T, μ, V1p)
+
+                @test eltype(var(N)) <: Real
+                @test eltype(std(N)) <: Real
+                @test eltype(logpdf(N, x)) <: Real
+                @test eltype(entropy(N)) <: Real
+
+                @test length(rand(N)) == dim(N)
+                @test eltype(rand(N)) == T
+                @test typeof(rand(N)) == sample_type(N)
+                @test eltype(rand(N)) == sample_eltype(N)
+            end
+
+            x = randn(T, n)
+            μ = randn(T, n)
+            λ = exp(randn(real(T)))
+            Σ = λ*I
+            N = Normal(μ, Σ)
+
+            @testset "IsotropicNormal | Unary | $(T)" begin
+                @test_nowarn repr(N)
+                @test sample_type(N) == typeof(mean(N))
+
+                @test !(copy(N) === N)
+                @test copy(N) == N
+                @test typeof(copy(N)) === typeof(N)
+
+                @test N == N
+                @test mean(N) == μ
+                @test cov(N) ≈ Σ
+                @test covparam(N) == Σ
+                @test all(x -> isapprox(x, λ), var(N))
+                @test all(x -> isapprox(x, sqrt(λ)), std(N))
+
+                @test residual(N, x) ≈ lsqrt(Σ) \ (x - μ)
+                @test logpdf(N, x) ≈ _logpdf(T, μ, Σ[1:n, 1:n], x)
+                @test entropy(N) ≈ _entropy(T, μ, Σ[1:n, 1:n])
 
                 @test eltype(var(N)) <: Real
                 @test eltype(std(N)) <: Real

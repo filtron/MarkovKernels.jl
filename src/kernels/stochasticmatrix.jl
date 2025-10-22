@@ -22,18 +22,18 @@ struct StochasticMatrix{A} <: AbstractStochasticMatrix
     P::A
 end
 
-function _normalize_matrix!(P::AbstractMatrix)
-    foreach(_normalize_vector!, eachcol(P))
-end
-
 """
 StochasticMatrix(P::AbstractMatrix)
 
 Constructs a stochastic matrix from the matrix of transition probabilities P.
 """
-function StochasticMatrix(P::AbstractMatrix)
-    Π = copy(P)
-    _normalize_matrix!(Π)
+function StochasticMatrix(P::AbstractMatrix, normalize = true)
+    if normalize
+        Π = copy(P)
+        foreach(Base.Fix2(normalize!, 1), eachcol(P))
+    else
+        Π = P
+    end
     return StochasticMatrix{typeof(Π)}(Π)
 end
 
@@ -49,6 +49,33 @@ using the random number generator rng.
 """
 rand(rng::AbstractRNG, K::AbstractStochasticMatrix, x::Int) = rand(rng, condition(K, x))
 rand(K::AbstractStochasticMatrix, x::Int) = rand(Random.default_rng(), K, x)
+
+eltype(k::AbstractStochasticMatrix) = eltype(probability_matrix(k))
+
+size(k::AbstractStochasticMatrix) = size(probability_matrix(k))
+size(k::AbstractStochasticMatrix, i) = size(k)[i]
+
+function Base.copy!(kdst::AbstractStochasticMatrix, ksrc::AbstractStochasticMatrix)
+    copy!(probability_matrix(kdst), probability_matrix(ksrc))
+    return kdst
+end
+
+similar(k::AbstractStochasticMatrix) = similar(k, eltype(k), size(k))
+similar(k::AbstractStochasticMatrix, m, n) = similar(k, (m, n))
+similar(k::AbstractStochasticMatrix, dims::NTuple{2,IDXT}) where {IDXT} =
+    similar(k, eltype(k), dims)
+similar(k::AbstractStochasticMatrix, ::Type{T}) where {T} = similar(k, T, size(k))
+similar(k::AbstractStochasticMatrix, ::Type{T}, m, n) where {T} = similar(k, T, (m, n))
+
+function similar(
+    k::AbstractStochasticMatrix,
+    ::Type{T},
+    dims::NTuple{2,IDXT},
+) where {T,IDXT}
+    P = probability_matrix(k)
+    Pout = similar(P, T, dims)
+    return StochasticMatrix(Pout, false)
+end
 
 function Base.show(io::IO, K::AbstractStochasticMatrix)
     println(io, summary(K))

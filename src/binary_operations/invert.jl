@@ -23,21 +23,49 @@ function invert(N::AbstractNormal, K::AffineDiracKernel)
     return Nout, Kout
 end
 
-function invert(C::ProbabilityVector, K::AbstractStochasticMatrix)
-    π = probability_vector(C)
-    P = probability_matrix(K)
+#=
+function invert(d::ProbabilityVector, k::AbstractStochasticMatrix)
+    π = probability_vector(d)
+    P = probability_matrix(k)
 
     πout = similar(π, size(P, 1))
     πout = mul!(πout, P, π)
-    Cout = ProbabilityVector(πout)
+    dout = ProbabilityVector(πout)
 
     Pout = similar(adjoint(P))
     for i in axes(Pout, 1), j in axes(Pout, 2)
         Pout[i, j] = P[j, i] * π[i] / πout[j]
     end
-    Kout = StochasticMatrix(Pout)
+    kout = StochasticMatrix(Pout)
 
-    return Cout, Kout
+    return dout, kout
+end
+=#
+
+function invert(d::ProbabilityVector, k::AbstractStochasticMatrix)
+    P = probability_matrix(k)
+    dout = similar(d, size(k, 1))
+    kout = similar(k, reverse(size(k)))
+    return invert!(dout, kout, d, k)
+end
+
+# we can destroy k here 
+function invert!(
+    dout::ProbabilityVector,
+    kout::AbstractStochasticMatrix,
+    d::ProbabilityVector,
+    k::AbstractStochasticMatrix,
+)
+    dout = forward_operator!(dout, k, d)
+
+    π = probability_vector(d)
+    πout = probability_vector(dout)
+    P = probability_matrix(k)
+    Pout = probability_matrix(kout)
+    for i in axes(Pout, 1), j in axes(Pout, 2)
+        Pout[i, j] = P[j, i] * π[i] / πout[j]
+    end
+    return dout, kout
 end
 
 invert(D::AbstractDistribution, K::IdentityKernel) = D, K
