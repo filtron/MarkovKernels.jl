@@ -12,18 +12,16 @@ function forward_operator(k::AbstractMarkovKernel, d) end
 forward_operator(k::AffineHomoskedasticNormalKernel, d::AbstractNormal) =
     Normal(mean(k)(mean(d)), stein(covparam(d), mean(k), covparam(k)))
 
-
 function forward_operator(
     k::MIMOAffineNormalKernel,
     d::CholeskyNormal,
     work_arr = similar(slope(mean(k)), sum(size(slope(mean(k)))), size(slope(mean(k)), 1)),
 )
-    a = mean(k)    
+    a = mean(k)
     dout = similar(d, size(slope(a), 1))
-    
+
     return forward_operator!(dout, k, d, work_arr)
 end
-
 
 function forward_operator!(
     dout::CholeskyNormal,
@@ -38,7 +36,6 @@ function forward_operator!(
     stein!(Σout, Σ, slope(a), Q, work_arr)
     return dout
 end
-
 
 forward_operator(k::AffineDiracKernel, d::AbstractNormal) =
     Normal(mean(k)(mean(d)), stein(covparam(d), mean(k)))
